@@ -59,7 +59,7 @@ export function Sky() {
       {/* Sun with rays, rising behind the product window */}
       <motion.div
         style={reduce ? undefined : { y: rise }}
-        className="absolute bottom-[-4%] left-1/2 h-[min(80vw,720px)] w-[min(80vw,720px)] -translate-x-1/2 sm:bottom-[-2%]"
+        className="absolute left-1/2 top-full h-[min(84vw,760px)] w-[min(84vw,760px)] -translate-x-1/2 -translate-y-[58%] md:-translate-y-[60%]"
       >
         {/* Soft glow */}
         <div className="animate-rays absolute inset-[-30%] rounded-full bg-[radial-gradient(circle,rgba(242,193,78,0.42)_0%,rgba(242,193,78,0.16)_32%,rgba(242,193,78,0)_62%)]" />

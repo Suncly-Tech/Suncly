@@ -1,0 +1,359 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------ */
+/* Brand tokens                                                        */
+/* ------------------------------------------------------------------ */
+@theme {
+  --color-*: initial;
+  --color-sky: #3461d1;
+  --color-sky-deep: #1d3a97;
+  --color-sky-soft: #5f86e6;
+  --color-sun: #f2c14e;
+  --color-ink: #16171c;
+  --color-ink-soft: #5b5e6b;
+  --color-ink-mute: #8a8d99;
+  --color-cream: #fbf6ec;
+  --color-cream-deep: #f1e9d8;
+  --color-paper: #ffffff;
+  --color-signal: #e8662b;
+  --color-pass: #1f7a4d;
+  --color-partial: #b2730e;
+  --color-fail: #c2371f;
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  --font-display: var(--font-instrument-serif), "Instrument Serif", Georgia, serif;
+  --font-sans: var(--font-manrope), "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --radius-*: initial;
+  --radius-none: 0;
+  --radius-full: 9999px;
+  --radius-control: 12px;
+  --radius-card: 24px;
+
+  --shadow-*: initial;
+  --shadow-none: none;
+  --shadow-raised: 0 32px 64px -24px rgb(22 23 28 / 0.35), 0 2px 0 0 rgb(22 23 28 / 0.04);
+
+  --breakpoint-*: initial;
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+  --breakpoint-xl: 80rem;
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ------------------------------------------------------------------ */
+/* Base                                                                */
+/* ------------------------------------------------------------------ */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+
+  body {
+    background: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 17px;
+    line-height: 1.6;
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background: var(--color-sun);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-sky);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  code,
+  pre,
+  kbd {
+    font-family: var(--font-mono);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Type scale: display 72 / 56 / 40, headings 28 / 20, body 17, small 14 */
+/* ------------------------------------------------------------------ */
+@utility text-display-xl {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 40px;
+  line-height: 1.02;
+  letter-spacing: -0.015em;
+  @media (min-width: 40rem) {
+    font-size: 56px;
+  }
+  @media (min-width: 64rem) {
+    font-size: 72px;
+  }
+}
+
+@utility text-display-lg {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 40px;
+  line-height: 1.05;
+  letter-spacing: -0.012em;
+  @media (min-width: 40rem) {
+    font-size: 56px;
+  }
+}
+
+@utility text-display-md {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 40px;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+}
+
+@utility text-heading-lg {
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+@utility text-heading-md {
+  font-size: 20px;
+  line-height: 1.3;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+@utility text-body {
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+@utility text-small {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+@utility text-eyebrow {
+  font-size: 14px;
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ------------------------------------------------------------------ */
+/* Layout                                                              */
+/* ------------------------------------------------------------------ */
+@utility container-site {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: 16px;
+  @media (min-width: 40rem) {
+    padding-inline: 24px;
+  }
+  @media (min-width: 64rem) {
+    padding-inline: 32px;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Buttons                                                             */
+/* ------------------------------------------------------------------ */
+@utility btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 24px;
+  border-radius: var(--radius-control);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 200ms var(--ease-out-soft),
+    color 200ms var(--ease-out-soft),
+    transform 200ms var(--ease-out-soft),
+    box-shadow 200ms var(--ease-out-soft);
+}
+
+@utility btn-primary {
+  background: var(--color-sun);
+  color: var(--color-ink);
+  border-radius: 9999px;
+  box-shadow: 0 1px 0 rgb(22 23 28 / 0.08);
+  &:hover {
+    background: var(--color-signal);
+    color: var(--color-paper);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px -6px rgb(232 102 43 / 0.5);
+  }
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+@utility btn-ghost {
+  background: transparent;
+  color: currentColor;
+  padding-inline: 12px;
+  & svg {
+    transition: transform 200ms var(--ease-out-soft);
+  }
+  &:hover svg {
+    transform: translateX(3px);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* The // motif                                                        */
+/* ------------------------------------------------------------------ */
+@utility cuts-bullet {
+  position: relative;
+  padding-left: 28px;
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.45em;
+    width: 18px;
+    height: 0.9em;
+    background: linear-gradient(
+      100deg,
+      transparent 0 20%,
+      currentColor 20% 36%,
+      transparent 36% 56%,
+      currentColor 56% 72%,
+      transparent 72%
+    );
+    opacity: 0.85;
+  }
+}
+
+/* Hairline that shows once the nav has scrolled */
+@utility hairline-b {
+  box-shadow: inset 0 -1px 0 rgb(22 23 28 / 0.1);
+}
+
+/* ------------------------------------------------------------------ */
+/* Keyframes used by the sky, terminal and loading states              */
+/* ------------------------------------------------------------------ */
+@keyframes drift-slow {
+  from {
+    transform: translate3d(-4%, 0, 0);
+  }
+  to {
+    transform: translate3d(4%, 0, 0);
+  }
+}
+
+@keyframes drift-slower {
+  from {
+    transform: translate3d(3%, 0, 0);
+  }
+  to {
+    transform: translate3d(-3%, 0, 0);
+  }
+}
+
+@keyframes rays-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes caret-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes cuts-run {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 36px 0;
+  }
+}
+
+@utility animate-drift-slow {
+  animation: drift-slow 38s ease-in-out infinite alternate;
+}
+@utility animate-drift-slower {
+  animation: drift-slower 52s ease-in-out infinite alternate;
+}
+@utility animate-rays {
+  animation: rays-breathe 9s ease-in-out infinite;
+  transform-origin: center;
+}
+@utility animate-caret {
+  animation: caret-blink 1s steps(1) infinite;
+}
+
+/* Loading bar built from the // motif */
+@utility cuts-loading {
+  height: 10px;
+  width: 72px;
+  border-radius: 2px;
+  background-image: linear-gradient(
+    100deg,
+    transparent 0 25%,
+    currentColor 25% 40%,
+    transparent 40% 60%,
+    currentColor 60% 75%,
+    transparent 75%
+  );
+  background-size: 36px 100%;
+  animation: cuts-run 900ms linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-drift-slow,
+  .animate-drift-slower,
+  .animate-rays,
+  .animate-caret,
+  .cuts-loading {
+    animation: none !important;
+  }
+}

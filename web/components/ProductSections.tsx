@@ -9,8 +9,8 @@ export function ProductSections() {
   return (
     <section id="product" className="scroll-mt-20 bg-cream pb-24 md:pb-32" aria-labelledby="product-heading">
       <div className="container-site">
-        <SectionLabel>
-          <span id="product-heading">{product.label}</span>
+        <SectionLabel as="h2" id="product-heading">
+          {product.label}
         </SectionLabel>
 
         <div className="mt-8 flex flex-col gap-6 md:gap-8">
@@ -20,7 +20,7 @@ export function ProductSections() {
             return (
               <Reveal key={s.number} as="article">
                 <div
-                  className={`grid items-center gap-8 rounded-card bg-paper p-6 ring-1 ring-ink/5 md:p-10 lg:grid-cols-2 lg:gap-14 lg:p-14 ${
+                  className={`grid grid-cols-1 items-center gap-8 rounded-card bg-paper p-6 ring-1 ring-ink/5 md:p-10 lg:grid-cols-2 lg:gap-14 lg:p-14 ${
                     flip ? "lg:[&>*:first-child]:order-2" : ""
                   }`}
                 >

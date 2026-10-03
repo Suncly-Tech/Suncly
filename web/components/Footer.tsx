@@ -18,13 +18,13 @@ export function Footer() {
               <h2 className="text-small font-semibold uppercase tracking-[0.08em] text-paper/60">
                 {group.title}
               </h2>
-              <ul className="mt-4 flex flex-col gap-3">
+              <ul className="mt-3 flex flex-col gap-1.5">
                 {group.links.map((link) => (
                   <li key={link.label} className="text-[15px]">
                     {link.href ? (
                       <Link
                         href={link.href}
-                        className="text-paper/85 transition-colors duration-200 hover:text-sun"
+                        className="inline-block py-1 text-paper/85 transition-colors duration-200 hover:text-sun"
                       >
                         {link.label}
                       </Link>

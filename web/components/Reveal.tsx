@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { m, useReducedMotion } from "motion/react";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -13,7 +13,7 @@ type Props = {
 /** Fade + 12px rise, once, when the element enters the viewport. Off under reduced motion. */
 export function Reveal({ children, className = "", delay = 0, as = "div" }: Props) {
   const reduce = useReducedMotion();
-  const Tag = motion[as];
+  const Tag = m[as];
   if (reduce) {
     const Plain = as;
     return <Plain className={className}>{children}</Plain>;

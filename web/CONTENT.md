@@ -155,7 +155,10 @@ JSON sample — `ILLUSTRATIVE`:
     { "path": "capabilities.streaming", "result": "partial" },
     { "path": "capabilities.pushNotifications", "result": "fail" }
   ],
-  "stress": { "runs": 1248, "adversarial": 312, "crashes": 0, "timeouts": 3 },
+  "stress": {
+    "runs": 1248, "adversarial": 312,
+    "crashes": 0, "timeouts": 3
+  },
   "signature": { "alg": "ed25519", "value": "…" }
 }
 ```

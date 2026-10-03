@@ -24,12 +24,13 @@ for (const width of widths) {
   await page.goto(base + "/", { waitUntil: "networkidle" });
   // Scroll through so whileInView reveals have fired, then return to top.
   const height = await page.evaluate(() => document.body.scrollHeight);
-  for (let y = 0; y < height; y += 600) {
-    await page.evaluate((v) => window.scrollTo(0, v), y);
-    await page.waitForTimeout(60);
+  for (let y = 0; y < height; y += 500) {
+    await page.evaluate((v) => window.scrollTo({ top: v, behavior: "instant" }), y);
+    await page.waitForTimeout(80);
   }
-  await page.evaluate(() => window.scrollTo(0, 0));
-  await page.waitForTimeout(700);
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+  // Let the terminal finish typing and streaming before the capture.
+  await page.waitForTimeout(9000);
   await page.screenshot({ path: `${outDir}home-${width}.png`, fullPage: true });
 
   if (width < 768) {

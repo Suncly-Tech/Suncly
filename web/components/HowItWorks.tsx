@@ -12,7 +12,7 @@ export function HowItWorks() {
     >
       <div className="container-site">
         <SectionHeader label={howItWorks.label} headline={howItWorks.headline} />
-        <div className="mt-12 grid items-start gap-12 lg:mt-16 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
+        <div className="mt-12 grid grid-cols-1 items-start gap-12 lg:mt-16 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
           <ol className="flex flex-col gap-8">
             {howItWorks.steps.map((step, i) => (
               <Reveal key={step.title} as="li" delay={i * 0.08}>

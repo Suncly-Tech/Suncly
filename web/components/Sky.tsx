@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
+import { m, useReducedMotion, useScroll, useTransform } from "motion/react";
 
 /**
  * Hand-built sky for the hero: gradient, two drifting cloud layers, and the
@@ -57,9 +57,9 @@ export function Sky() {
       </svg>
 
       {/* Sun with rays, rising behind the product window */}
-      <motion.div
+      <m.div
         style={reduce ? undefined : { y: rise }}
-        className="absolute left-1/2 top-full h-[min(84vw,760px)] w-[min(84vw,760px)] -translate-x-1/2 -translate-y-[58%] md:-translate-y-[60%]"
+        className="absolute left-1/2 top-full h-[min(130vw,760px)] w-[min(130vw,760px)] -translate-x-1/2 -translate-y-[82%] md:h-[min(84vw,760px)] md:w-[min(84vw,760px)] md:-translate-y-[60%]"
       >
         {/* Soft glow */}
         <div className="animate-rays absolute inset-[-30%] rounded-full bg-[radial-gradient(circle,rgba(242,193,78,0.42)_0%,rgba(242,193,78,0.16)_32%,rgba(242,193,78,0)_62%)]" />
@@ -86,7 +86,7 @@ export function Sky() {
           </defs>
           <circle cx="60" cy="60" r="44" fill="#F2C14E" mask="url(#sky-cuts)" />
         </svg>
-      </motion.div>
+      </m.div>
     </div>
   );
 }

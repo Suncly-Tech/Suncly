@@ -7,8 +7,8 @@ export function ProblemStrip() {
   return (
     <section className="bg-cream py-24 md:py-32" aria-labelledby="problem-heading">
       <div className="container-site">
-        <SectionLabel>
-          <span id="problem-heading">{problem.label}</span>
+        <SectionLabel as="h2" id="problem-heading">
+          {problem.label}
         </SectionLabel>
         <ul className="mt-8 grid gap-4 md:grid-cols-3 md:gap-6">
           {problem.cards.map((card, i) => (

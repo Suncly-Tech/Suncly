@@ -124,7 +124,7 @@ make Suncly approve less, never more.
 - Owns concurrency limits, retries, timeouts and the cost budget per
   attestation.
 - Runs stateless workers that pull from a queue and scale horizontally. The
-  queue starts as a Postgres-backed job table; a real queue is added only when
+  queue starts as a D1-backed job table; a real queue is added only when
   needed (schema §7).
 - Tracks `attestation.cost_total` against `attestation.budget_limit` and stops
   enqueuing runs when `cost_total` reaches `budget_limit`. The attestation then
@@ -503,8 +503,8 @@ From schema §7:
 | Concern | Choice |
 |---|---|
 | Language | Python. The schema's reason is that it has the most mature A2A SDK. Whether that SDK supports A2A protocol version 1.0 is unconfirmed (TODO: verify SDK support, A2A-T7). |
-| Storage | Postgres for tables, object storage for transcripts. |
-| Queue | A Postgres-backed job table first; a real queue only when needed ([OQ-D8](DATA_MODEL.md#open-questions)). |
+| Storage | Cloudflare D1 for tables, R2 object storage for transcripts. |
+| Queue | A D1-backed job table first; a real queue only when needed ([OQ-D8](DATA_MODEL.md#open-questions)). |
 | Signing | Asymmetric signatures over the canonicalized attestation. |
 | Models | Customers bring their own keys. The judge model is pinned by version. |
 

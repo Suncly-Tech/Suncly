@@ -292,7 +292,7 @@ The database does not check these; the backend must.
 - `updated_at` is set on every update of `organizations`, `users` and `agents`.
 - An attestation is issued only for a `completed` run.
 - `Authorization` headers, API keys and cookies are removed from `http_exchanges` rows before saving.
-- The response body is cut at the size limit and `body_truncated` is set to `true`.
+- The response body is cut at the size limit and `body_truncated` is set to `1`.
 - `card_snapshots`, `check_results`, `http_exchanges` and `audit_log` are never updated, only inserted into.
 - Row visibility per organization: every query filters by `organization_id`. The database has no row-level security.
 - Large response bodies: D1 limits the size of a row, so bodies are truncated at the application's size limit. If full bodies are needed later, store them in R2 and keep only a reference here.

@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: lint, typecheck, test (${{ matrix.os }}, py${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python: ["3.12", "3.13", "3.14"]
+        include:
+          - os: windows-latest
+            python: "3.12"
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - name: Install
+        run: python tasks.py install
+      - name: Lint
+        run: python tasks.py lint
+      - name: Type-check
+        run: python tasks.py typecheck
+      - name: Test
+        run: python tasks.py test
+
+  database:
+    name: database tests (Postgres 17)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: suncly
+          POSTGRES_PASSWORD: suncly-ci-only
+          POSTGRES_DB: suncly
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U suncly -d suncly"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      DATABASE_URL: postgresql://suncly:suncly-ci-only@localhost:5432/suncly
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: python tasks.py install
+      - name: Apply the migration with psql
+        run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/migrations/0001_initial_schema.sql
+      - name: Database and store tests
+        run: python tasks.py test

@@ -45,6 +45,10 @@ htmlcov/
 *.pem
 *.key
 
+# Suncly output and local state
+suncly-reports/
+.suncly/
+
 # Editors and operating systems
 .idea/
 .vscode/

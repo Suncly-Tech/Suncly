@@ -100,6 +100,7 @@ implementation develops.
 | [docs/POLICY.md](docs/POLICY.md) | Risk levels, approval rules, and when a human is required. |
 | [docs/DECISIONS.md](docs/DECISIONS.md) | The non-negotiable rules, as decision records. |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | The six build stages, with a definition of done for each. |
+| [db/README.md](db/README.md) | What the migration enforces, and which open questions it leaves open. |
 
 **How to read these documents.** Where a document and
 [SCHEMA.md](SCHEMA.md) disagree, the schema wins. Each document ends with its
@@ -114,6 +115,7 @@ specification are marked `TODO: verify against spec`.
 ├── README.md
 ├── SCHEMA.md                  Architecture schema (source of truth)
 ├── docs/                      Architecture documentation
+├── db/                        Postgres schema for the seven entities (stage 3)
 └── src/suncly/                Package skeleton: one placeholder per component, no logic yet
     ├── cli.py                 CLI (stage 1)
     ├── api.py                 HTTP API (stage 5)

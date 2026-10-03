@@ -1,9 +1,10 @@
 // Minimal static server for the exported site, behaving like Cloudflare Pages / Vercel:
 // clean URLs (/docs -> docs.html), index.html for directories, 404.html, and
-// immutable caching for hashed assets. Usage: node scripts/serve.mjs [port]
+// immutable caching for hashed assets, gzip for text. Usage: node scripts/serve.mjs [port]
 import { createServer } from "node:http";
 import { createReadStream, existsSync, statSync } from "node:fs";
 import { extname, join, normalize } from "node:path";
+import { createGzip } from "node:zlib";
 
 const port = Number(process.argv[2] ?? 3100);
 const root = new URL("../out/", import.meta.url).pathname;
@@ -47,6 +48,12 @@ createServer((req, res) => {
   headers["Cache-Control"] = file.includes("/_next/static/")
     ? "public, max-age=31536000, immutable"
     : "public, max-age=0, must-revalidate";
+  const compressible = /^(text\/|application\/(json|xml|javascript|manifest))/.test(headers["Content-Type"]) || ext === ".svg";
+  const gzip = compressible && /\bgzip\b/.test(req.headers["accept-encoding"] ?? "");
+  if (gzip) headers["Content-Encoding"] = "gzip";
+  headers["Vary"] = "Accept-Encoding";
   res.writeHead(200, headers);
-  createReadStream(file).pipe(res);
+  const stream = createReadStream(file);
+  if (gzip) stream.pipe(createGzip()).pipe(res);
+  else stream.pipe(res);
 }).listen(port, () => console.log(`serving ${root} on http://localhost:${port}`));

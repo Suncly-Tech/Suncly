@@ -28,6 +28,10 @@ testimonials, or usage numbers, because none exist in the repo.
 
 ## Global
 
+- Logo: the lockup files in `assets/` (suncly-blue / white / black / purple). The web
+  versions in `public/brand/` are derived from `assets/suncly-black.png` by keying out the
+  background (`scripts/generate-logo.mjs`); the OG image places the same lockup on the blue
+  from `assets/suncly-blue.png`. Favicons use the vector mark from the brief.
 - Site name: **suncly** (lowercase wordmark) — `BRIEF`
 - Mission line: *Attestation for agents that talk to agents.* — `README` (restated)
 - Meta title: *Suncly — Attestation for A2A agents* — `README`

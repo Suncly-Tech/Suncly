@@ -7,7 +7,7 @@
     "build": "next build --webpack",
     "start": "python3 -m http.server 3100 --directory out",
     "typecheck": "tsc --noEmit",
-    "assets": "node scripts/generate-assets.mjs",
+    "assets": "node scripts/generate-assets.mjs && node scripts/generate-logo.mjs",
     "screenshots": "node scripts/screenshots.mjs"
   },
   "dependencies": {

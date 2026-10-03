@@ -1,7 +1,53 @@
 import Link from "next/link";
-import { site } from "@/lib/content";
+import logo from "@/public/brand/logo.json";
 
-/** The sun with two diagonal cuts. Always yellow, on every background. */
+/**
+ * The brand lockup from assets/ (mark + wordmark), keyed to transparency by
+ * scripts/generate-logo.mjs. Both tones are rendered and toggled with CSS so
+ * the nav can switch on scroll without a flash.
+ */
+export function Logo({
+  tone = "ink",
+  height = 30,
+  href = "/",
+  className = "",
+}: {
+  tone?: "ink" | "paper";
+  height?: number;
+  href?: string;
+  className?: string;
+}) {
+  const width = Math.round(height * logo.aspect);
+  return (
+    <Link
+      href={href}
+      className={`inline-flex shrink-0 items-center no-underline ${className}`}
+      aria-label="Suncly home"
+      style={{ width, height }}
+    >
+      <img
+        src="/brand/logo-light.webp"
+        alt=""
+        width={width}
+        height={height}
+        decoding="async"
+        fetchPriority="low"
+        className={tone === "paper" ? "block" : "hidden"}
+      />
+      <img
+        src="/brand/logo-dark.webp"
+        alt=""
+        width={width}
+        height={height}
+        decoding="async"
+        fetchPriority="low"
+        className={tone === "ink" ? "block" : "hidden"}
+      />
+    </Link>
+  );
+}
+
+/** The sun with two diagonal cuts, as vector. Always yellow, on every background. */
 export function Mark({ size = 28, className = "" }: { size?: number; className?: string }) {
   return (
     <svg
@@ -22,32 +68,5 @@ export function Mark({ size = 28, className = "" }: { size?: number; className?:
       </defs>
       <circle cx="60" cy="60" r="44" fill="#F2C14E" mask="url(#suncly-cuts)" />
     </svg>
-  );
-}
-
-export function Logo({
-  tone = "ink",
-  size = 28,
-  href = "/",
-}: {
-  tone?: "ink" | "paper";
-  size?: number;
-  href?: string;
-}) {
-  const color = tone === "paper" ? "text-paper" : "text-ink";
-  return (
-    <Link
-      href={href}
-      className={`inline-flex items-center gap-2.5 ${color} no-underline`}
-      aria-label="Suncly home"
-    >
-      <Mark size={size} />
-      <span
-        className="font-sans font-bold leading-none"
-        style={{ fontSize: size * 0.95, letterSpacing: "-0.03em" }}
-      >
-        {site.name}
-      </span>
-    </Link>
   );
 }

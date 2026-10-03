@@ -11,6 +11,7 @@ node scripts/screenshots.mjs http://localhost:3100   # full-page captures at 144
 node scripts/keyboard.mjs http://localhost:3100      # keyboard-only navigation checks
 node scripts/lighthouse.mjs http://localhost:3100    # Lighthouse mobile + desktop, / and /docs
 node scripts/lcp-probe.mjs http://localhost:3100/    # observed LCP candidates under throttling
+npm run assets                                        # regenerate favicons, logo lockups and og.png from mark.svg + assets/
 ```
 
 Playwright and Lighthouse drive the locally installed Google Chrome (`channel: "chrome"`),
@@ -20,12 +21,13 @@ so no browser download is needed.
 
 | Page | Form factor | Performance | Accessibility | Best Practices | SEO |
 | --- | --- | --- | --- | --- | --- |
-| `/` | mobile | 97 | 100 | 100 | 100 |
+| `/` | mobile | 96 | 100 | 100 | 100 |
 | `/` | desktop | 100 | 100 | 100 | 100 |
 | `/docs` | mobile | 97 | 100 | 100 | 100 |
 | `/docs` | desktop | 100 | 100 | 100 | 100 |
 
-Reports are written to `lighthouse/` (git-ignored). The remaining mobile deductions are
+Reports are written to `lighthouse/` (git-ignored). Scores above are from the final run
+after the nav, footer and docs header switched to the raster logo lockups in `public/brand/`. The remaining mobile deductions are
 Next's hydration JavaScript; the observed LCP under 4G throttling is the hero subhead at
 about 0.7 s, identical to first paint.
 

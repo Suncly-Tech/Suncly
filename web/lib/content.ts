@@ -195,12 +195,15 @@ export const standard = {
   "agent": { "name": "ledger-agent", "version": "1.4.2" },
   "card": "https://agent.example.com/.well-known/agent-card.json",
   "claims": [
-    { "path": "skills.reconcile-invoices",       "result": "pass" },
-    { "path": "skills.export-report",            "result": "pass" },
-    { "path": "capabilities.streaming",          "result": "partial" },
-    { "path": "capabilities.pushNotifications",  "result": "fail" }
+    { "path": "skills.reconcile-invoices", "result": "pass" },
+    { "path": "skills.export-report", "result": "pass" },
+    { "path": "capabilities.streaming", "result": "partial" },
+    { "path": "capabilities.pushNotifications", "result": "fail" }
   ],
-  "stress": { "runs": 1248, "adversarial": 312, "crashes": 0, "timeouts": 3 },
+  "stress": {
+    "runs": 1248, "adversarial": 312,
+    "crashes": 0, "timeouts": 3
+  },
   "signature": { "alg": "ed25519", "value": "…" }
 }`,
 } as const;

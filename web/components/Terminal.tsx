@@ -107,7 +107,7 @@ export function Terminal() {
         className="min-h-[300px] overflow-x-auto p-5 font-mono text-[13px] leading-[1.75] md:min-h-[332px] md:text-[14px]"
         aria-live="polite"
       >
-        <div className="whitespace-nowrap">
+        <div className="whitespace-pre-wrap break-all md:whitespace-nowrap">
           <span className="text-sun">$ </span>
           <span className="text-paper">{command.slice(0, typed)}</span>
           {(phase === "idle" || phase === "typing") && (
@@ -117,7 +117,7 @@ export function Terminal() {
 
         <ol className="mt-1">
           {lines.slice(0, shown).map((l, i) => (
-            <li key={i} className="whitespace-nowrap">
+            <li key={i} className="whitespace-pre-wrap break-words md:whitespace-nowrap">
               {l.kind === "note" ? (
                 <span className="text-paper/40">{l.text}</span>
               ) : l.kind === "done" ? (

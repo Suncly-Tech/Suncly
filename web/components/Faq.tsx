@@ -7,7 +7,7 @@ export function Faq() {
   return (
     <section id="faq" className="scroll-mt-20 bg-cream py-24 md:py-32" aria-labelledby="faq-heading">
       <div className="container-site">
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:gap-16">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:gap-16">
           <SectionHeader label={faq.label} headline={faq.headline} />
           <Reveal>
             <div className="divide-y divide-ink/10 border-y border-ink/10">

@@ -43,7 +43,7 @@ export function EarlyAccess() {
   return (
     <section id="early-access" className="scroll-mt-20 bg-ink py-24 text-paper md:py-32" aria-labelledby="access-heading">
       <div className="container-site">
-        <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">
           <div>
             <SectionLabel tone="paper">{earlyAccess.headline.replace(/\.$/, "")}</SectionLabel>
             <h2 id="access-heading" className="mt-5 text-display-lg text-paper">

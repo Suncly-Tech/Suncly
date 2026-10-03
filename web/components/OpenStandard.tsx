@@ -32,7 +32,7 @@ export function OpenStandard() {
         <SectionHeader label={standard.label} headline={standard.headline} />
         <p className="mt-6 max-w-[640px] text-body text-ink-soft md:text-[19px]">{standard.intro}</p>
 
-        <div className="mt-12 grid items-start gap-10 lg:mt-16 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
+        <div className="mt-12 grid grid-cols-1 items-start gap-10 lg:mt-16 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:gap-16">
           <div className="flex flex-col gap-10">
             <Reveal>
               <FieldList title={standard.reads.title} items={standard.reads.items} />
@@ -48,7 +48,7 @@ export function OpenStandard() {
                 <Cuts className="text-sun" height={12} stroke={3} />
                 <span className="font-mono text-[13px] text-paper/60">attestation.json</span>
               </div>
-              <pre className="overflow-x-auto p-5 font-mono text-[13px] leading-[1.7] text-paper/90 md:text-[14px]">
+              <pre className="overflow-x-auto p-5 font-mono text-[12.5px] leading-[1.7] text-paper/90 sm:text-[13px] xl:text-[14px]">
                 <code>{standard.json}</code>
               </pre>
             </div>

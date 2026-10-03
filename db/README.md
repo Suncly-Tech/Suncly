@@ -1,306 +1,142 @@
-# Suncly database
+# Database
 
-This folder contains the Suncly database schema. Suncly fetches an A2A agent's Agent Card, tests whether the agent really does what the card claims, and issues a signed attestation.
+The Postgres schema for Suncly's seven entities. It belongs to roadmap
+**stage 3** ("Postgres, Evidence store, signing"); stages 1 and 2 do not need a
+database.
 
 | File | Contents |
 |---|---|
-| `migrations/0001_initial_schema.sql` | The whole schema as one migration (Cloudflare D1 / SQLite) |
-| `README.md` | This document: which tables exist and why |
+| `migrations/0001_initial_schema.sql` | The seven tables, eight enums, constraints and triggers. |
+| `README.md` | This document: what the migration enforces and what it leaves open. |
+
+**Source of truth.** This folder implements
+[docs/DATA_MODEL.md](../docs/DATA_MODEL.md). It does not redefine the model:
+entities, fields, enum values and the ER diagram live there. Where
+[SCHEMA.md](../SCHEMA.md) and this folder disagree, the schema wins.
+
+Conventions are as in [docs/ARCHITECTURE.md](../docs/ARCHITECTURE.md):
+"schema §N" refers to SCHEMA.md, **Proposed** marks what the schema does not
+define, and `OQ-…` marks open questions.
 
 ## Running it
 
-The database is Cloudflare D1. Point Wrangler at this folder in the Wrangler config file (`wrangler.jsonc`):
-
-```jsonc
-{
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "suncly",
-      "database_id": "<your-database-id>",
-      "migrations_dir": "db/migrations"
-    }
-  ]
-}
-```
-
-Then apply the migrations:
+Any PostgreSQL 13 or newer works: Supabase, Google Cloud SQL or a local
+install.
 
 ```bash
-# local development database
-npx wrangler d1 migrations apply suncly --local
-
-# the real database on Cloudflare
-npx wrangler d1 migrations apply suncly --remote
+psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/migrations/0001_initial_schema.sql
 ```
 
-Wrangler remembers which migration files have already been applied, so running the command again is safe.
+On Supabase the file can also be pasted into the SQL Editor. The migration
+runs in one transaction: either everything is created or nothing is.
 
-## How data flows
+To check the result:
 
-Every test follows the same path:
-
-1. A user adds an agent (`agents`) by giving its Agent Card URL.
-2. The user starts a test. A row appears in `runs` with status `queued`.
-3. The engine fetches the card and stores an exact copy of it (`card_snapshots`). The run moves to `running`.
-4. The engine walks through the check catalog (`check_definitions`) and writes the outcome of each check (`check_results`).
-5. For each outcome, the real requests and responses are stored as evidence (`http_exchanges`).
-6. The run moves to `completed`. The engine builds the report, signs it and stores it (`attestations`).
-7. A third party verifies the signature with the public key (`signing_keys`).
-
-## Schema
-
-```mermaid
-erDiagram
-    organizations ||--o{ organization_members : "members"
-    users ||--o{ organization_members : "belongs to"
-    organizations ||--o{ api_keys : "owns"
-    organizations ||--o{ agents : "owns"
-    agents ||--o{ card_snapshots : "card versions"
-    agents ||--o{ runs : "tests"
-    card_snapshots ||--o{ runs : "tested card"
-    runs ||--o{ check_results : "results"
-    check_definitions ||--o{ check_results : "check type"
-    check_results ||--o{ http_exchanges : "evidence"
-    runs ||--o| attestations : "report"
-    signing_keys ||--o{ attestations : "signed by"
-    organizations ||--o{ audit_log : "log"
-
-    organizations {
-        text id PK
-        text name
-        text slug UK
-    }
-    users {
-        text id PK
-        text email UK
-        text display_name
-    }
-    organization_members {
-        text organization_id PK, FK
-        text user_id PK, FK
-        text role
-    }
-    api_keys {
-        text id PK
-        text organization_id FK
-        text key_prefix
-        text key_hash UK
-        text revoked_at
-    }
-    agents {
-        text id PK
-        text organization_id FK
-        text name
-        text card_url
-    }
-    card_snapshots {
-        text id PK
-        text agent_id FK
-        text raw_card
-        text sha256
-        integer is_schema_valid
-        text validation_errors
-    }
-    check_definitions {
-        text id PK
-        text category
-        text severity
-        integer per_skill
-    }
-    runs {
-        text id PK
-        text agent_id FK
-        text card_snapshot_id FK
-        text status
-        text spec_version
-        text engine_version
-        text started_at
-        text finished_at
-    }
-    check_results {
-        text id PK
-        text run_id FK
-        text check_definition_id FK
-        text skill_id
-        text claim
-        text outcome
-        text message
-    }
-    http_exchanges {
-        text id PK
-        text check_result_id FK
-        integer seq
-        text request_url
-        integer response_status
-        text response_body
-    }
-    signing_keys {
-        text id PK
-        text key_id UK
-        text public_key UK
-        text retired_at
-    }
-    attestations {
-        text id PK
-        text run_id FK, UK
-        text signing_key_id FK
-        text public_id UK
-        text verdict
-        text payload
-        text signature
-        text revoked_at
-    }
-    audit_log {
-        integer id PK
-        text organization_id FK
-        text actor_user_id FK
-        text action
-        text metadata
-    }
+```sql
+SELECT count(*) FROM information_schema.tables
+WHERE table_schema = 'public' AND table_type = 'BASE TABLE';
+-- expected: 7
 ```
 
-The diagram shows only the most important columns. The full list, with comments, is in the SQL file.
+Never put the connection string or the database password in the repository.
 
-## How values are stored
+## What is in the migration
 
-D1 is SQLite, which has only a few column types. The schema uses these conventions everywhere:
+Exactly the seven entities of schema §3, with the names, fields and enum
+values of DATA_MODEL.md and the column types it proposes (OQ-D1):
 
-| Kind of value | Stored as | Example |
-|---|---|---|
-| ID | `TEXT`, a UUID generated by the application (`crypto.randomUUID()`) | `3f2b8c1e-...` |
-| Timestamp | `TEXT`, ISO 8601 in UTC | `2026-10-03T18:50:54.615Z` |
-| Boolean | `INTEGER`, 0 or 1 | `1` |
-| JSON | `TEXT`, validated with `json_valid()` | `{"name":"A"}` |
-| Fixed list (status, role, outcome) | `TEXT` with a `CHECK` listing the allowed values | `'queued'` |
+`agent` · `card_version` · `contract` · `test_case` · `attestation` · `run` ·
+`decision`
 
-`created_at` fills itself in. `updated_at` does not update itself: the application must set it on every update.
+Not included, on purpose:
 
-## Tables
-
-### 1. Who uses Suncly
-
-| Table | What it holds | Good to know |
-|---|---|---|
-| `organizations` | A customer team. Every agent and test belongs to exactly one organization. | `slug` is unique: lowercase letters, digits and hyphens. |
-| `users` | A person who can log in. | Passwords are not stored here; that is the auth provider's job. Email is unique regardless of letter case. |
-| `organization_members` | Who belongs to which organization and in what role (`owner`, `admin`, `member`). | One user can be in several organizations. |
-| `api_keys` | Keys for calling the API from CI or a script. | Only the SHA-256 hash of the key is stored. The key itself is never stored. |
-
-### 2. What is tested
-
-| Table | What it holds | Good to know |
-|---|---|---|
-| `agents` | An A2A agent registered for testing. | `card_url` must start with `https://`. The same URL can exist only once per organization. |
-| `card_snapshots` | An exact copy of the Agent Card at fetch time, with its SHA-256 hash. | Never modified. If the card changes, a new row is created. A card with the same hash is not stored twice for the same agent. |
-
-### 3. Which checks exist
-
-| Table | What it holds | Good to know |
-|---|---|---|
-| `check_definitions` | The catalog of all checks. | Rows are added by migrations, not by users. `id` is readable text (e.g. `capability.streaming`) and is never renamed. |
-
-The first migration adds ten checks:
-
-| id | Severity | What it checks |
-|---|---|---|
-| `card.reachable` | critical | The card URL answers over https |
-| `card.schema_valid` | critical | The card matches the A2A schema |
-| `transport.endpoint_reachable` | critical | The service URL declared on the card answers |
-| `capability.streaming` | major | If the card declares streaming, it works |
-| `capability.push_notifications` | major | If the card declares push notifications, they work |
-| `skill.responds` | major | The skill responds to its own example (once per skill) |
-| `skill.output_modes` | major | The skill returns a response type the card allows (once per skill) |
-| `error_handling.invalid_request` | minor | A malformed request gets a proper error |
-| `error_handling.unknown_task` | minor | An unknown task id gets a proper error |
-| `auth.enforced` | critical | If the card requires authentication, access without it is refused |
-
-### 4. What happened
-
-| Table | What it holds | Good to know |
-|---|---|---|
-| `runs` | One execution of the test engine against one agent. | Also stores the spec and engine version so the result can be reproduced later. |
-| `check_results` | The outcome of one check in one run. | `claim` = what the card claimed, `message` = what Suncly observed. `message` is required unless the outcome is `pass`. |
-| `http_exchanges` | Evidence: the real requests and responses. | Auth headers must be removed by the application before saving. |
-
-Run statuses:
-
-```mermaid
-stateDiagram-v2
-    [*] --> queued
-    queued --> running
-    queued --> cancelled
-    running --> completed
-    running --> failed
-    running --> cancelled
-    completed --> [*]
-    failed --> [*]
-    cancelled --> [*]
-```
-
-`failed` means Suncly itself broke (e.g. the card could not be fetched). It does not mean the agent failed its checks. An agent failing is a `completed` run that has `fail` among its results.
-
-Check outcomes (`outcome` column):
-
-| Value | Meaning |
-|---|---|
-| `pass` | The claim is true |
-| `fail` | The claim is false: the agent does not do what the card promises |
-| `warn` | Works, but deviates from the specification |
-| `skipped` | Not applicable (e.g. the card does not declare streaming) |
-| `error` | Suncly could not finish the check (timeout, network error) |
-
-### 5. The signed result
-
-| Table | What it holds | Good to know |
-|---|---|---|
-| `signing_keys` | Public keys for verifying attestations. | The private key lives in Workers secrets, never in the database. |
-| `attestations` | The signed report for one finished run. | At most one per run. `public_id` is random and goes into the public verification URL. |
-
-Verdict: `pass` = all checks passed, `partial` = only a `minor` check failed, `fail` = a `critical` or `major` check failed.
-
-### 6. Who did what
-
-| Table | What it holds | Good to know |
-|---|---|---|
-| `audit_log` | Log of important actions (e.g. `agent.created`, `attestation.revoked`). | Append-only. Survives even if the organization or user is deleted. |
-
-### View
-
-`run_summaries` gives one row per run with the outcome counts (how many `pass`, `fail` and so on). It is computed at query time from `check_results`, so the numbers cannot disagree with the real results. The dashboard list reads this view.
+- **The job table.** OQ-D8 proposes that it is queue infrastructure, not part
+  of the data model. It gets its own migration when the Orchestrator needs it.
+- **Users, organizations, API keys, signing keys.** They are not among the
+  seven entities. Reviewer identities come from elsewhere (schema §10), and
+  how verifiers obtain public keys is open (OQ-A8).
 
 ## Rules the database enforces
 
-These are written as `CHECK`, `UNIQUE` and `FOREIGN KEY` constraints, so buggy code cannot break them. All tables are `STRICT`, so a value of the wrong type is rejected too.
+Each rule below is a constraint or trigger in the migration. "Invariant N"
+refers to the numbered list in DATA_MODEL.md.
 
-- A run cannot point at another agent's card.
-- Run timestamps must agree with the status: a `queued` run has no start or end time, a `running` run has a start time, a finished run has an end time.
-- A `completed` run always has the card it tested. A `failed` run always has an error message.
-- There can be only one result per check (and per skill) in a run.
-- Every HTTP exchange ends in either a response or an error.
-- A card with a valid schema has no validation errors.
-- Hashes are always 64 lowercase hex characters.
-- JSON columns always contain valid JSON of the expected shape (object or array).
-- Status, role, outcome, severity and verdict accept only their listed values.
-- A revoked attestation always has a reason.
+### From the schema
+
+| Rule | Source | Enforced by |
+|---|---|---|
+| `approved_by` and `approved_at` are null until the contract is approved, and filled in when it is. | Invariant 3, schema §11 | `CHECK` constraints on `contract` |
+| An approved contract never changes and cannot be deleted. | Invariant 2, schema §2 | Trigger `contract_guard` |
+| The test cases of an approved contract cannot be added to, changed or deleted. | Invariant 2, schema §2 | Trigger `test_case_guard` |
+| An attestation can only be created for a contract whose `status` is `approved`. | Invariant 4, schema §4 | Trigger `attestation_guard` |
+| `finished_at` is set exactly when the attestation is `completed`, `failed`, `cancelled` or `invalidated`. | Schema §11 | `CHECK` on `attestation` |
+| `signature` and `signing_key_id` are both null until signed. | Schema §11 | `CHECK` on `attestation` |
+| Only `status`, `cost_total`, `finished_at`, `signature` and `signing_key_id` of an attestation may change. | DATA_MODEL.md: Mutability | Trigger `attestation_guard` |
+| `rationale` is present whenever `judge_layer` is `model`. | Invariant 7, schema §2 | `CHECK` on `run` |
+| A `failed` or `invalidated` attestation has no decision. | Invariant 10, schema §11 | Triggers `decision_guard` and `attestation_guard` |
+| The first decision for an attestation has `decided_by` = `policy`. | Invariant 11, schema §4 | Trigger `decision_guard` |
+| `run` and `decision` records are never updated, deleted or truncated. | Invariant 12, DR-002 | Triggers `run_append_only`, `decision_append_only` and the `no_truncate` triggers |
+| Nothing is deleted as a side effect: no foreign key cascades. | DR-002 | Foreign keys use `NO ACTION` |
+
+### Proposed in DATA_MODEL.md
+
+These rules are proposals tied to open questions. They are enforced so the
+database fails safe, and each can be removed with a new migration if its
+question is decided differently.
+
+| Rule | Open question | Enforced by | If decided otherwise |
+|---|---|---|---|
+| (`attestation_id`, `test_case_id`, `attempt`) is unique: the deterministic run key. | OQ-D3, DR-001 | `UNIQUE` constraint `run_key` | Replace the constraint with the new key. |
+| `attestation.card_version_id` equals the contract's `card_version_id`. | OQ-D6 | Foreign key `attestation_card_version_matches_contract` | Drop the constraint. |
+| A `completed` attestation has a decision and a signature. | OQ-D6 | `CHECK` `attestation_completed_is_signed` and trigger `attestation_guard` | Drop the check and the trigger branch. |
+| A `cancelled` attestation has no decision. | OQ-D6 | Triggers `decision_guard` and `attestation_guard` | Remove `cancelled` from both lists. |
+| The only change allowed to an approved contract is the move to `superseded`. | OQ-D5 | Trigger `contract_guard` | Adjust the trigger. |
+
+### Derived
+
+Two rules are not stated in the documents but follow from them. Please
+confirm them.
+
+| Rule | Reasoning | Enforced by |
+|---|---|---|
+| A run's test case belongs to the contract of the run's attestation. | An attestation is one execution of one contract (schema §3). | Trigger `run_guard` |
+| A test case of kind `skill` has a `skill_id`. | Roadmap stage 2: "`skill_id` is the skill's `AgentSkill.id`". The column stays nullable for probes (OQ-D7). | `CHECK` on `test_case` |
 
 ## Rules the application must enforce
 
-The database does not check these; the backend must.
+The database cannot check these, or checking them would decide an open
+question.
 
-- IDs are generated as UUIDs (`crypto.randomUUID()`) before inserting.
-- `updated_at` is set on every update of `organizations`, `users` and `agents`.
-- An attestation is issued only for a `completed` run.
-- `Authorization` headers, API keys and cookies are removed from `http_exchanges` rows before saving.
-- The response body is cut at the size limit and `body_truncated` is set to `1`.
-- `card_snapshots`, `check_results`, `http_exchanges` and `audit_log` are never updated, only inserted into.
-- Row visibility per organization: every query filters by `organization_id`. The database has no row-level security.
-- Large response bodies: D1 limits the size of a row, so bodies are truncated at the application's size limit. If full bodies are needed later, store them in R2 and keep only a reference here.
+| Rule | Source | Why not in the database |
+|---|---|---|
+| Every contract has at least one test case per declared skill. | Invariant 1, schema §2 | Needs the skills parsed out of `card_version.raw_json`. |
+| `inconclusive` is never counted as a pass in any aggregation. | Invariant 8, schema §2 | Aggregation happens in the Policy engine. |
+| No run is enqueued once `cost_total` has reached `budget_limit`. | Invariant 9, schema §11 | Enqueuing happens in the Orchestrator. |
+| A human resolution follows a `flag`; later decisions are corrections. | Invariant 11, OQ-D11 | How many decisions are allowed, and which outcomes a human may choose, is open. |
+| Transcripts are redacted before they are stored. | DR-003 | The database only holds `transcript_ref`. |
+| A `card_version` record never changes once written. | OQ-D9 (Proposed) | Left out until OQ-D9 is decided. |
+| An attestation is frozen once final and signed. | OQ-D6, OQ-F7 (Proposed) | Left out until those are decided. |
 
-## Deleting
+## Open questions this migration does not decide
 
-Deleting an organization deletes all of its agents, cards, runs, results, evidence and attestations. Audit log rows stay, with the organization reference set to empty. Deleting a user does not delete the runs they started; only the reference to them becomes empty. A signing key that has signed attestations cannot be deleted.
+Where a question is open, the migration takes the least restrictive form and
+says so in a comment.
+
+| Question | What the migration does |
+|---|---|
+| OQ-D1: types and cost units | Uses the proposed types (`uuid`, `numeric`, `text` for `raw_json`). Stores no unit. |
+| OQ-D5: is `contract.version` numbered per card version or per agent? | No `UNIQUE` on `version`. |
+| OQ-D7: `skill_id` for probes | Nullable for probes. |
+| OQ-D9: is a card hash seen before reused? | (`agent_id`, `card_hash`) is indexed but not `UNIQUE`. |
+| OQ-D2, OQ-D4: card URL, repetitions, judge model version | No columns added. The seven entities keep exactly the schema's fields. |
+| OQ-A7, OQ-A8: hash and signature formats | `card_hash` and `signature` are plain `text` with no format check. |
 
 ## Changing the schema
 
-An existing migration file is never edited once it has been run anywhere. Every change is a new file: `0002_...sql`, `0003_...sql` and so on. A new check is also added with a migration (`INSERT INTO check_definitions`).
+A migration file is never edited once it has been run anywhere. Every change
+is a new file: `0002_...sql`, `0003_...sql` and so on.
+
+Postgres superusers can disable triggers, so the append-only triggers protect
+against application bugs, not against someone with full database access. The
+application should connect with a role that is not a superuser and does not
+own the tables.

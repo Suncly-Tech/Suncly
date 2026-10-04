@@ -237,7 +237,7 @@ def attest(
     config = _config(ctx).with_overrides(runs=runs, reports_dir=reports_dir)
     console = Console(stream=sys.stderr if as_json else sys.stdout)
     progress = ProgressPrinter(console, quiet=as_json)
-    services = build_services(config, progress)
+    # Every argument is validated before any resource (a store connection) is opened.
     contract_file = (
         parse_contract_file(contract_path.read_text(encoding="utf-8")) if contract_path else None
     )
@@ -253,6 +253,7 @@ def attest(
         contract_file=contract_file,
         export_draft=export_path is not None,
     )
+    services = build_services(config, progress)
     try:
         outcome = AttestationService(services).attest(request)
     finally:

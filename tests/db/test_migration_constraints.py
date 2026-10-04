@@ -283,9 +283,11 @@ def test_rejects_a_completed_attestation_without_decision_or_signature(db: Conn)
     card_version_id, contract_id, _ = approved_contract(db)
     attestation_id = insert_attestation(db, contract_id, card_version_id)
 
+    # Without a decision the BEFORE UPDATE trigger refuses first (invariant 13), whether or
+    # not a signature is present; the CHECK constraint is only reached once a decision exists.
     rejects(
         db,
-        errors.CheckViolation,
+        errors.RaiseException,
         "UPDATE attestation SET status = 'completed', finished_at = now() WHERE id = %s",
         (attestation_id,),
     )
@@ -297,6 +299,12 @@ def test_rejects_a_completed_attestation_without_decision_or_signature(db: Conn)
         (attestation_id,),
     )
     insert_decision(db, attestation_id)
+    rejects(
+        db,
+        errors.CheckViolation,
+        "UPDATE attestation SET status = 'completed', finished_at = now() WHERE id = %s",
+        (attestation_id,),
+    )
     db.execute(
         "UPDATE attestation SET status = 'completed', finished_at = now(),"
         " signature = 'sig', signing_key_id = 'key' WHERE id = %s",

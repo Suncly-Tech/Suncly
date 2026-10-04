@@ -5,6 +5,7 @@ from __future__ import annotations
 import io
 from pathlib import Path
 
+import pytest
 from click.testing import CliRunner
 
 from suncly.cli import exit_codes
@@ -72,6 +73,47 @@ def test_attest_requires_a_card_url_and_rejects_bad_budgets(tmp_path: Path) -> N
         ],
     )
     assert result.exit_code == exit_codes.USAGE and "number of attempts" in result.output
+
+
+def test_invalid_arguments_never_open_a_store(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A rejected argument must not leave a store (or a database connection) behind."""
+    from suncly.cli import main as cli_main
+
+    def refuse_to_build(*args: object, **kwargs: object) -> None:
+        raise AssertionError("build_services must not be called before the arguments are valid")
+
+    monkeypatch.setattr(cli_main, "build_services", refuse_to_build)
+    runner = CliRunner()
+    bad_budget = runner.invoke(
+        main,
+        [
+            "--home",
+            str(tmp_path),
+            "attest",
+            "https://x.example.com/c",
+            "--sandbox",
+            "--budget",
+            "lots",
+        ],
+    )
+    assert bad_budget.exit_code == exit_codes.USAGE
+    contract = tmp_path / "contract.json"
+    contract.write_text("{not json", encoding="utf-8")
+    bad_contract = runner.invoke(
+        main,
+        [
+            "--home",
+            str(tmp_path),
+            "attest",
+            "https://x.example.com/c",
+            "--sandbox",
+            "--contract",
+            str(contract),
+        ],
+    )
+    assert bad_contract.exit_code == exit_codes.REFUSED and "not valid JSON" in bad_contract.output
 
 
 def test_a_bad_config_is_reported_in_three_sentences(tmp_path: Path) -> None:

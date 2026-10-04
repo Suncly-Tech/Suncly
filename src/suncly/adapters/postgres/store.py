@@ -326,8 +326,11 @@ class PostgresEvidenceStore:
             )
 
     def list_decisions(self, attestation_id: UUID) -> list[Decision]:
+        # Oldest first. Equal timestamps are broken by physical position (ctid), which is
+        # insertion order for a table that is never updated or deleted; the data model has
+        # no sequence column, and a random uuid would not order anything.
         rows = self._all(
-            "SELECT * FROM decision WHERE attestation_id = %s ORDER BY decided_at, id",
+            "SELECT * FROM decision WHERE attestation_id = %s ORDER BY decided_at, ctid",
             (attestation_id,),
         )
         return [Decision.model_validate(row) for row in rows]

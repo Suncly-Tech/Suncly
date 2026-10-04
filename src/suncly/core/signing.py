@@ -52,13 +52,20 @@ def build_payload(
     transcript_hashes: Mapping[str, str],
     decision: Decision | None,
 ) -> JsonObject:
-    """The signed payload of schema §11, as a JSON object."""
+    """The signed payload of schema §11, as a JSON object.
+
+    Results are ordered by test case id and transcript hashes by run id, so the
+    payload is the same whichever order a store returns records in.
+    """
     return {
         "payload_version": PAYLOAD_VERSION,
         "attestation_id": str(attestation.id),
         "card_hash": card_hash,
         "contract": {"id": str(contract.id), "version": contract.version},
-        "results": [result.to_payload() for result in results],
+        "results": [
+            result.to_payload()
+            for result in sorted(results, key=lambda result: str(result.test_case_id))
+        ],
         "transcript_hashes": dict(sorted(transcript_hashes.items())),
         "decision": None
         if decision is None

@@ -112,11 +112,20 @@ def insert_decision(conn: Conn, attestation_id: uuid.UUID, decided_by: str = "po
 
 
 def approved_contract(conn: Conn) -> tuple[uuid.UUID, uuid.UUID, uuid.UUID]:
-    """An agent, card version and approved contract with one test case."""
+    """An agent, card version and approved contract with one test case.
+
+    Test cases are added while the contract is a draft; approving it afterwards
+    is the only order the migration allows (schema §2).
+    """
     agent_id = insert_agent(conn)
     card_version_id = insert_card_version(conn, agent_id)
-    contract_id = insert_contract(conn, card_version_id)
+    contract_id = insert_contract(conn, card_version_id, status="draft")
     test_case_id = insert_test_case(conn, contract_id)
+    conn.execute(
+        "UPDATE contract SET status = 'approved', approved_by = 'reviewer', approved_at = now()"
+        " WHERE id = %s",
+        (contract_id,),
+    )
     return card_version_id, contract_id, test_case_id
 
 

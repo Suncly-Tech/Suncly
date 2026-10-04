@@ -89,10 +89,11 @@ version handles without taking a side:
 
 Contradictions or errors noticed while implementing. None was fixed silently.
 
-1. **Definition of done, item 9.** `git grep -n -i -E "D1|Cloudflare|wrangler"`
-   can never be empty while the documents contain the open-question ids
-   `OQ-D1`, `OQ-D10` and `OQ-D11`. The check that passes is the word-boundary
-   form: `git grep -n -i -E "(^|[^-])D1\b|Cloudflare|wrangler" -- . ':!CLAUDE_CODE_BRIEF.md'`.
+1. **Definition of done, item 9.** The literal grep for the former storage vendor's
+   names can never be empty while the documents contain the open-question ids
+   `OQ-D1`, `OQ-D10` and `OQ-D11`. The check that passes excludes those ids:
+   `git grep -n -i -P "(?<!OQ-)\bD[1]\b|Cloud[f]lare|wrang[l]er" -- . ':!CLAUDE_CODE_BRIEF.md'`
+   (the bracketed letters keep this sentence itself out of the result).
 2. **CLAUDE_CODE_BRIEF.md 3.1 vs the MVP prompt** on the A2A SDK: the brief
    says to use the SDK if it supports 1.0; the prompt leaves the choice open.
    See "A2A client" above.

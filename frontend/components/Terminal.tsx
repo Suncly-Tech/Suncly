@@ -55,7 +55,7 @@ export function Terminal() {
       const t = setTimeout(() => setPhase("streaming"), 350);
       return () => clearTimeout(t);
     }
-    const t = setTimeout(() => setTyped((n) => n + 1), 18 + Math.random() * 30);
+    const t = setTimeout(() => setTyped((n) => n + 1), 16 + Math.random() * 26);
     return () => clearTimeout(t);
   }, [phase, typed]);
 
@@ -80,10 +80,7 @@ export function Terminal() {
   };
 
   return (
-    <div
-      ref={ref}
-      className="overflow-hidden rounded-card bg-ink text-paper shadow-raised ring-1 ring-paper/10"
-    >
+    <div ref={ref} className="overflow-hidden rounded-card bg-ink text-paper shadow-raised ring-1 ring-paper/10">
       <div className="flex items-center justify-between border-b border-paper/10 px-5 py-3">
         <div className="flex items-center gap-3">
           <Cuts className="text-sun" height={12} stroke={3} />
@@ -107,7 +104,7 @@ export function Terminal() {
         className="min-h-[300px] overflow-x-auto p-5 font-mono text-[13px] leading-[1.75] md:min-h-[332px] md:text-[14px]"
         aria-live="polite"
       >
-        <div className="whitespace-pre-wrap break-all md:whitespace-nowrap">
+        <div className="whitespace-pre-wrap break-all">
           <span className="text-sun">$ </span>
           <span className="text-paper">{command.slice(0, typed)}</span>
           {(phase === "idle" || phase === "typing") && (
@@ -117,7 +114,7 @@ export function Terminal() {
 
         <ol className="mt-1">
           {lines.slice(0, shown).map((l, i) => (
-            <li key={i} className="whitespace-pre-wrap break-words md:whitespace-nowrap">
+            <li key={i} className="whitespace-pre-wrap break-words">
               {l.kind === "note" ? (
                 <span className="text-paper/40">{l.text}</span>
               ) : l.kind === "done" ? (
@@ -127,7 +124,7 @@ export function Terminal() {
                   <span className="text-paper/40">→ </span>
                   <span className="text-paper/85">{l.text}</span>
                   {"status" in l && l.status ? (
-                    <span className={`ml-3 font-semibold ${statusColor[l.status]}`}>{l.status}</span>
+                    <span className={`ml-3 font-semibold ${statusColor[l.kind] ?? "text-paper"}`}>{l.status}</span>
                   ) : null}
                 </>
               )}

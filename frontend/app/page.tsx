@@ -1,9 +1,15 @@
 import { Nav } from "@/components/Nav";
 import { Hero } from "@/components/Hero";
 import { ProblemStrip } from "@/components/ProblemStrip";
+import { Inspection } from "@/components/Inspection";
 import { HowItWorks } from "@/components/HowItWorks";
+import { Architecture } from "@/components/Architecture";
 import { ProductSections } from "@/components/ProductSections";
+import { Policy } from "@/components/Policy";
+import { Rules } from "@/components/Rules";
 import { OpenStandard } from "@/components/OpenStandard";
+import { Interfaces } from "@/components/Interfaces";
+import { Roadmap } from "@/components/Roadmap";
 import { DevResources } from "@/components/DevResources";
 import { EarlyAccess } from "@/components/EarlyAccess";
 import { Faq } from "@/components/Faq";
@@ -17,10 +23,16 @@ export default function Home() {
       <main id="main">
         <Hero />
         <ProblemStrip />
-        <CutsDivider />
+        <Inspection />
         <HowItWorks />
+        <Architecture />
         <ProductSections />
+        <Policy />
+        <Rules />
         <OpenStandard />
+        <Interfaces />
+        <Roadmap />
+        <CutsDivider />
         <DevResources />
         <EarlyAccess />
         <Faq />

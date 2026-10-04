@@ -1,15 +1,11 @@
+"use client";
+
 import { standard } from "@/lib/content";
 import { Cuts } from "./Cuts";
 import { Reveal } from "./Reveal";
 import { SectionHeader } from "./SectionHeader";
 
-function FieldList({
-  title,
-  items,
-}: {
-  title: string;
-  items: ReadonlyArray<{ field: string; note: string }>;
-}) {
+function FieldList({ title, items }: { title: string; items: ReadonlyArray<{ field: string; note: string }> }) {
   return (
     <div>
       <h3 className="text-heading-md text-ink">{title}</h3>
@@ -29,10 +25,9 @@ export function OpenStandard() {
   return (
     <section id="standard" className="scroll-mt-20 bg-cream-deep py-24 md:py-32" aria-labelledby="standard-heading">
       <div className="container-site">
-        <SectionHeader label={standard.label} headline={standard.headline} />
-        <p className="mt-6 max-w-[640px] text-body text-ink-soft md:text-[19px]">{standard.intro}</p>
+        <SectionHeader label={standard.label} headline={standard.headline} intro={standard.intro} id="standard-heading" />
 
-        <div className="mt-12 grid grid-cols-1 items-start gap-10 lg:mt-16 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:gap-16">
+        <div className="mt-12 grid grid-cols-1 items-start gap-10 lg:mt-16 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
           <div className="flex flex-col gap-10">
             <Reveal>
               <FieldList title={standard.reads.title} items={standard.reads.items} />
@@ -42,11 +37,11 @@ export function OpenStandard() {
             </Reveal>
           </div>
 
-          <Reveal delay={0.1}>
+          <Reveal delay={0.1} className="lg:sticky lg:top-28">
             <div className="overflow-hidden rounded-card bg-ink text-paper shadow-raised ring-1 ring-paper/10">
               <div className="flex items-center gap-3 border-b border-paper/10 px-5 py-3">
                 <Cuts className="text-sun" height={12} stroke={3} />
-                <span className="font-mono text-[13px] text-paper/60">attestation.json</span>
+                <span className="font-mono text-[13px] text-paper/60">{standard.jsonTitle}</span>
               </div>
               <pre className="overflow-x-auto p-5 font-mono text-[12.5px] leading-[1.7] text-paper/90 sm:text-[13px] xl:text-[14px]">
                 <code>{standard.json}</code>

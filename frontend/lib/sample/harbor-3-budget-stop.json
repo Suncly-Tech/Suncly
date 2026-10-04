@@ -1,0 +1,660 @@
+{
+ "sample": {
+  "label": "3-budget-stop",
+  "behaviour": "regressed",
+  "generated_by": "frontend/scripts/make-sample.py",
+  "note": "Synthetic sample. Produced by the real Suncly code path against a fictional local mock agent. Not a customer evaluation."
+ },
+ "result": {
+  "generated_at": "2026-10-04T21:04:45.570684Z",
+  "agent": {
+   "id": "7bbe9bc6-c18c-5789-888d-278ad0d05a81",
+   "name": "Harbor Returns Agent",
+   "owner": "Harbor Commerce platform team (fictional)",
+   "risk_level": "medium"
+  },
+  "card_version": {
+   "id": "bec95195-7679-43c7-8625-250fc2562030",
+   "agent_id": "7bbe9bc6-c18c-5789-888d-278ad0d05a81",
+   "card_hash": "sha256:c25be2adb553bc2efce2a1506c0b19194c8299c030e1f0b265890fbbeb96850b",
+   "raw_json": "{\"name\": \"Harbor Returns Agent\", \"description\": \"Looks up orders, starts returns and estimates refunds for Harbor Commerce customers.\", \"version\": \"2.3.1\", \"supportedInterfaces\": [{\"url\": \"http://127.0.0.1:53448/rpc\", \"protocolBinding\": \"JSONRPC\", \"protocolVersion\": \"1.0\"}], \"capabilities\": {\"streaming\": true}, \"defaultInputModes\": [\"text/plain\"], \"defaultOutputModes\": [\"text/plain\"], \"skills\": [{\"id\": \"order-status\", \"name\": \"Order status\", \"description\": \"Tells a customer where an order is and when it will arrive.\", \"tags\": [\"orders\", \"read-only\"], \"examples\": [\"Where is order 48213?\", \"Has order 48213 shipped yet?\"]}, {\"id\": \"start-return\", \"name\": \"Start a return\", \"description\": \"Opens a return for one or more items of a delivered order and emails a prepaid label.\", \"tags\": [\"returns\", \"writes\"], \"examples\": [\"Start a return for order 48213, item 2\"]}, {\"id\": \"refund-estimate\", \"name\": \"Refund estimate\", \"description\": \"Estimates the refund for a return, including restocking fees.\", \"tags\": [\"returns\", \"read-only\"], \"examples\": [\"How much will I get back if I return order 48213?\"]}, {\"id\": \"cancel-order\", \"name\": \"Cancel an order\", \"description\": \"Cancels an order that has not shipped yet. Declares no examples.\", \"tags\": [\"orders\", \"writes\"]}], \"provider\": {\"organization\": \"Harbor Commerce (fictional)\", \"url\": \"https://harbor.example\"}}",
+   "fetched_at": "2026-10-04T21:04:37.805796Z"
+  },
+  "parsed_card": {
+   "raw_json": "{\"name\": \"Harbor Returns Agent\", \"description\": \"Looks up orders, starts returns and estimates refunds for Harbor Commerce customers.\", \"version\": \"2.3.1\", \"supportedInterfaces\": [{\"url\": \"http://127.0.0.1:53448/rpc\", \"protocolBinding\": \"JSONRPC\", \"protocolVersion\": \"1.0\"}], \"capabilities\": {\"streaming\": true}, \"defaultInputModes\": [\"text/plain\"], \"defaultOutputModes\": [\"text/plain\"], \"skills\": [{\"id\": \"order-status\", \"name\": \"Order status\", \"description\": \"Tells a customer where an order is and when it will arrive.\", \"tags\": [\"orders\", \"read-only\"], \"examples\": [\"Where is order 48213?\", \"Has order 48213 shipped yet?\"]}, {\"id\": \"start-return\", \"name\": \"Start a return\", \"description\": \"Opens a return for one or more items of a delivered order and emails a prepaid label.\", \"tags\": [\"returns\", \"writes\"], \"examples\": [\"Start a return for order 48213, item 2\"]}, {\"id\": \"refund-estimate\", \"name\": \"Refund estimate\", \"description\": \"Estimates the refund for a return, including restocking fees.\", \"tags\": [\"returns\", \"read-only\"], \"examples\": [\"How much will I get back if I return order 48213?\"]}, {\"id\": \"cancel-order\", \"name\": \"Cancel an order\", \"description\": \"Cancels an order that has not shipped yet. Declares no examples.\", \"tags\": [\"orders\", \"writes\"]}], \"provider\": {\"organization\": \"Harbor Commerce (fictional)\", \"url\": \"https://harbor.example\"}}",
+   "json_object": {
+    "name": "Harbor Returns Agent",
+    "description": "Looks up orders, starts returns and estimates refunds for Harbor Commerce customers.",
+    "version": "2.3.1",
+    "supportedInterfaces": [
+     {
+      "url": "http://127.0.0.1:53448/rpc",
+      "protocolBinding": "JSONRPC",
+      "protocolVersion": "1.0"
+     }
+    ],
+    "capabilities": {
+     "streaming": true
+    },
+    "defaultInputModes": [
+     "text/plain"
+    ],
+    "defaultOutputModes": [
+     "text/plain"
+    ],
+    "skills": [
+     {
+      "id": "order-status",
+      "name": "Order status",
+      "description": "Tells a customer where an order is and when it will arrive.",
+      "tags": [
+       "orders",
+       "read-only"
+      ],
+      "examples": [
+       "Where is order 48213?",
+       "Has order 48213 shipped yet?"
+      ]
+     },
+     {
+      "id": "start-return",
+      "name": "Start a return",
+      "description": "Opens a return for one or more items of a delivered order and emails a prepaid label.",
+      "tags": [
+       "returns",
+       "writes"
+      ],
+      "examples": [
+       "Start a return for order 48213, item 2"
+      ]
+     },
+     {
+      "id": "refund-estimate",
+      "name": "Refund estimate",
+      "description": "Estimates the refund for a return, including restocking fees.",
+      "tags": [
+       "returns",
+       "read-only"
+      ],
+      "examples": [
+       "How much will I get back if I return order 48213?"
+      ]
+     },
+     {
+      "id": "cancel-order",
+      "name": "Cancel an order",
+      "description": "Cancels an order that has not shipped yet. Declares no examples.",
+      "tags": [
+       "orders",
+       "writes"
+      ]
+     }
+    ],
+    "provider": {
+     "organization": "Harbor Commerce (fictional)",
+     "url": "https://harbor.example"
+    }
+   },
+   "card": {
+    "name": "Harbor Returns Agent",
+    "description": "Looks up orders, starts returns and estimates refunds for Harbor Commerce customers.",
+    "version": "2.3.1",
+    "supported_interfaces": [
+     {
+      "url": "http://127.0.0.1:53448/rpc",
+      "protocol_binding": "JSONRPC",
+      "protocol_version": "1.0",
+      "tenant": null
+     }
+    ],
+    "capabilities": {
+     "streaming": true,
+     "push_notifications": null,
+     "extended_agent_card": null,
+     "extensions": null
+    },
+    "default_input_modes": [
+     "text/plain"
+    ],
+    "default_output_modes": [
+     "text/plain"
+    ],
+    "skills": [
+     {
+      "id": "order-status",
+      "name": "Order status",
+      "description": "Tells a customer where an order is and when it will arrive.",
+      "tags": [
+       "orders",
+       "read-only"
+      ],
+      "examples": [
+       "Where is order 48213?",
+       "Has order 48213 shipped yet?"
+      ],
+      "input_modes": null,
+      "output_modes": null,
+      "security_requirements": null
+     },
+     {
+      "id": "start-return",
+      "name": "Start a return",
+      "description": "Opens a return for one or more items of a delivered order and emails a prepaid label.",
+      "tags": [
+       "returns",
+       "writes"
+      ],
+      "examples": [
+       "Start a return for order 48213, item 2"
+      ],
+      "input_modes": null,
+      "output_modes": null,
+      "security_requirements": null
+     },
+     {
+      "id": "refund-estimate",
+      "name": "Refund estimate",
+      "description": "Estimates the refund for a return, including restocking fees.",
+      "tags": [
+       "returns",
+       "read-only"
+      ],
+      "examples": [
+       "How much will I get back if I return order 48213?"
+      ],
+      "input_modes": null,
+      "output_modes": null,
+      "security_requirements": null
+     },
+     {
+      "id": "cancel-order",
+      "name": "Cancel an order",
+      "description": "Cancels an order that has not shipped yet. Declares no examples.",
+      "tags": [
+       "orders",
+       "writes"
+      ],
+      "examples": null,
+      "input_modes": null,
+      "output_modes": null,
+      "security_requirements": null
+     }
+    ],
+    "provider": {
+     "organization": "Harbor Commerce (fictional)",
+     "url": "https://harbor.example"
+    }
+   },
+   "card_hash": "sha256:c25be2adb553bc2efce2a1506c0b19194c8299c030e1f0b265890fbbeb96850b"
+  },
+  "card_url": "http://127.0.0.1:53448/.well-known/agent-card.json",
+  "contract": {
+   "id": "081fefaf-370f-4d3e-8e10-c5053a55b786",
+   "card_version_id": "bec95195-7679-43c7-8625-250fc2562030",
+   "version": 1,
+   "status": "approved",
+   "created_at": "2026-10-04T21:04:37.813302Z",
+   "approved_by": "m.lind@harbor.example",
+   "approved_at": "2026-10-04T21:04:37.813684Z"
+  },
+  "test_cases": [
+   {
+    "id": "1c213901-e016-4771-8790-c2e7fa0ea015",
+    "contract_id": "081fefaf-370f-4d3e-8e10-c5053a55b786",
+    "skill_id": "order-status",
+    "input": {
+     "text": "Where is order 48213?"
+    },
+    "criteria": {
+     "final_state": "TASK_STATE_COMPLETED",
+     "latency_limit_ms": 2000,
+     "response_present": true,
+     "output_modes": [
+      "text/plain"
+     ],
+     "required_fields": [
+      "/artifacts/0/parts/0/text"
+     ],
+     "model_checks": [],
+     "accept_direct_message": false
+    },
+    "kind": "skill"
+   },
+   {
+    "id": "d196cdc8-4a6a-44cb-97a4-d6cd26f58422",
+    "contract_id": "081fefaf-370f-4d3e-8e10-c5053a55b786",
+    "skill_id": "order-status",
+    "input": {
+     "text": "Has order 48213 shipped yet?"
+    },
+    "criteria": {
+     "final_state": "TASK_STATE_COMPLETED",
+     "latency_limit_ms": 2000,
+     "response_present": true,
+     "output_modes": [
+      "text/plain"
+     ],
+     "required_fields": [
+      "/artifacts/0/parts/0/text"
+     ],
+     "model_checks": [],
+     "accept_direct_message": false
+    },
+    "kind": "skill"
+   },
+   {
+    "id": "006fb9f0-a034-4a0d-ab64-595dafaaf808",
+    "contract_id": "081fefaf-370f-4d3e-8e10-c5053a55b786",
+    "skill_id": "start-return",
+    "input": {
+     "text": "Start a return for order 48213, item 2"
+    },
+    "criteria": {
+     "final_state": "TASK_STATE_COMPLETED",
+     "latency_limit_ms": 2000,
+     "response_present": true,
+     "output_modes": [
+      "text/plain"
+     ],
+     "required_fields": [
+      "/artifacts/0/parts/0/text"
+     ],
+     "model_checks": [],
+     "accept_direct_message": false
+    },
+    "kind": "skill"
+   },
+   {
+    "id": "d92fb406-20a1-4b04-a683-e71640b5272b",
+    "contract_id": "081fefaf-370f-4d3e-8e10-c5053a55b786",
+    "skill_id": "refund-estimate",
+    "input": {
+     "text": "How much will I get back if I return order 48213?"
+    },
+    "criteria": {
+     "final_state": "TASK_STATE_COMPLETED",
+     "latency_limit_ms": 2000,
+     "response_present": true,
+     "output_modes": [
+      "text/plain"
+     ],
+     "required_fields": [
+      "/artifacts/0/parts/0/text"
+     ],
+     "model_checks": [
+      "the amount equals the order total minus the restocking fee"
+     ],
+     "accept_direct_message": false
+    },
+    "kind": "skill"
+   }
+  ],
+  "attestation": {
+   "id": "c4056661-3317-49bf-9939-0c9f800af0fe",
+   "contract_id": "081fefaf-370f-4d3e-8e10-c5053a55b786",
+   "card_version_id": "bec95195-7679-43c7-8625-250fc2562030",
+   "trigger": "manual",
+   "status": "failed",
+   "started_at": "2026-10-04T21:04:44.676778Z",
+   "finished_at": "2026-10-04T21:04:45.568467Z",
+   "budget_limit": "7",
+   "cost_total": "7",
+   "signature": "ed25519:CTc-dMeg8xwQvgbw8aDhYgV84wO_nxhrou6o3TKPp6WqjlUmwuy5MvQEiNyViqehbcHTIY_8GMP55LECWpcuDQ",
+   "signing_key_id": "ed25519-3b05ae908c2cb82a"
+  },
+  "runs": [
+   {
+    "run": {
+     "id": "e6ea965d-c2a5-420d-a286-9ffe59441623",
+     "attestation_id": "c4056661-3317-49bf-9939-0c9f800af0fe",
+     "test_case_id": "1c213901-e016-4771-8790-c2e7fa0ea015",
+     "attempt": 1,
+     "verdict": "pass",
+     "judge_layer": "deterministic",
+     "rationale": null,
+     "latency_ms": 327,
+     "cost": "1",
+     "transcript_ref": "c4056661-3317-49bf-9939-0c9f800af0fe/1c213901-e016-4771-8790-c2e7fa0ea015-1.json",
+     "started_at": "2026-10-04T21:04:44.822470Z",
+     "finished_at": "2026-10-04T21:04:45.149966Z"
+    },
+    "document_hash": "sha256:2f3282c23661611278e76250105f2bb9fbeaea94b842a1ef9695b485deba50bc"
+   },
+   {
+    "run": {
+     "id": "b5a89b12-e562-4d3d-afc4-dcb232554d45",
+     "attestation_id": "c4056661-3317-49bf-9939-0c9f800af0fe",
+     "test_case_id": "1c213901-e016-4771-8790-c2e7fa0ea015",
+     "attempt": 2,
+     "verdict": "pass",
+     "judge_layer": "deterministic",
+     "rationale": null,
+     "latency_ms": 247,
+     "cost": "1",
+     "transcript_ref": "c4056661-3317-49bf-9939-0c9f800af0fe/1c213901-e016-4771-8790-c2e7fa0ea015-2.json",
+     "started_at": "2026-10-04T21:04:44.816312Z",
+     "finished_at": "2026-10-04T21:04:45.064082Z"
+    },
+    "document_hash": "sha256:9394d96c3e8193defdd064f55f0fb0e188041873c791e69feefdfdd29d9cf1fe"
+   },
+   {
+    "run": {
+     "id": "05b60c1b-06f6-4d7f-abb8-c72b2c3f6eeb",
+     "attestation_id": "c4056661-3317-49bf-9939-0c9f800af0fe",
+     "test_case_id": "1c213901-e016-4771-8790-c2e7fa0ea015",
+     "attempt": 3,
+     "verdict": "pass",
+     "judge_layer": "deterministic",
+     "rationale": null,
+     "latency_ms": 197,
+     "cost": "1",
+     "transcript_ref": "c4056661-3317-49bf-9939-0c9f800af0fe/1c213901-e016-4771-8790-c2e7fa0ea015-3.json",
+     "started_at": "2026-10-04T21:04:44.816351Z",
+     "finished_at": "2026-10-04T21:04:45.014631Z"
+    },
+    "document_hash": "sha256:d1492dfb8df83cb23b269419f180ca287393521d93dd485da90f3258e9cb3c7d"
+   },
+   {
+    "run": {
+     "id": "c1d96425-d73d-479e-9e4d-cf1d8d2efbcd",
+     "attestation_id": "c4056661-3317-49bf-9939-0c9f800af0fe",
+     "test_case_id": "1c213901-e016-4771-8790-c2e7fa0ea015",
+     "attempt": 4,
+     "verdict": "pass",
+     "judge_layer": "deterministic",
+     "rationale": null,
+     "latency_ms": 359,
+     "cost": "1",
+     "transcript_ref": "c4056661-3317-49bf-9939-0c9f800af0fe/1c213901-e016-4771-8790-c2e7fa0ea015-4.json",
+     "started_at": "2026-10-04T21:04:44.816528Z",
+     "finished_at": "2026-10-04T21:04:45.176069Z"
+    },
+    "document_hash": "sha256:ad6a612a4b1d2900a553001eb60c754fb641d71b6293c64c2c1197156b5b9890"
+   },
+   {
+    "run": {
+     "id": "915d2485-367f-487f-bad2-c89ef8baeccc",
+     "attestation_id": "c4056661-3317-49bf-9939-0c9f800af0fe",
+     "test_case_id": "1c213901-e016-4771-8790-c2e7fa0ea015",
+     "attempt": 5,
+     "verdict": "pass",
+     "judge_layer": "deterministic",
+     "rationale": null,
+     "latency_ms": 178,
+     "cost": "1",
+     "transcript_ref": "c4056661-3317-49bf-9939-0c9f800af0fe/1c213901-e016-4771-8790-c2e7fa0ea015-5.json",
+     "started_at": "2026-10-04T21:04:45.172786Z",
+     "finished_at": "2026-10-04T21:04:45.351227Z"
+    },
+    "document_hash": "sha256:0fac548faa4076f1cb863a6aaa2fb060ddd1e08c0cc3586786f056d96b2c83e4"
+   },
+   {
+    "run": {
+     "id": "df430589-9d72-4bed-9a89-8a05b6ff5038",
+     "attestation_id": "c4056661-3317-49bf-9939-0c9f800af0fe",
+     "test_case_id": "d196cdc8-4a6a-44cb-97a4-d6cd26f58422",
+     "attempt": 1,
+     "verdict": "pass",
+     "judge_layer": "deterministic",
+     "rationale": null,
+     "latency_ms": 284,
+     "cost": "1",
+     "transcript_ref": "c4056661-3317-49bf-9939-0c9f800af0fe/d196cdc8-4a6a-44cb-97a4-d6cd26f58422-1.json",
+     "started_at": "2026-10-04T21:04:45.193338Z",
+     "finished_at": "2026-10-04T21:04:45.478481Z"
+    },
+    "document_hash": "sha256:59593804f51873384cfa3cdc3686e289640fd9298f853a36c93ff764f802bb44"
+   },
+   {
+    "run": {
+     "id": "bc9ea961-ef25-4601-834d-f2ac22b5f186",
+     "attestation_id": "c4056661-3317-49bf-9939-0c9f800af0fe",
+     "test_case_id": "d196cdc8-4a6a-44cb-97a4-d6cd26f58422",
+     "attempt": 2,
+     "verdict": "fail",
+     "judge_layer": "deterministic",
+     "rationale": null,
+     "latency_ms": 270,
+     "cost": "1",
+     "transcript_ref": "c4056661-3317-49bf-9939-0c9f800af0fe/d196cdc8-4a6a-44cb-97a4-d6cd26f58422-2.json",
+     "started_at": "2026-10-04T21:04:45.275149Z",
+     "finished_at": "2026-10-04T21:04:45.545463Z"
+    },
+    "document_hash": "sha256:6d5daa8490ffd8d657300a481d8ecc257de005e7ef7c7de545d2ce345068ee6e"
+   }
+  ],
+  "decisions": [],
+  "results": [
+   {
+    "test_case_id": "1c213901-e016-4771-8790-c2e7fa0ea015",
+    "skill_id": "order-status",
+    "kind": "skill",
+    "pass_count": 5,
+    "fail_count": 0,
+    "inconclusive_count": 0
+   },
+   {
+    "test_case_id": "d196cdc8-4a6a-44cb-97a4-d6cd26f58422",
+    "skill_id": "order-status",
+    "kind": "skill",
+    "pass_count": 1,
+    "fail_count": 1,
+    "inconclusive_count": 0
+   },
+   {
+    "test_case_id": "006fb9f0-a034-4a0d-ab64-595dafaaf808",
+    "skill_id": "start-return",
+    "kind": "skill",
+    "pass_count": 0,
+    "fail_count": 0,
+    "inconclusive_count": 0
+   },
+   {
+    "test_case_id": "d92fb406-20a1-4b04-a683-e71640b5272b",
+    "skill_id": "refund-estimate",
+    "kind": "skill",
+    "pass_count": 0,
+    "fail_count": 0,
+    "inconclusive_count": 0
+   }
+  ],
+  "planned_runs": 20,
+  "not_executed": [
+   {
+    "test_case_id": "006fb9f0-a034-4a0d-ab64-595dafaaf808",
+    "attempt": 1,
+    "reason": "budget",
+    "detail": "cost_total reached budget_limit 7"
+   },
+   {
+    "test_case_id": "006fb9f0-a034-4a0d-ab64-595dafaaf808",
+    "attempt": 2,
+    "reason": "budget",
+    "detail": "cost_total reached budget_limit 7"
+   },
+   {
+    "test_case_id": "006fb9f0-a034-4a0d-ab64-595dafaaf808",
+    "attempt": 3,
+    "reason": "budget",
+    "detail": "cost_total reached budget_limit 7"
+   },
+   {
+    "test_case_id": "006fb9f0-a034-4a0d-ab64-595dafaaf808",
+    "attempt": 4,
+    "reason": "budget",
+    "detail": "cost_total reached budget_limit 7"
+   },
+   {
+    "test_case_id": "006fb9f0-a034-4a0d-ab64-595dafaaf808",
+    "attempt": 5,
+    "reason": "budget",
+    "detail": "cost_total reached budget_limit 7"
+   },
+   {
+    "test_case_id": "d196cdc8-4a6a-44cb-97a4-d6cd26f58422",
+    "attempt": 3,
+    "reason": "budget",
+    "detail": "cost_total reached budget_limit before this attempt"
+   },
+   {
+    "test_case_id": "d196cdc8-4a6a-44cb-97a4-d6cd26f58422",
+    "attempt": 4,
+    "reason": "budget",
+    "detail": "cost_total reached budget_limit 7"
+   },
+   {
+    "test_case_id": "d196cdc8-4a6a-44cb-97a4-d6cd26f58422",
+    "attempt": 5,
+    "reason": "budget",
+    "detail": "cost_total reached budget_limit 7"
+   },
+   {
+    "test_case_id": "d92fb406-20a1-4b04-a683-e71640b5272b",
+    "attempt": 1,
+    "reason": "budget",
+    "detail": "cost_total reached budget_limit 7"
+   },
+   {
+    "test_case_id": "d92fb406-20a1-4b04-a683-e71640b5272b",
+    "attempt": 2,
+    "reason": "budget",
+    "detail": "cost_total reached budget_limit 7"
+   },
+   {
+    "test_case_id": "d92fb406-20a1-4b04-a683-e71640b5272b",
+    "attempt": 3,
+    "reason": "budget",
+    "detail": "cost_total reached budget_limit 7"
+   },
+   {
+    "test_case_id": "d92fb406-20a1-4b04-a683-e71640b5272b",
+    "attempt": 4,
+    "reason": "budget",
+    "detail": "cost_total reached budget_limit 7"
+   },
+   {
+    "test_case_id": "d92fb406-20a1-4b04-a683-e71640b5272b",
+    "attempt": 5,
+    "reason": "budget",
+    "detail": "cost_total reached budget_limit 7"
+   }
+  ],
+  "card_recheck": {
+   "outcome": "not_performed",
+   "card_hash": null,
+   "detail": "the budget stopped the attestation"
+  },
+  "not_tested": [
+   {
+    "category": "skill without test case",
+    "detail": "skill 'cancel-order' has no test case; invariant 1 (one test case per declared skill) is not satisfied for it"
+   },
+   {
+    "category": "runs never executed",
+    "detail": "13 run(s) of 20 planned were never executed: 13 because of budget"
+   },
+   {
+    "category": "declared capability not exercised",
+    "detail": "the card declares streaming; no test case exercises it"
+   },
+   {
+    "category": "probes",
+    "detail": "no probe_undeclared, probe_injection or probe_failure test cases exist yet (stage 4)"
+   },
+   {
+    "category": "semantic correctness",
+    "detail": "Layer 1 checks structure, state, output modes and latency; whether the content of each answer is correct needs Layer 2 (stage 4)"
+   },
+   {
+    "category": "production endpoint",
+    "detail": "tests ran against the declared sandbox or dry-run endpoint http://127.0.0.1:53448/rpc; the production endpoint itself was not tested (DR-006)"
+   }
+  ],
+  "sandbox_declared": true,
+  "drafter_name": "contract file",
+  "signer_public_key": "foI43Hhe8ShgR8thjY0n8R599wCvo9WbTGVoPvIWVhI",
+  "signature_payload": {
+   "payload_version": 1,
+   "attestation_id": "c4056661-3317-49bf-9939-0c9f800af0fe",
+   "card_hash": "sha256:c25be2adb553bc2efce2a1506c0b19194c8299c030e1f0b265890fbbeb96850b",
+   "contract": {
+    "id": "081fefaf-370f-4d3e-8e10-c5053a55b786",
+    "version": 1
+   },
+   "results": [
+    {
+     "test_case_id": "006fb9f0-a034-4a0d-ab64-595dafaaf808",
+     "skill_id": "start-return",
+     "kind": "skill",
+     "pass": 0,
+     "fail": 0,
+     "inconclusive": 0
+    },
+    {
+     "test_case_id": "1c213901-e016-4771-8790-c2e7fa0ea015",
+     "skill_id": "order-status",
+     "kind": "skill",
+     "pass": 5,
+     "fail": 0,
+     "inconclusive": 0
+    },
+    {
+     "test_case_id": "d196cdc8-4a6a-44cb-97a4-d6cd26f58422",
+     "skill_id": "order-status",
+     "kind": "skill",
+     "pass": 1,
+     "fail": 1,
+     "inconclusive": 0
+    },
+    {
+     "test_case_id": "d92fb406-20a1-4b04-a683-e71640b5272b",
+     "skill_id": "refund-estimate",
+     "kind": "skill",
+     "pass": 0,
+     "fail": 0,
+     "inconclusive": 0
+    }
+   ],
+   "transcript_hashes": {
+    "05b60c1b-06f6-4d7f-abb8-c72b2c3f6eeb": "sha256:d1492dfb8df83cb23b269419f180ca287393521d93dd485da90f3258e9cb3c7d",
+    "915d2485-367f-487f-bad2-c89ef8baeccc": "sha256:0fac548faa4076f1cb863a6aaa2fb060ddd1e08c0cc3586786f056d96b2c83e4",
+    "b5a89b12-e562-4d3d-afc4-dcb232554d45": "sha256:9394d96c3e8193defdd064f55f0fb0e188041873c791e69feefdfdd29d9cf1fe",
+    "bc9ea961-ef25-4601-834d-f2ac22b5f186": "sha256:6d5daa8490ffd8d657300a481d8ecc257de005e7ef7c7de545d2ce345068ee6e",
+    "c1d96425-d73d-479e-9e4d-cf1d8d2efbcd": "sha256:ad6a612a4b1d2900a553001eb60c754fb641d71b6293c64c2c1197156b5b9890",
+    "df430589-9d72-4bed-9a89-8a05b6ff5038": "sha256:59593804f51873384cfa3cdc3686e289640fd9298f853a36c93ff764f802bb44",
+    "e6ea965d-c2a5-420d-a286-9ffe59441623": "sha256:2f3282c23661611278e76250105f2bb9fbeaea94b842a1ef9695b485deba50bc"
+   },
+   "decision": null
+  },
+  "proposals": [
+   "OQ-A2: the sandbox is the endpoint the user declared with --sandbox; Suncly cannot verify it",
+   "OQ-A3: the Runner redacts its credential, Authorization and cookie headers and known token patterns before a transcript leaves it",
+   "OQ-A4: the Runner speaks A2A 1.0 over JSON-RPC, follows tasks by polling GetTask, uses no push notifications and never answers an interrupted state",
+   "OQ-A7: card_hash is SHA-256 of the RFC 8785 form of the card without `signatures`",
+   "OQ-A8: signatures are Ed25519 over the RFC 8785 payload, encoded `ed25519:<base64url>`; signing_key_id is a SHA-256 fingerprint of the public key",
+   "OQ-D1: cost is counted in attempts; every attempt costs 1, including retries",
+   "OQ-D3: run.attempt is the repetition number; (attestation_id, test_case_id, attempt) is unique",
+   "OQ-D7: input is {text} or {parts}; criteria hold the Layer 1 checks (docs/API.md)",
+   "OQ-D9: a card hash seen before reuses its card_version and its approved contract",
+   "OQ-D10: latency_ms runs from sending the message to the final task state; null without a response",
+   "OQ-F3: an unreachable agent gives inconclusive runs; a timeout fails the latency check",
+   "OQ-F5: a card that cannot be re-fetched at the end makes the attestation failed",
+   "OQ-F7: failed and invalidated attestations are signed with no decision in the payload",
+   "OQ-PO5: decision.policy_version is the placeholder 'unconfigured' until a policy exists",
+   "OQ-R1: a minimal Orchestrator runs inside the process",
+   "OQ-R2: test cases come from the deterministic drafter or a contract file; no model is involved",
+   "OQ-R6: the file report is the first version of the Report adapter"
+  ],
+  "format": "suncly-result/1"
+ },
+ "transcripts": {
+  "05b60c1b-06f6-4d7f-abb8-c72b2c3f6eeb": "{\"judgement\":{\"checks\":[{\"detail\":\"a well-formed Task\",\"name\":\"valid_schema\",\"passed\":true},{\"detail\":\"expected TASK_STATE_COMPLETED, observed TASK_STATE_COMPLETED\",\"name\":\"final_task_state\",\"passed\":true},{\"detail\":\"197 ms against a limit of 2000 ms\",\"name\":\"latency_limit\",\"passed\":true},{\"detail\":\"1 output part(s) with content\",\"name\":\"response_present\",\"passed\":true},{\"detail\":\"declared ['text/plain']; every part conforms\",\"name\":\"output_modes\",\"passed\":true},{\"detail\":\"present\",\"name\":\"required_field /artifacts/0/parts/0/text\",\"passed\":true}],\"judge_layer\":\"deterministic\",\"summary\":\"pass: every Layer 1 check passed\",\"verdict\":\"pass\"},\"transcript\":{\"attempt\":3,\"attestation_id\":\"c4056661-3317-49bf-9939-0c9f800af0fe\",\"cost\":\"1\",\"exchanges\":[{\"at\":\"2026-10-04T21:04:44.816556Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"method\":\"SendMessage\",\"params\":{\"message\":{\"messageId\":\"da23c061-63e9-4308-b400-aec3a54d3949\",\"parts\":[{\"text\":\"Where is order 48213?\"}],\"role\":\"ROLE_USER\"}}},\"direction\":\"request\",\"headers\":{\"A2A-Version\":\"1.0\",\"Accept\":\"application/json\",\"Authorization\":\"[REDACTED]\",\"Content-Type\":\"application/json\"},\"http_status\":null,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"},{\"at\":\"2026-10-04T21:04:45.014327Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"result\":{\"task\":{\"artifacts\":[{\"artifactId\":\"92ea27d7a33a4de694dcd1d1b262312d\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Order 48213 is in transit and is expected on Tuesday 7 October. Tracking: HC-2210-5581.\"}]}],\"contextId\":\"8bb08416236a494e957530045cf50cf8\",\"id\":\"ebe33f75f9f34bb08c38fac02481c7ec\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:45.012Z\"}}}},\"direction\":\"response\",\"headers\":{\"content-length\":\"452\",\"content-type\":\"application/json\",\"date\":\"Sun, 04 Oct 2026 21:04:45 GMT\",\"server\":\"BaseHTTP/0.6 Python/3.14.3\"},\"http_status\":200,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"}],\"failure\":null,\"final_response\":{\"artifacts\":[{\"artifactId\":\"92ea27d7a33a4de694dcd1d1b262312d\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Order 48213 is in transit and is expected on Tuesday 7 October. Tracking: HC-2210-5581.\"}]}],\"contextId\":\"8bb08416236a494e957530045cf50cf8\",\"id\":\"ebe33f75f9f34bb08c38fac02481c7ec\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:45.012Z\"}},\"final_task_state\":\"TASK_STATE_COMPLETED\",\"finished_at\":\"2026-10-04T21:04:45.014631Z\",\"latency_ms\":197,\"outcome\":\"responded_task\",\"protocol_binding\":\"JSONRPC\",\"protocol_version\":\"1.0\",\"redaction\":{\"replacements\":1,\"rules\":[\"sensitive_key\"]},\"started_at\":\"2026-10-04T21:04:44.816351Z\",\"target_url\":\"http://127.0.0.1:53448/rpc\",\"task_id\":\"ebe33f75f9f34bb08c38fac02481c7ec\",\"test_case_id\":\"1c213901-e016-4771-8790-c2e7fa0ea015\"}}",
+  "915d2485-367f-487f-bad2-c89ef8baeccc": "{\"judgement\":{\"checks\":[{\"detail\":\"a well-formed Task\",\"name\":\"valid_schema\",\"passed\":true},{\"detail\":\"expected TASK_STATE_COMPLETED, observed TASK_STATE_COMPLETED\",\"name\":\"final_task_state\",\"passed\":true},{\"detail\":\"178 ms against a limit of 2000 ms\",\"name\":\"latency_limit\",\"passed\":true},{\"detail\":\"1 output part(s) with content\",\"name\":\"response_present\",\"passed\":true},{\"detail\":\"declared ['text/plain']; every part conforms\",\"name\":\"output_modes\",\"passed\":true},{\"detail\":\"present\",\"name\":\"required_field /artifacts/0/parts/0/text\",\"passed\":true}],\"judge_layer\":\"deterministic\",\"summary\":\"pass: every Layer 1 check passed\",\"verdict\":\"pass\"},\"transcript\":{\"attempt\":5,\"attestation_id\":\"c4056661-3317-49bf-9939-0c9f800af0fe\",\"cost\":\"1\",\"exchanges\":[{\"at\":\"2026-10-04T21:04:45.172961Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"method\":\"SendMessage\",\"params\":{\"message\":{\"messageId\":\"1d7cb81e-27c4-4705-8ac9-0582d2351383\",\"parts\":[{\"text\":\"Where is order 48213?\"}],\"role\":\"ROLE_USER\"}}},\"direction\":\"request\",\"headers\":{\"A2A-Version\":\"1.0\",\"Accept\":\"application/json\",\"Authorization\":\"[REDACTED]\",\"Content-Type\":\"application/json\"},\"http_status\":null,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"},{\"at\":\"2026-10-04T21:04:45.351104Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"result\":{\"task\":{\"artifacts\":[{\"artifactId\":\"c48ac03c81fe42549082d64012c0f56f\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Order 48213 is in transit and is expected on Tuesday 7 October. Tracking: HC-2210-5581.\"}]}],\"contextId\":\"1a9307151f2747048beafaff33c21909\",\"id\":\"12d734c082c94180b415856ae5a04fd2\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:45.350Z\"}}}},\"direction\":\"response\",\"headers\":{\"content-length\":\"452\",\"content-type\":\"application/json\",\"date\":\"Sun, 04 Oct 2026 21:04:45 GMT\",\"server\":\"BaseHTTP/0.6 Python/3.14.3\"},\"http_status\":200,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"}],\"failure\":null,\"final_response\":{\"artifacts\":[{\"artifactId\":\"c48ac03c81fe42549082d64012c0f56f\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Order 48213 is in transit and is expected on Tuesday 7 October. Tracking: HC-2210-5581.\"}]}],\"contextId\":\"1a9307151f2747048beafaff33c21909\",\"id\":\"12d734c082c94180b415856ae5a04fd2\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:45.350Z\"}},\"final_task_state\":\"TASK_STATE_COMPLETED\",\"finished_at\":\"2026-10-04T21:04:45.351227Z\",\"latency_ms\":178,\"outcome\":\"responded_task\",\"protocol_binding\":\"JSONRPC\",\"protocol_version\":\"1.0\",\"redaction\":{\"replacements\":1,\"rules\":[\"sensitive_key\"]},\"started_at\":\"2026-10-04T21:04:45.172786Z\",\"target_url\":\"http://127.0.0.1:53448/rpc\",\"task_id\":\"12d734c082c94180b415856ae5a04fd2\",\"test_case_id\":\"1c213901-e016-4771-8790-c2e7fa0ea015\"}}",
+  "b5a89b12-e562-4d3d-afc4-dcb232554d45": "{\"judgement\":{\"checks\":[{\"detail\":\"a well-formed Task\",\"name\":\"valid_schema\",\"passed\":true},{\"detail\":\"expected TASK_STATE_COMPLETED, observed TASK_STATE_COMPLETED\",\"name\":\"final_task_state\",\"passed\":true},{\"detail\":\"247 ms against a limit of 2000 ms\",\"name\":\"latency_limit\",\"passed\":true},{\"detail\":\"1 output part(s) with content\",\"name\":\"response_present\",\"passed\":true},{\"detail\":\"declared ['text/plain']; every part conforms\",\"name\":\"output_modes\",\"passed\":true},{\"detail\":\"present\",\"name\":\"required_field /artifacts/0/parts/0/text\",\"passed\":true}],\"judge_layer\":\"deterministic\",\"summary\":\"pass: every Layer 1 check passed\",\"verdict\":\"pass\"},\"transcript\":{\"attempt\":2,\"attestation_id\":\"c4056661-3317-49bf-9939-0c9f800af0fe\",\"cost\":\"1\",\"exchanges\":[{\"at\":\"2026-10-04T21:04:44.816477Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"method\":\"SendMessage\",\"params\":{\"message\":{\"messageId\":\"bc08919f-8213-4143-b438-d5e53f57a8b9\",\"parts\":[{\"text\":\"Where is order 48213?\"}],\"role\":\"ROLE_USER\"}}},\"direction\":\"request\",\"headers\":{\"A2A-Version\":\"1.0\",\"Accept\":\"application/json\",\"Authorization\":\"[REDACTED]\",\"Content-Type\":\"application/json\"},\"http_status\":null,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"},{\"at\":\"2026-10-04T21:04:45.063920Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"result\":{\"task\":{\"artifacts\":[{\"artifactId\":\"fbaaf91ace8d467d837906b8eb673604\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Order 48213 is in transit and is expected on Tuesday 7 October. Tracking: HC-2210-5581.\"}]}],\"contextId\":\"0a2799eb974944e29d7e556e103ab0f4\",\"id\":\"3b7dcbdc2c264e94a89cdb76b140806b\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:45.062Z\"}}}},\"direction\":\"response\",\"headers\":{\"content-length\":\"452\",\"content-type\":\"application/json\",\"date\":\"Sun, 04 Oct 2026 21:04:45 GMT\",\"server\":\"BaseHTTP/0.6 Python/3.14.3\"},\"http_status\":200,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"}],\"failure\":null,\"final_response\":{\"artifacts\":[{\"artifactId\":\"fbaaf91ace8d467d837906b8eb673604\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Order 48213 is in transit and is expected on Tuesday 7 October. Tracking: HC-2210-5581.\"}]}],\"contextId\":\"0a2799eb974944e29d7e556e103ab0f4\",\"id\":\"3b7dcbdc2c264e94a89cdb76b140806b\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:45.062Z\"}},\"final_task_state\":\"TASK_STATE_COMPLETED\",\"finished_at\":\"2026-10-04T21:04:45.064082Z\",\"latency_ms\":247,\"outcome\":\"responded_task\",\"protocol_binding\":\"JSONRPC\",\"protocol_version\":\"1.0\",\"redaction\":{\"replacements\":1,\"rules\":[\"sensitive_key\"]},\"started_at\":\"2026-10-04T21:04:44.816312Z\",\"target_url\":\"http://127.0.0.1:53448/rpc\",\"task_id\":\"3b7dcbdc2c264e94a89cdb76b140806b\",\"test_case_id\":\"1c213901-e016-4771-8790-c2e7fa0ea015\"}}",
+  "bc9ea961-ef25-4601-834d-f2ac22b5f186": "{\"judgement\":{\"checks\":[{\"detail\":\"a well-formed Task\",\"name\":\"valid_schema\",\"passed\":true},{\"detail\":\"expected TASK_STATE_COMPLETED, observed TASK_STATE_FAILED\",\"name\":\"final_task_state\",\"passed\":false},{\"detail\":\"270 ms against a limit of 2000 ms\",\"name\":\"latency_limit\",\"passed\":true},{\"detail\":\"0 output part(s) with content\",\"name\":\"response_present\",\"passed\":false},{\"detail\":\"declared ['text/plain']; every part conforms\",\"name\":\"output_modes\",\"passed\":true},{\"detail\":\"missing\",\"name\":\"required_field /artifacts/0/parts/0/text\",\"passed\":false}],\"judge_layer\":\"deterministic\",\"summary\":\"fail: final_task_state, response_present, required_field /artifacts/0/parts/0/text\",\"verdict\":\"fail\"},\"transcript\":{\"attempt\":2,\"attestation_id\":\"c4056661-3317-49bf-9939-0c9f800af0fe\",\"cost\":\"1\",\"exchanges\":[{\"at\":\"2026-10-04T21:04:45.275282Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"method\":\"SendMessage\",\"params\":{\"message\":{\"messageId\":\"12362af2-c057-4db0-8bfd-3a1daeac5d7d\",\"parts\":[{\"text\":\"Has order 48213 shipped yet?\"}],\"role\":\"ROLE_USER\"}}},\"direction\":\"request\",\"headers\":{\"A2A-Version\":\"1.0\",\"Accept\":\"application/json\",\"Authorization\":\"[REDACTED]\",\"Content-Type\":\"application/json\"},\"http_status\":null,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"},{\"at\":\"2026-10-04T21:04:45.545349Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"result\":{\"task\":{\"contextId\":\"84fd2d8c2a0c4431a1d714b57b58338e\",\"id\":\"414b1f46327c4c7cb9827e6fcc6a0391\",\"status\":{\"message\":{\"messageId\":\"9a7f7505bc93443aa9e2c36edc72e726\",\"parts\":[{\"text\":\"order-service: upstream timeout after 8000 ms\"}],\"role\":\"ROLE_AGENT\"},\"state\":\"TASK_STATE_FAILED\",\"timestamp\":\"2026-10-04T21:04:45.544Z\"}}}},\"direction\":\"response\",\"headers\":{\"content-length\":\"379\",\"content-type\":\"application/json\",\"date\":\"Sun, 04 Oct 2026 21:04:45 GMT\",\"server\":\"BaseHTTP/0.6 Python/3.14.3\"},\"http_status\":200,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"}],\"failure\":null,\"final_response\":{\"contextId\":\"84fd2d8c2a0c4431a1d714b57b58338e\",\"id\":\"414b1f46327c4c7cb9827e6fcc6a0391\",\"status\":{\"message\":{\"messageId\":\"9a7f7505bc93443aa9e2c36edc72e726\",\"parts\":[{\"text\":\"order-service: upstream timeout after 8000 ms\"}],\"role\":\"ROLE_AGENT\"},\"state\":\"TASK_STATE_FAILED\",\"timestamp\":\"2026-10-04T21:04:45.544Z\"}},\"final_task_state\":\"TASK_STATE_FAILED\",\"finished_at\":\"2026-10-04T21:04:45.545463Z\",\"latency_ms\":270,\"outcome\":\"responded_task\",\"protocol_binding\":\"JSONRPC\",\"protocol_version\":\"1.0\",\"redaction\":{\"replacements\":1,\"rules\":[\"sensitive_key\"]},\"started_at\":\"2026-10-04T21:04:45.275149Z\",\"target_url\":\"http://127.0.0.1:53448/rpc\",\"task_id\":\"414b1f46327c4c7cb9827e6fcc6a0391\",\"test_case_id\":\"d196cdc8-4a6a-44cb-97a4-d6cd26f58422\"}}",
+  "c1d96425-d73d-479e-9e4d-cf1d8d2efbcd": "{\"judgement\":{\"checks\":[{\"detail\":\"a well-formed Task\",\"name\":\"valid_schema\",\"passed\":true},{\"detail\":\"expected TASK_STATE_COMPLETED, observed TASK_STATE_COMPLETED\",\"name\":\"final_task_state\",\"passed\":true},{\"detail\":\"359 ms against a limit of 2000 ms\",\"name\":\"latency_limit\",\"passed\":true},{\"detail\":\"1 output part(s) with content\",\"name\":\"response_present\",\"passed\":true},{\"detail\":\"declared ['text/plain']; every part conforms\",\"name\":\"output_modes\",\"passed\":true},{\"detail\":\"present\",\"name\":\"required_field /artifacts/0/parts/0/text\",\"passed\":true}],\"judge_layer\":\"deterministic\",\"summary\":\"pass: every Layer 1 check passed\",\"verdict\":\"pass\"},\"transcript\":{\"attempt\":4,\"attestation_id\":\"c4056661-3317-49bf-9939-0c9f800af0fe\",\"cost\":\"1\",\"exchanges\":[{\"at\":\"2026-10-04T21:04:44.816796Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"method\":\"SendMessage\",\"params\":{\"message\":{\"messageId\":\"f4fec772-e65f-4243-91ff-05ca6ce33b3f\",\"parts\":[{\"text\":\"Where is order 48213?\"}],\"role\":\"ROLE_USER\"}}},\"direction\":\"request\",\"headers\":{\"A2A-Version\":\"1.0\",\"Accept\":\"application/json\",\"Authorization\":\"[REDACTED]\",\"Content-Type\":\"application/json\"},\"http_status\":null,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"},{\"at\":\"2026-10-04T21:04:45.175973Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"result\":{\"task\":{\"artifacts\":[{\"artifactId\":\"6ec7f1970953491a8b5c6e47b9c469cb\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Order 48213 is in transit and is expected on Tuesday 7 October. Tracking: HC-2210-5581.\"}]}],\"contextId\":\"803c4b96f7ba4a6590c28a51ddd37fb3\",\"id\":\"251d8d35256c44b8b210dc89bc4a9570\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:45.175Z\"}}}},\"direction\":\"response\",\"headers\":{\"content-length\":\"452\",\"content-type\":\"application/json\",\"date\":\"Sun, 04 Oct 2026 21:04:45 GMT\",\"server\":\"BaseHTTP/0.6 Python/3.14.3\"},\"http_status\":200,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"}],\"failure\":null,\"final_response\":{\"artifacts\":[{\"artifactId\":\"6ec7f1970953491a8b5c6e47b9c469cb\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Order 48213 is in transit and is expected on Tuesday 7 October. Tracking: HC-2210-5581.\"}]}],\"contextId\":\"803c4b96f7ba4a6590c28a51ddd37fb3\",\"id\":\"251d8d35256c44b8b210dc89bc4a9570\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:45.175Z\"}},\"final_task_state\":\"TASK_STATE_COMPLETED\",\"finished_at\":\"2026-10-04T21:04:45.176069Z\",\"latency_ms\":359,\"outcome\":\"responded_task\",\"protocol_binding\":\"JSONRPC\",\"protocol_version\":\"1.0\",\"redaction\":{\"replacements\":1,\"rules\":[\"sensitive_key\"]},\"started_at\":\"2026-10-04T21:04:44.816528Z\",\"target_url\":\"http://127.0.0.1:53448/rpc\",\"task_id\":\"251d8d35256c44b8b210dc89bc4a9570\",\"test_case_id\":\"1c213901-e016-4771-8790-c2e7fa0ea015\"}}",
+  "df430589-9d72-4bed-9a89-8a05b6ff5038": "{\"judgement\":{\"checks\":[{\"detail\":\"a well-formed Task\",\"name\":\"valid_schema\",\"passed\":true},{\"detail\":\"expected TASK_STATE_COMPLETED, observed TASK_STATE_COMPLETED\",\"name\":\"final_task_state\",\"passed\":true},{\"detail\":\"284 ms against a limit of 2000 ms\",\"name\":\"latency_limit\",\"passed\":true},{\"detail\":\"1 output part(s) with content\",\"name\":\"response_present\",\"passed\":true},{\"detail\":\"declared ['text/plain']; every part conforms\",\"name\":\"output_modes\",\"passed\":true},{\"detail\":\"present\",\"name\":\"required_field /artifacts/0/parts/0/text\",\"passed\":true}],\"judge_layer\":\"deterministic\",\"summary\":\"pass: every Layer 1 check passed\",\"verdict\":\"pass\"},\"transcript\":{\"attempt\":1,\"attestation_id\":\"c4056661-3317-49bf-9939-0c9f800af0fe\",\"cost\":\"1\",\"exchanges\":[{\"at\":\"2026-10-04T21:04:45.193524Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"method\":\"SendMessage\",\"params\":{\"message\":{\"messageId\":\"da82def4-0ae6-4979-aa50-5de041b69eb2\",\"parts\":[{\"text\":\"Has order 48213 shipped yet?\"}],\"role\":\"ROLE_USER\"}}},\"direction\":\"request\",\"headers\":{\"A2A-Version\":\"1.0\",\"Accept\":\"application/json\",\"Authorization\":\"[REDACTED]\",\"Content-Type\":\"application/json\"},\"http_status\":null,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"},{\"at\":\"2026-10-04T21:04:45.478284Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"result\":{\"task\":{\"artifacts\":[{\"artifactId\":\"d35634b9963f4ab3ba0293fe34e1d110\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Yes. Order 48213 shipped on 2 October and is with the carrier (tracking HC-2210-5581).\"}]}],\"contextId\":\"d9b8e02df81542e1b00ed8e8fd399fc0\",\"id\":\"ef05dd6c15854cc3b05e421a6a72ac99\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:45.476Z\"}}}},\"direction\":\"response\",\"headers\":{\"content-length\":\"451\",\"content-type\":\"application/json\",\"date\":\"Sun, 04 Oct 2026 21:04:45 GMT\",\"server\":\"BaseHTTP/0.6 Python/3.14.3\"},\"http_status\":200,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"}],\"failure\":null,\"final_response\":{\"artifacts\":[{\"artifactId\":\"d35634b9963f4ab3ba0293fe34e1d110\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Yes. Order 48213 shipped on 2 October and is with the carrier (tracking HC-2210-5581).\"}]}],\"contextId\":\"d9b8e02df81542e1b00ed8e8fd399fc0\",\"id\":\"ef05dd6c15854cc3b05e421a6a72ac99\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:45.476Z\"}},\"final_task_state\":\"TASK_STATE_COMPLETED\",\"finished_at\":\"2026-10-04T21:04:45.478481Z\",\"latency_ms\":284,\"outcome\":\"responded_task\",\"protocol_binding\":\"JSONRPC\",\"protocol_version\":\"1.0\",\"redaction\":{\"replacements\":1,\"rules\":[\"sensitive_key\"]},\"started_at\":\"2026-10-04T21:04:45.193338Z\",\"target_url\":\"http://127.0.0.1:53448/rpc\",\"task_id\":\"ef05dd6c15854cc3b05e421a6a72ac99\",\"test_case_id\":\"d196cdc8-4a6a-44cb-97a4-d6cd26f58422\"}}",
+  "e6ea965d-c2a5-420d-a286-9ffe59441623": "{\"judgement\":{\"checks\":[{\"detail\":\"a well-formed Task\",\"name\":\"valid_schema\",\"passed\":true},{\"detail\":\"expected TASK_STATE_COMPLETED, observed TASK_STATE_COMPLETED\",\"name\":\"final_task_state\",\"passed\":true},{\"detail\":\"327 ms against a limit of 2000 ms\",\"name\":\"latency_limit\",\"passed\":true},{\"detail\":\"1 output part(s) with content\",\"name\":\"response_present\",\"passed\":true},{\"detail\":\"declared ['text/plain']; every part conforms\",\"name\":\"output_modes\",\"passed\":true},{\"detail\":\"present\",\"name\":\"required_field /artifacts/0/parts/0/text\",\"passed\":true}],\"judge_layer\":\"deterministic\",\"summary\":\"pass: every Layer 1 check passed\",\"verdict\":\"pass\"},\"transcript\":{\"attempt\":1,\"attestation_id\":\"c4056661-3317-49bf-9939-0c9f800af0fe\",\"cost\":\"1\",\"exchanges\":[{\"at\":\"2026-10-04T21:04:44.822607Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"method\":\"SendMessage\",\"params\":{\"message\":{\"messageId\":\"cbd52dcb-c714-4960-90e4-8fa49d79c504\",\"parts\":[{\"text\":\"Where is order 48213?\"}],\"role\":\"ROLE_USER\"}}},\"direction\":\"request\",\"headers\":{\"A2A-Version\":\"1.0\",\"Accept\":\"application/json\",\"Authorization\":\"[REDACTED]\",\"Content-Type\":\"application/json\"},\"http_status\":null,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"},{\"at\":\"2026-10-04T21:04:45.149875Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"result\":{\"task\":{\"artifacts\":[{\"artifactId\":\"55dcee348f314aa59a007f3787da2937\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Order 48213 is in transit and is expected on Tuesday 7 October. Tracking: HC-2210-5581.\"}]}],\"contextId\":\"3285ecfcdf34462e90cf2d9299740887\",\"id\":\"149198880ea54458b1323fd8d101e816\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:45.149Z\"}}}},\"direction\":\"response\",\"headers\":{\"content-length\":\"452\",\"content-type\":\"application/json\",\"date\":\"Sun, 04 Oct 2026 21:04:45 GMT\",\"server\":\"BaseHTTP/0.6 Python/3.14.3\"},\"http_status\":200,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"}],\"failure\":null,\"final_response\":{\"artifacts\":[{\"artifactId\":\"55dcee348f314aa59a007f3787da2937\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Order 48213 is in transit and is expected on Tuesday 7 October. Tracking: HC-2210-5581.\"}]}],\"contextId\":\"3285ecfcdf34462e90cf2d9299740887\",\"id\":\"149198880ea54458b1323fd8d101e816\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:45.149Z\"}},\"final_task_state\":\"TASK_STATE_COMPLETED\",\"finished_at\":\"2026-10-04T21:04:45.149966Z\",\"latency_ms\":327,\"outcome\":\"responded_task\",\"protocol_binding\":\"JSONRPC\",\"protocol_version\":\"1.0\",\"redaction\":{\"replacements\":1,\"rules\":[\"sensitive_key\"]},\"started_at\":\"2026-10-04T21:04:44.822470Z\",\"target_url\":\"http://127.0.0.1:53448/rpc\",\"task_id\":\"149198880ea54458b1323fd8d101e816\",\"test_case_id\":\"1c213901-e016-4771-8790-c2e7fa0ea015\"}}"
+ },
+ "report_md": "# Suncly attestation report: Harbor Returns Agent\n\n**No decision: the attestation ended failed.**\n\nThe budget cap stopped it, or the card could not be re-fetched at the end (not_performed). No decision is made for a failed attestation (schema §11).\n\nAttestation status: **failed**. Generated 2026-10-04T21:04:45+00:00.\n\n> Verdict counts are shown per test case. Suncly never combines them into a single score, and inconclusive runs are never counted as passes.\n\n## Results per test case\n\n| Skill | Kind | Input | pass | fail | inconclusive |\n|---|---|---|---|---|---|\n| order-status | skill | Where is order 48213? | 5 | 0 | 0 |\n| order-status | skill | Has order 48213 shipped yet? | 1 | 1 | 0 |\n| start-return | skill | Start a return for order 48213, item 2 | 0 | 0 | 0 |\n| refund-estimate | skill | How much will I get back if I return order 48213? | 0 | 0 | 0 |\n\nTotals across test cases: pass 6, fail 1, inconclusive 0. These are counts, not a score.\n\n## What was NOT tested\n\n- **skill without test case:** skill 'cancel-order' has no test case; invariant 1 (one test case per declared skill) is not satisfied for it\n- **runs never executed:** 13 run(s) of 20 planned were never executed: 13 because of budget\n- **declared capability not exercised:** the card declares streaming; no test case exercises it\n- **probes:** no probe_undeclared, probe_injection or probe_failure test cases exist yet (stage 4)\n- **semantic correctness:** Layer 1 checks structure, state, output modes and latency; whether the content of each answer is correct needs Layer 2 (stage 4)\n- **production endpoint:** tests ran against the declared sandbox or dry-run endpoint http://127.0.0.1:53448/rpc; the production endpoint itself was not tested (DR-006)\n\nRuns never executed:\n\n- test case 006fb9f0-a034-4a0d-ab64-595dafaaf808 attempt 1: budget (cost_total reached budget_limit 7)\n- test case 006fb9f0-a034-4a0d-ab64-595dafaaf808 attempt 2: budget (cost_total reached budget_limit 7)\n- test case 006fb9f0-a034-4a0d-ab64-595dafaaf808 attempt 3: budget (cost_total reached budget_limit 7)\n- test case 006fb9f0-a034-4a0d-ab64-595dafaaf808 attempt 4: budget (cost_total reached budget_limit 7)\n- test case 006fb9f0-a034-4a0d-ab64-595dafaaf808 attempt 5: budget (cost_total reached budget_limit 7)\n- test case d196cdc8-4a6a-44cb-97a4-d6cd26f58422 attempt 3: budget (cost_total reached budget_limit before this attempt)\n- test case d196cdc8-4a6a-44cb-97a4-d6cd26f58422 attempt 4: budget (cost_total reached budget_limit 7)\n- test case d196cdc8-4a6a-44cb-97a4-d6cd26f58422 attempt 5: budget (cost_total reached budget_limit 7)\n- test case d92fb406-20a1-4b04-a683-e71640b5272b attempt 1: budget (cost_total reached budget_limit 7)\n- test case d92fb406-20a1-4b04-a683-e71640b5272b attempt 2: budget (cost_total reached budget_limit 7)\n- test case d92fb406-20a1-4b04-a683-e71640b5272b attempt 3: budget (cost_total reached budget_limit 7)\n- test case d92fb406-20a1-4b04-a683-e71640b5272b attempt 4: budget (cost_total reached budget_limit 7)\n- test case d92fb406-20a1-4b04-a683-e71640b5272b attempt 5: budget (cost_total reached budget_limit 7)\n\n## Attestation\n\n| Field | Value |\n|---|---|\n| id | c4056661-3317-49bf-9939-0c9f800af0fe |\n| status | failed |\n| trigger | manual |\n| started_at | 2026-10-04T21:04:44+00:00 |\n| finished_at | 2026-10-04T21:04:45+00:00 |\n| budget_limit | 7 attempt(s) |\n| cost_total | 7 attempt(s) |\n| planned_runs | 20 |\n| recorded_runs | 7 |\n| not_executed | 13 |\n\n## Agent Card\n\n| Field | Value |\n|---|---|\n| url | http://127.0.0.1:53448/.well-known/agent-card.json |\n| name | Harbor Returns Agent |\n| version | 2.3.1 |\n| card_hash | sha256:c25be2adb553bc2efce2a1506c0b19194c8299c030e1f0b265890fbbeb96850b |\n| hash_scheme | SHA-256 of the RFC 8785 (JCS) form of the card without the `signatures` field |\n| fetched_at | 2026-10-04T21:04:37+00:00 |\n| interface | JSONRPC 1.0 at http://127.0.0.1:53448/rpc |\n| skills | order-status, start-return, refund-estimate, cancel-order |\n| sandbox | declared by the user with --sandbox (DR-006) |\n| agent_id | 7bbe9bc6-c18c-5789-888d-278ad0d05a81 |\n| owner | Harbor Commerce platform team (fictional) |\n| risk_level | medium |\n\n## Card re-check at the end\n\n| Field | Value |\n|---|---|\n| outcome | not_performed |\n| detail | the budget stopped the attestation |\n\n## Contract\n\n| Field | Value |\n|---|---|\n| id | 081fefaf-370f-4d3e-8e10-c5053a55b786 |\n| version | 1 |\n| status | approved |\n| approved_by | m.lind@harbor.example |\n| approved_at | 2026-10-04T21:04:37+00:00 |\n| source | contract file |\n| test_cases | 4 |\n\n### Test cases and criteria\n\n- **order-status** (skill), test case `1c213901-e016-4771-8790-c2e7fa0ea015`\n  - input: Where is order 48213?\n  - criteria: `{\"accept_direct_message\": false, \"final_state\": \"TASK_STATE_COMPLETED\", \"latency_limit_ms\": 2000, \"model_checks\": [], \"output_modes\": [\"text/plain\"], \"required_fields\": [\"/artifacts/0/parts/0/text\"], \"response_present\": true}`\n- **order-status** (skill), test case `d196cdc8-4a6a-44cb-97a4-d6cd26f58422`\n  - input: Has order 48213 shipped yet?\n  - criteria: `{\"accept_direct_message\": false, \"final_state\": \"TASK_STATE_COMPLETED\", \"latency_limit_ms\": 2000, \"model_checks\": [], \"output_modes\": [\"text/plain\"], \"required_fields\": [\"/artifacts/0/parts/0/text\"], \"response_present\": true}`\n- **start-return** (skill), test case `006fb9f0-a034-4a0d-ab64-595dafaaf808`\n  - input: Start a return for order 48213, item 2\n  - criteria: `{\"accept_direct_message\": false, \"final_state\": \"TASK_STATE_COMPLETED\", \"latency_limit_ms\": 2000, \"model_checks\": [], \"output_modes\": [\"text/plain\"], \"required_fields\": [\"/artifacts/0/parts/0/text\"], \"response_present\": true}`\n- **refund-estimate** (skill), test case `d92fb406-20a1-4b04-a683-e71640b5272b`\n  - input: How much will I get back if I return order 48213?\n  - criteria: `{\"accept_direct_message\": false, \"final_state\": \"TASK_STATE_COMPLETED\", \"latency_limit_ms\": 2000, \"model_checks\": [\"the amount equals the order total minus the restocking fee\"], \"output_modes\": [\"text/plain\"], \"required_fields\": [\"/artifacts/0/parts/0/text\"], \"response_present\": true}`\n\n## Signature\n\n| Field | Value |\n|---|---|\n| signing_key_id | ed25519-3b05ae908c2cb82a |\n| signature | ed25519:CTc-dMeg8xwQvgbw8aDhYgV84wO_nxhrou6o3TKPp6WqjlUmwuy5MvQEiNyViqehbcHTIY_8GMP55LECWpcuDQ |\n| public_key | foI43Hhe8ShgR8thjY0n8R599wCvo9WbTGVoPvIWVhI |\n| payload | attestation id, card_hash, contract id and version, per-test-case results, the hash of every transcript, the decision outcome and policy_version (schema §11) |\n| verify | suncly verify suncly-reports/c4056661-3317-49bf-9939-0c9f800af0fe |\n\n## Runs\n\n| Skill | Attempt | Verdict | Latency (ms) | Outcome | Summary | Transcript |\n|---|---|---|---|---|---|---|\n| order-status | 1 | pass | 327 | responded_task | pass: every Layer 1 check passed | transcripts/e6ea965d-c2a5-420d-a286-9ffe59441623.json |\n| order-status | 2 | pass | 247 | responded_task | pass: every Layer 1 check passed | transcripts/b5a89b12-e562-4d3d-afc4-dcb232554d45.json |\n| order-status | 3 | pass | 197 | responded_task | pass: every Layer 1 check passed | transcripts/05b60c1b-06f6-4d7f-abb8-c72b2c3f6eeb.json |\n| order-status | 4 | pass | 359 | responded_task | pass: every Layer 1 check passed | transcripts/c1d96425-d73d-479e-9e4d-cf1d8d2efbcd.json |\n| order-status | 5 | pass | 178 | responded_task | pass: every Layer 1 check passed | transcripts/915d2485-367f-487f-bad2-c89ef8baeccc.json |\n| order-status | 1 | pass | 284 | responded_task | pass: every Layer 1 check passed | transcripts/df430589-9d72-4bed-9a89-8a05b6ff5038.json |\n| order-status | 2 | fail | 270 | responded_task | fail: final_task_state, response_present, required_field /artifacts/0/parts/0/text | transcripts/bc9ea961-ef25-4601-834d-f2ac22b5f186.json |\n\n## Proposals in effect\n\n- OQ-A2: the sandbox is the endpoint the user declared with --sandbox; Suncly cannot verify it\n- OQ-A3: the Runner redacts its credential, Authorization and cookie headers and known token patterns before a transcript leaves it\n- OQ-A4: the Runner speaks A2A 1.0 over JSON-RPC, follows tasks by polling GetTask, uses no push notifications and never answers an interrupted state\n- OQ-A7: card_hash is SHA-256 of the RFC 8785 form of the card without `signatures`\n- OQ-A8: signatures are Ed25519 over the RFC 8785 payload, encoded `ed25519:<base64url>`; signing_key_id is a SHA-256 fingerprint of the public key\n- OQ-D1: cost is counted in attempts; every attempt costs 1, including retries\n- OQ-D3: run.attempt is the repetition number; (attestation_id, test_case_id, attempt) is unique\n- OQ-D7: input is {text} or {parts}; criteria hold the Layer 1 checks (docs/API.md)\n- OQ-D9: a card hash seen before reuses its card_version and its approved contract\n- OQ-D10: latency_ms runs from sending the message to the final task state; null without a response\n- OQ-F3: an unreachable agent gives inconclusive runs; a timeout fails the latency check\n- OQ-F5: a card that cannot be re-fetched at the end makes the attestation failed\n- OQ-F7: failed and invalidated attestations are signed with no decision in the payload\n- OQ-PO5: decision.policy_version is the placeholder 'unconfigured' until a policy exists\n- OQ-R1: a minimal Orchestrator runs inside the process\n- OQ-R2: test cases come from the deterministic drafter or a contract file; no model is involved\n- OQ-R6: the file report is the first version of the Report adapter\n\nOpen questions are listed in the docs; none is decided by this report.\n"
+}

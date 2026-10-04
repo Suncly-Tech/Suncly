@@ -1,0 +1,92 @@
+{
+  "suncly_contract_file": 1,
+  "card_hash": "sha256:c25be2adb553bc2efce2a1506c0b19194c8299c030e1f0b265890fbbeb96850b",
+  "agent_name": "Harbor Returns Agent",
+  "skills_without_test_case": [
+    "cancel-order"
+  ],
+  "test_cases": [
+    {
+      "skill_id": "order-status",
+      "kind": "skill",
+      "input": {
+        "text": "Where is order 48213?"
+      },
+      "criteria": {
+        "final_state": "TASK_STATE_COMPLETED",
+        "latency_limit_ms": 2000,
+        "response_present": true,
+        "output_modes": [
+          "text/plain"
+        ],
+        "required_fields": [
+          "/artifacts/0/parts/0/text"
+        ],
+        "model_checks": [],
+        "accept_direct_message": false
+      }
+    },
+    {
+      "skill_id": "order-status",
+      "kind": "skill",
+      "input": {
+        "text": "Has order 48213 shipped yet?"
+      },
+      "criteria": {
+        "final_state": "TASK_STATE_COMPLETED",
+        "latency_limit_ms": 2000,
+        "response_present": true,
+        "output_modes": [
+          "text/plain"
+        ],
+        "required_fields": [
+          "/artifacts/0/parts/0/text"
+        ],
+        "model_checks": [],
+        "accept_direct_message": false
+      }
+    },
+    {
+      "skill_id": "start-return",
+      "kind": "skill",
+      "input": {
+        "text": "Start a return for order 48213, item 2"
+      },
+      "criteria": {
+        "final_state": "TASK_STATE_COMPLETED",
+        "latency_limit_ms": 2000,
+        "response_present": true,
+        "output_modes": [
+          "text/plain"
+        ],
+        "required_fields": [
+          "/artifacts/0/parts/0/text"
+        ],
+        "model_checks": [],
+        "accept_direct_message": false
+      }
+    },
+    {
+      "skill_id": "refund-estimate",
+      "kind": "skill",
+      "input": {
+        "text": "How much will I get back if I return order 48213?"
+      },
+      "criteria": {
+        "final_state": "TASK_STATE_COMPLETED",
+        "latency_limit_ms": 2000,
+        "response_present": true,
+        "output_modes": [
+          "text/plain"
+        ],
+        "required_fields": [
+          "/artifacts/0/parts/0/text"
+        ],
+        "model_checks": [
+          "the amount equals the order total minus the restocking fee"
+        ],
+        "accept_direct_message": false
+      }
+    }
+  ]
+}

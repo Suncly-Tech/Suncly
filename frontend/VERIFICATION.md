@@ -1,79 +1,93 @@
 # Verification log
 
-How the site was checked before the branch was handed over, and how to repeat it.
+How the site and the workspace were checked on 2026-10-04/05, what passed, and what was
+not tested.
 
 ## Commands
 
 ```bash
-npm run build                 # static export to out/ (webpack bundler, zero warnings)
+npm run typecheck             # tsc --noEmit: clean
+npm run build                 # next build --webpack: 22 static routes, no warnings
 node scripts/serve.mjs 3100   # serve out/ with clean URLs, gzip and cache headers
-node scripts/screenshots.mjs http://localhost:3100   # full-page captures at 1440 / 1024 / 390 (+ tiles)
-node scripts/keyboard.mjs http://localhost:3100      # keyboard-only navigation checks
-node scripts/lighthouse.mjs http://localhost:3100    # Lighthouse mobile + desktop, / and /docs
-node scripts/lcp-probe.mjs http://localhost:3100/    # observed LCP candidates under throttling
-npm run assets                                        # regenerate favicons, logo lockups and og.png from mark.svg + assets/
+node scripts/lighthouse.mjs http://localhost:3100   # Lighthouse mobile + desktop, / and /docs
+.venv/bin/python frontend/scripts/make-sample.py    # regenerate the sample data set (needs the package installed)
 ```
 
-Playwright and Lighthouse drive the locally installed Google Chrome (`channel: "chrome"`),
-so no browser download is needed. Pages taller than Chrome's 16384px capture limit are
-shot in clips and stitched.
+The sample generator and Lighthouse were run from the Terminal panel (they need local
+ports and Chrome); the build and typecheck ran in the sandbox.
 
-## Lighthouse (2026-10-04, Lighthouse 13, served from `out/` with gzip)
+## Sample data
+
+`frontend/scripts/make-sample.py` ran the real attestation use case three times against
+a fictional local mock agent with a fake credential in the Runner's environment. The
+script fails if the credential appears in any transcript; it did not. The three bundles
+verify with the in-browser verifier (eight checks, including the Ed25519 signature) and
+carry the owner and risk level the script passes.
+
+## Lighthouse (2026-10-05, Lighthouse 13, served from `out/` with gzip)
 
 | Page | Form factor | Performance | Accessibility | Best Practices | SEO |
 | --- | --- | --- | --- | --- | --- |
-| `/` | mobile | 95 | 100 | 100 | 100 |
+| `/` | mobile | 88 | 100 | 100 | 100 |
 | `/` | desktop | 100 | 100 | 100 | 100 |
-| `/docs` | mobile | 96 | 100 | 100 | 100 |
+| `/docs` | mobile | 95 | 100 | 100 | 100 |
 | `/docs` | desktop | 100 | 100 | 100 | 100 |
 
-Reports are written to `lighthouse/` (git-ignored). These are the scores for the expanded
-site (fifteen sections, about 18,000px tall at 1440px). The remaining mobile deductions are
-Next's hydration JavaScript; the observed LCP under 4G throttling is the hero subhead,
-identical to first paint.
+The mobile home deduction is unused JavaScript from the interactive sections. The hero
+evaluation window is server-rendered, so the sample JSON does not ship to the client on
+the home page.
 
-Settings that matter for the score and for production hosting:
+## Browser review (built-in browser, static export)
 
-- `experimental.inlineCss` inlines the stylesheet so first paint does not wait on a
-  render-blocking request.
-- Presentational sections are client components. Server-rendered sections are serialized
-  twice in a static export (HTML plus the RSC payload); as client components their markup
-  ships once and their code lands in a cacheable chunk. This took the home page from
-  387 KB to 230 KB of HTML.
-- `content-visibility: auto` on sections was tried and rejected: it broke anchor
-  navigation (sections above the target expand as they render, so `#policy` landed
-  6,000px off) and made the contrast checker read the wrong background.
-- The export must be served compressed with long cache lifetimes for `/_next/static/`.
-  Cloudflare Pages and Vercel do both by default; `scripts/serve.mjs` mimics them locally.
+Checked at the pane's desktop width, at 1024 × 800 and at 375 × 812:
 
-## Browser review
+- Home: hero with the real sample window, the gap, claim-to-decision chain, process,
+  manual-review comparison, coverage, scope and limitations, FAQ, final CTA, footer.
+- `/product`, `/workflows`, `/security`, `/docs`, `/docs/getting-started`, `/docs/cli`,
+  `/docs/evidence`, `/access`, `/company`, `/privacy`, `/terms` render; anchor links and
+  sticky side navigation work.
+- `/demo`: the three evaluation cards switch the view; tabs work; the Signature tab's
+  in-browser verification passes all eight checks; the comparison and the sample reviewer
+  record render.
+- `/app`: empty state with three guided actions; "Load sample data" fills the overview
+  (stats, outstanding reviews, what changed, recent evaluations, agents); phone width no
+  longer overflows after constraining the tab row.
+- `/app/evaluation?…&tab=review`: submitting the empty form shows both field errors;
+  recording a note with a reviewer and rationale adds it to the decision history with
+  Markdown and JSON export buttons.
+- `/app/agent?id=<unknown>` shows the not-found empty state; `/app/compare` picks the
+  last two completed attestations by default and shows regressions; `/app/new`,
+  `/app/import` and `/app/settings` render with their forms and notices.
+- `/access`: submitting the empty form shows the email validation error inline.
 
-Full-page screenshots at 1440, 1024 and 390 px live in `screenshots/` (git-ignored), with
-the open mobile menu and the `/docs` page captured as well. Issues found and fixed during
-review of the expanded site:
-
-- Terminal command and result lines overflowed at desktop width once `--runs 50` and the
-  longer status lines were added; lines now wrap at every width.
-- The POST example in the interfaces section overflowed its card; it wraps now, and the
-  CLI card carries the documented stage-1 and stage-2 behaviour so the two columns balance.
-- The attestation window's "not tested" footer broke mid-label on phones; it is a wrapping
-  flex row now.
-- Decision timestamps in the window used the muted grey at 12px (3.3:1); they use the soft
-  ink (7:1) now.
-
-Earlier fixes (mobile menu containing block, single-column grid tracks, sun placement,
-heading order, tap targets) are described in the git history.
+Issues found and fixed during the review: nav labels wrapping at mid widths; the desktop
+nav overflowing at 1024 px (tighter spacing, workspace link from xl); the workspace tab
+row forcing horizontal overflow on phones; a comparison labelling test cases without
+runs as "improved" (now "no runs recorded"); the sample agent registered with default
+owner and risk because the draft-export step ran first.
 
 ## Keyboard
 
-`scripts/keyboard.mjs` confirms: skip link first in tab order and jumps to `#main`; all
-nav links, CTAs, the email field, the FAQ summaries and footer links are reachable; FAQ
-items open and close with Enter and Space; focus-visible outline is drawn on buttons; the
-mobile menu opens from the keyboard and closes on Escape; the terminal's replay button is
-enabled after the demo and restarts it on Enter.
+Skip link first in tab order; nav links show the focus ring (outline in sky blue);
+tabs use roving focus with arrow keys; the mobile menu opens from the keyboard and
+closes on Escape; dialogs are native `<dialog>` elements (focus trap and Escape from the
+browser); every form control has a label, and errors are announced with `role="alert"`.
 
 ## Reduced motion
 
-Under `prefers-reduced-motion: reduce`: cloud drift, ray breathing, caret blink and the
-loading bar are disabled in CSS; the scroll reveals render their final state; the sun
-parallax is off; the terminal renders its complete output immediately.
+Scroll reveals render their final state, the sky animations are disabled, and the
+budget meter is static by design.
+
+## Not tested
+
+- Importing a real report folder through the file picker and drag-and-drop in the
+  built-in browser (no file-system access from the automation). The parser is the same
+  code path the sample loader uses, and its error branches are unit-level logic in
+  `lib/workspace/store.ts`.
+- The pilot form against a live `NEXT_PUBLIC_SIGNUP_ENDPOINT` (none is configured; the
+  mailto fallback was exercised as far as building the link).
+- Browsers without Ed25519 in WebCrypto: the verifier reports that check as "not run"
+  and points to the CLI; this branch was not exercised.
+- Firefox and Safari rendering.
+- The Python test suite was not run as part of this work; the backend is unchanged from
+  `origin/mvp`.

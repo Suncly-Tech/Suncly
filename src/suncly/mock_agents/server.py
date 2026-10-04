@@ -123,6 +123,7 @@ class MockAgentServer:
     def stop(self) -> None:
         self._server.shutdown()
         self._server.server_close()
+        self.behaviour.close()
 
     def __enter__(self) -> MockAgentServer:
         return self.start()

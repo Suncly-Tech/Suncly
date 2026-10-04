@@ -53,6 +53,10 @@ class StoreError(SunclyError):
     """The evidence store refused an operation, usually an append-only or key rule."""
 
 
+class TranscriptExistsError(StoreError):
+    """A transcript with this key was written before; evidence is never overwritten (DR-002)."""
+
+
 class SigningError(SunclyError):
     """Signing or key handling failed. The attestation is not reported as approved."""
 

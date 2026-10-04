@@ -104,6 +104,16 @@ class HttpxJsonRpcTransport:
                 headers=self._headers,
                 timeout=httpx.Timeout(timeout_s, connect=min(timeout_s, 10.0)),
             )
+        except httpx.ConnectTimeout as exc:
+            return RpcResponse(
+                sent_at=sent_at,
+                received_at=datetime.now(UTC),
+                request_headers=dict(self._headers),
+                request_body=body,
+                http_status=None,
+                response_body=None,
+                transport_error=f"unreachable: {exc.__class__.__name__} (no connection)",
+            )
         except httpx.TimeoutException as exc:
             return RpcResponse(
                 sent_at=sent_at,

@@ -277,10 +277,8 @@ class PostgresEvidenceStore:
     def add_run(self, run: Run) -> None:
         with self._tx() as conn:
             attestation = self.get_attestation(run.attestation_id)
-            test_case = None
-            if attestation is not None:
-                test_cases = self.list_test_cases(attestation.contract_id)
-                test_case = next((tc for tc in test_cases if tc.id == run.test_case_id), None)
+            row = self._one("SELECT * FROM test_case WHERE id = %s", (run.test_case_id,))
+            test_case = TestCase.model_validate(row) if row else None
             existing = {r.key for r in self.list_runs(run.attestation_id)}
             rules.check_run_insert(run, attestation, test_case, existing)
             conn.execute(

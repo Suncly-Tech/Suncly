@@ -130,29 +130,19 @@ def _decimal(name: str) -> Callable[[str], Decimal]:
     return parse
 
 
-def _path(name: str) -> Callable[[str], Path]:
-    def parse(raw: str) -> Path:
-        if not raw.strip():
-            raise ConfigError(f"The setting {name} is empty.")
-        return Path(raw).expanduser()
-
-    return parse
+def _path(raw: str) -> Path:
+    return Path(raw).expanduser()
 
 
-def _text(name: str) -> Callable[[str], str]:
-    def parse(raw: str) -> str:
-        if not raw.strip():
-            raise ConfigError(f"The setting {name} is empty.")
-        return raw
-
-    return parse
+def _text(raw: str) -> str:
+    return raw
 
 
 #: Field name -> parser from the string form (environment variables and TOML strings).
 PARSERS: dict[str, Callable[[str], Any]] = {
-    "home": _path("home"),
-    "database_url": _text("database_url"),
-    "reports_dir": _path("reports_dir"),
+    "home": _path,
+    "database_url": _text,
+    "reports_dir": _path,
     "runs": _positive_int("runs"),
     "budget_limit": _decimal("budget_limit"),
     "run_timeout_s": _positive_float("run_timeout_s"),

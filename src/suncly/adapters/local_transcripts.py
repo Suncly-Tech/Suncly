@@ -2,22 +2,37 @@
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
-from suncly.domain.errors import StoreError
+from suncly.domain.errors import StoreError, TranscriptExistsError
+
+#: A key is a relative POSIX path of safe segments, such as ``<attestation>/<test_case>-1.json``.
+#: Keys are validated lexically and never resolved against the file system: on Windows,
+#: resolving a not-yet-existing path while another thread creates its folder can yield a
+#: wrong path, which must never decide where evidence is written.
+KEY_SEGMENT = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
+
+
+def validate_key(key: str) -> list[str]:
+    """The segments of a valid key. Raises ``StoreError`` for anything that could leave the root."""
+    segments = key.split("/")
+    if not key or any(
+        not KEY_SEGMENT.match(segment) or segment in (".", "..") for segment in segments
+    ):
+        raise StoreError(f"The transcript key {key!r} is not a relative path of safe segments.")
+    return segments
 
 
 class LocalTranscriptStorage:
     """Write-once files under one root. ``transcript_ref`` is the key, relative to the root."""
 
     def __init__(self, root: Path) -> None:
-        self._root = root
+        root.mkdir(parents=True, exist_ok=True)
+        self._root = root.resolve()
 
     def _path(self, key: str) -> Path:
-        path = (self._root / key).resolve()
-        if self._root.resolve() not in path.parents:
-            raise StoreError(f"The transcript key {key!r} leaves the storage root.")
-        return path
+        return self._root.joinpath(*validate_key(key))
 
     def put(self, key: str, data: bytes) -> str:
         path = self._path(key)
@@ -26,7 +41,7 @@ class LocalTranscriptStorage:
             with path.open("xb") as handle:
                 handle.write(data)
         except FileExistsError as exc:
-            raise StoreError(
+            raise TranscriptExistsError(
                 "A transcript with this key already exists.",
                 f"{key} was written before; evidence is never overwritten (DR-002).",
             ) from exc

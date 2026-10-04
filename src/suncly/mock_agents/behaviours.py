@@ -37,11 +37,30 @@ class CallContext:
     card_fetches: int
 
 
-def free_port() -> int:
-    """A port nothing listens on right now (used for the unreachable agent)."""
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-        sock.bind(("127.0.0.1", 0))
-        return int(sock.getsockname()[1])
+class DeadPort:
+    """A loopback port that refuses connections for as long as this object lives.
+
+    The socket is bound but never listens, so connecting to it is refused, and
+    nothing else can be assigned the port in the meantime.
+    """
+
+    def __init__(self) -> None:
+        self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self._socket.bind(("127.0.0.1", 0))
+        self.port = int(self._socket.getsockname()[1])
+
+    @property
+    def url(self) -> str:
+        return f"http://127.0.0.1:{self.port}/rpc"
+
+    def close(self) -> None:
+        self._socket.close()
+
+    def __enter__(self) -> DeadPort:
+        return self
+
+    def __exit__(self, *exc_info: object) -> None:
+        self.close()
 
 
 def _now() -> str:
@@ -169,6 +188,10 @@ class Behaviour:
     def get_task(self, params: JsonObject, context: CallContext) -> JsonObject:
         raise RpcError(-32001, "Task not found")
 
+    def close(self) -> None:
+        """Release anything the behaviour holds. Called when its server stops."""
+        return
+
 
 class Honest(Behaviour):
     """Does what its card says. Expected: every run passes."""
@@ -253,17 +276,20 @@ class Slow(Behaviour):
 
 
 class Unreachable(Behaviour):
-    """Its card points at a port where nothing listens. Expected: no run passes."""
+    """Its card points at a port that refuses connections. Expected: no run passes."""
 
     name = "unreachable"
     description = "Serves a card whose endpoint refuses connections."
 
-    def __init__(self, dead_port: int) -> None:
-        self.dead_port = dead_port
+    def __init__(self, dead_port: DeadPort | None = None) -> None:
+        self.dead_port = dead_port or DeadPort()
+
+    def close(self) -> None:
+        self.dead_port.close()
 
     def card(self, base_url: str, context: CallContext) -> JsonObject:
         card = super().card(base_url, context)
-        card["supportedInterfaces"][0]["url"] = f"http://127.0.0.1:{self.dead_port}/rpc"
+        card["supportedInterfaces"][0]["url"] = self.dead_port.url
         return card
 
 
@@ -351,7 +377,7 @@ class BehaviourSpec:
 BEHAVIOURS = {
     "honest": BehaviourSpec(Honest, "every run passes"),
     "honest-async": BehaviourSpec(HonestAsync, "every run passes after polling GetTask"),
-    "unreachable": BehaviourSpec(lambda: Unreachable(free_port()), "no run passes"),
+    "unreachable": BehaviourSpec(Unreachable, "no run passes"),
     "lying": BehaviourSpec(Lying, "every run fails the output_modes check"),
     "flaky": BehaviourSpec(Flaky, "odd calls pass, even calls fail"),
     "slow": BehaviourSpec(Slow, "every run fails the latency limit"),

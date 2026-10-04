@@ -18,7 +18,7 @@ import jsonschema
 from suncly.domain import a2a
 from suncly.domain.canonical import canonical_json
 from suncly.domain.criteria import Criteria, parse_criteria
-from suncly.domain.errors import StoreError
+from suncly.domain.errors import TranscriptExistsError
 from suncly.domain.models import JsonObject, JudgeLayer, Run, RunVerdict, TestCase
 from suncly.domain.transcript import RunOutcome, Transcript
 from suncly.ports.clock import Clock, IdGenerator
@@ -279,9 +279,9 @@ class JudgeService:
         key = self.transcript_key(transcript.attestation_id, test_case.id, transcript.attempt)
         try:
             transcript_ref = self._transcripts.put(key, data)
-        except StoreError:
-            # The document for this run key was written by an earlier attempt that then
-            # failed to record its run; the run key keeps the result unique (DR-001).
+        except TranscriptExistsError:
+            # An earlier attempt under this run key stored its document but did not get to
+            # record the run. The key keeps the result unique either way (DR-001).
             transcript_ref = key
         run = Run(
             id=self._ids.new_id(),

@@ -60,6 +60,9 @@ def handles_errors[**P, R](command: Callable[P, R]) -> Callable[P, R]:
             return command(*args, **kwargs)
         except SunclyError as error:
             _fail(console, error, debug)
+        except click.Abort:
+            click.echo("Aborted.", err=True)
+            sys.exit(exit_codes.REFUSED)
         except click.ClickException:
             raise
         except Exception as error:
@@ -134,17 +137,20 @@ def interactive_approval(console: Console) -> Callable[[DraftPresentation], str 
                 fg="yellow",
             )
         console.line()
-        if not sys.stdin.isatty():
+        try:
+            if not click.confirm(
+                "Approve this contract and run it against the sandbox?", default=False
+            ):
+                return None
+            approver: str = click.prompt("Your identifier, recorded as approved_by", type=str)
+        except click.Abort:
+            console.line()
             console.line(
-                "No terminal to ask for approval. Re-run with --approve-as <identifier>.",
+                "No approval was given. To approve without a prompt, re-run with "
+                "--approve-as <identifier>.",
                 fg="yellow",
             )
             return None
-        if not click.confirm(
-            "Approve this contract and run it against the sandbox?", default=False
-        ):
-            return None
-        approver: str = click.prompt("Your identifier, recorded as approved_by", type=str)
         return approver.strip() or None
 
     return prompt
@@ -506,3 +512,7 @@ def doctor(ctx: click.Context, card_url: str | None, debug: bool) -> None:
             f"{problems} check(s) failed.", "", "Fix the failed checks above and run again."
         )
     console.line("All checks passed.")
+
+
+if __name__ == "__main__":  # pragma: no cover - exercised as a subprocess
+    main()

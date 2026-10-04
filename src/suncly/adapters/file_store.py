@@ -154,6 +154,15 @@ class FileEvidenceStore:
             _TestCases(test_cases=test_cases).write(folder / "test_cases.json")
             self._write_new(folder / "contract.json", contract, read_only=False)
 
+    def _find_test_case(self, test_case_id: UUID) -> TestCase | None:
+        for folder in (self._root / "contracts").iterdir():
+            if not folder.is_dir():
+                continue
+            for test_case in self.list_test_cases(UUID(folder.name)):
+                if test_case.id == test_case_id:
+                    return test_case
+        return None
+
     def list_test_cases(self, contract_id: UUID) -> list[TestCase]:
         record = self._read(self._contract_dir(contract_id) / "test_cases.json", _TestCases)
         return list(record.test_cases) if record else []
@@ -228,18 +237,7 @@ class FileEvidenceStore:
     def add_run(self, run: Run) -> None:
         with self._lock:
             attestation = self.get_attestation(run.attestation_id)
-            test_case = (
-                next(
-                    (
-                        tc
-                        for tc in self.list_test_cases(attestation.contract_id)
-                        if tc.id == run.test_case_id
-                    ),
-                    None,
-                )
-                if attestation is not None
-                else None
-            )
+            test_case = self._find_test_case(run.test_case_id)
             existing = {r.key for r in self.list_runs(run.attestation_id)}
             rules.check_run_insert(run, attestation, test_case, existing)
             self._write_new(self._run_path(run.key), run, read_only=True)

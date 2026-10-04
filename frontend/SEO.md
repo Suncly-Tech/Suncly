@@ -1,0 +1,83 @@
+# Search and answer-engine optimisation
+
+What is implemented on the site, the keyword map, and the off-site work only the
+owners can do. Honest framing first: nobody can promise a first position. What a site
+can do is make the brand entity unambiguous, make every page the best answer for a
+specific question, and give search engines and AI assistants structured, consistent,
+quotable facts. That is what this does.
+
+## 1. On-site: implemented
+
+| Area | Where | What |
+| --- | --- | --- |
+| Brand entity | `lib/seo.ts`, `app/layout.tsx` | One canonical definition (`DEFINITION`) reused in the Organization, WebSite and SoftwareApplication JSON-LD on every page, in the manifest, in `llms.txt`, on `/company` and in the FAQ. `alternateName` covers "Suncly AI" and "suncly.com". |
+| Page metadata | every `app/**/page.tsx` via `pageMeta()` | Keyword-led titles under the `%s — Suncly` template, unique descriptions, canonical URLs, keywords, Open Graph and Twitter cards, explicit robots directives with unlimited snippets. |
+| Structured data | `components/site/JsonLd.tsx` | Organization + WebSite + SoftwareApplication (root); FAQPage (home, product, company); BreadcrumbList (every inner page); TechArticle (security, docs guides); HowTo with six steps (getting started); DefinedTermSet with 23 terms (glossary); AboutPage, ContactPage, CollectionPage types where they apply. No ratings, reviews, prices or offers, because none exist. |
+| Answer-engine content | `/glossary`, `/company` FAQ, home FAQ, `public/llms.txt`, `public/llms-full.txt` | One-sentence quotable definitions, Q&A pairs, and a full plain-text statement of the product with its limits for LLM crawlers. |
+| Crawling | `public/robots.txt`, `public/sitemap.xml` | All crawlers allowed on the public site, `/app` excluded; AI crawlers (GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot, Google-Extended, Applebot, CCBot, Bingbot, DuckAssistBot, Meta) listed explicitly; sitemap with `lastmod`, `changefreq`, `priority`. |
+| Brand surfaces | `public/site.webmanifest`, icons, `og.png` | Name, short name, description, theme colour and icons consistent with the entity. |
+| Verification hooks | `app/layout.tsx` | `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` and `NEXT_PUBLIC_BING_SITE_VERIFICATION` are emitted as meta tags when set. |
+| Technical | static export, Lighthouse 100 SEO on checked pages | Semantic headings (one H1 per page), labelled navigation, skip link, fast first paint, no render-blocking CSS, self-hosted fonts. |
+
+## 2. Keyword map
+
+Keywords are placed in titles, descriptions, H1/H2 and the first paragraph where they
+read naturally. Nothing is stuffed; every page targets one primary question.
+
+| Page | Primary query | Supporting terms |
+| --- | --- | --- |
+| `/` | evaluate AI agents before approval | AI agent evaluation, A2A agent evaluation, signed evidence, what was not tested, Suncly |
+| `/product` | AI agent evaluation tool (tests, evidence, approval) | behavioural testing, human-approved test plan, deterministic verdicts, inconclusive, coverage gaps |
+| `/workflows` | A2A protocol testing / Agent Card verification | Agent2Agent, JSON-RPC, model-agnostic, integrations, sandbox agents |
+| `/demo` | AI agent evaluation example / demo | failure, evidence, reviewer decision, regression, budget |
+| `/security` | AI agent security review / credential handling | redaction, sandbox, self-hosted, append-only evidence, limitations |
+| `/glossary` | what is an Agent Card / attestation / inconclusive | every term in `lib/glossary.ts` |
+| `/docs/getting-started` | how to test an A2A agent | suncly attest, suncly demo, suncly verify |
+| `/docs/cli` | suncly attest / CLI reference | exit codes, contract file, environment variables |
+| `/docs/evidence` | signed evidence for AI agents / evaluation report | result.json, Ed25519, verify |
+| `/company` | Suncly (brand), who makes Suncly, Suncly Tallinn | about, contact, principles |
+| `/access` | Suncly pilot / access | request access |
+
+Brand query "Suncly": title template, Organization and WebSite entities, `/company`
+FAQ ("What is Suncly?", "Who is Suncly for?", spelling and pronunciation), consistent
+name in manifest and Open Graph. Nothing else on the web should describe Suncly
+differently; keep `DEFINITION` the single source when writing elsewhere.
+
+## 3. Off-site: needs the owners' accounts
+
+In rough order of effect on the brand query and on AI answers:
+
+1. **Deploy the site at https://suncly.com** with HTTPS, compression and the
+   `/_next/static/` cache headers; until it is live nothing below applies.
+2. **Google Search Console and Bing Webmaster Tools.** Verify the domain (set the two
+   verification variables above, or DNS), submit `https://suncly.com/sitemap.xml`,
+   request indexing of the home page, and watch the "Suncly" query in the performance
+   report. Bing also feeds Copilot and DuckDuckGo.
+3. **IndexNow** (Bing, Yandex, Naver): generate a key, host it at the root, and ping on
+   each deploy. One `curl` in the deploy step.
+4. **Entity profiles with the same name, logo and definition**: a LinkedIn company
+   page, the public GitHub organisation (`Suncly-Tech`) with a README that links to
+   the site, Crunchbase, and a Wikidata item once there is a citable source. Add their
+   URLs to `organizationLd().sameAs` in `lib/seo.ts`.
+5. **Google Business Profile** is optional (no walk-in location); skip unless an
+   office address is public.
+6. **Backlinks that matter for this niche**: the A2A community (the protocol's
+   discussions and awesome-lists), Estonian startup directories, the accelerator or
+   programme pages if any apply, talks and podcasts. Each link should use the brand
+   name and a plain description of what Suncly does.
+7. **Content cadence**: one technical post per month on the questions buyers ask
+   (how to evaluate an A2A agent, why inconclusive is not a pass, what a signed
+   attestation covers), each with the FAQ and TechArticle schema the docs pages use.
+   The glossary and docs are the long-tail base; posts earn links.
+8. **Monitoring**: Search Console queries and the AI assistants themselves. Once a
+   month ask ChatGPT, Claude, Perplexity and Google AI Mode "What is Suncly?" and "how
+   do I evaluate an A2A agent before approving it" and compare the answers with
+   `DEFINITION`; if an assistant repeats something false, the fix is on the page it cites.
+
+## 4. Rules that keep this honest
+
+- No aggregateRating, review, offer or price in structured data until they are real.
+- No "trusted by", partner logos or certifications without evidence (see HANDOFF.md).
+- Planned features stay "planned" in copy, in the capability map and in `llms-full.txt`.
+- When the implementation changes, update `lib/capabilities.ts`, `CONTENT.md`,
+  `public/llms-full.txt` and the sitemap `lastmod` in the same change.

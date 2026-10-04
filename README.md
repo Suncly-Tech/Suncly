@@ -128,6 +128,24 @@ From [SCHEMA.md](SCHEMA.md) §1:
  Registry status · CI gate · Evidence report
 ```
 
+## Website and review workspace
+
+`frontend/` holds the public website and the review workspace (Next.js, static
+export). The workspace reads the report folders `suncly attest` writes and keeps
+them in the browser; it does not start runs, because there is no HTTP API yet.
+
+```powershell
+cd frontend
+npm install
+npm run build        # static export to out/
+npm run start        # serve out/ on http://localhost:3100
+```
+
+`frontend/CONTENT.md` records the source of every claim on the site,
+`frontend/HANDOFF.md` lists what was withheld and what the owners still need to
+supply, and `frontend/scripts/make-sample.py` regenerates the sample data set
+through the real code path.
+
 ## Documentation
 
 | Document | Contents |

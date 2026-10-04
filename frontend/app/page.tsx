@@ -1,41 +1,44 @@
 import { Nav } from "@/components/Nav";
 import { Hero } from "@/components/Hero";
-import { ProblemStrip } from "@/components/ProblemStrip";
-import { Inspection } from "@/components/Inspection";
-import { HowItWorks } from "@/components/HowItWorks";
-import { Architecture } from "@/components/Architecture";
-import { ProductSections } from "@/components/ProductSections";
-import { Policy } from "@/components/Policy";
-import { Rules } from "@/components/Rules";
-import { OpenStandard } from "@/components/OpenStandard";
-import { Interfaces } from "@/components/Interfaces";
-import { Roadmap } from "@/components/Roadmap";
-import { DevResources } from "@/components/DevResources";
-import { EarlyAccess } from "@/components/EarlyAccess";
+import { ClaimChain, Coverage, ManualComparison, Problem, Process, Scope } from "@/components/home/Sections";
 import { Faq } from "@/components/Faq";
+import { FinalCta } from "@/components/site/FinalCta";
 import { Footer } from "@/components/Footer";
-import { CutsDivider } from "@/components/Cuts";
+import { JsonLd } from "@/components/site/JsonLd";
+import { faq, site } from "@/lib/content";
+import { faqLd, graph, KEYWORDS, pageMeta, webPageLd } from "@/lib/seo";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  ...pageMeta({
+    title: "Evaluate AI agents before you approve them",
+    description: site.description,
+    path: "/",
+    keywords: [...KEYWORDS.core, ...KEYWORDS.protocol],
+  }),
+  title: { absolute: site.title },
+};
 
 export default function Home() {
   return (
     <>
-      <Nav />
+      <JsonLd
+        data={graph(
+          webPageLd({ path: "/", name: "Evaluate AI agents before you approve them", description: site.description }),
+          faqLd(faq.items),
+        )}
+      />
+      <Nav variant="hero" />
       <main id="main">
         <Hero />
-        <ProblemStrip />
-        <Inspection />
-        <HowItWorks />
-        <Architecture />
-        <ProductSections />
-        <Policy />
-        <Rules />
-        <OpenStandard />
-        <Interfaces />
-        <Roadmap />
-        <CutsDivider />
-        <DevResources />
-        <EarlyAccess />
+        <Problem />
+        <ClaimChain />
+        <Process />
+        <ManualComparison />
+        <Coverage />
+        <Scope />
         <Faq />
+        <FinalCta />
       </main>
       <Footer />
     </>

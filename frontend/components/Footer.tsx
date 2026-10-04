@@ -11,32 +11,25 @@ export function Footer() {
           <div className="max-w-xs">
             <Logo tone="paper" />
             <p className="mt-5 text-body text-paper/70">{site.mission}</p>
+            <p className="mt-4 text-small text-paper/55">
+              Suncly is in pilot. Decisions are flag-only in this version; a human reviews every result.
+            </p>
           </div>
 
           {footer.groups.map((group) => (
             <div key={group.title}>
-              <h2 className="text-small font-semibold uppercase tracking-[0.08em] text-paper/60">
-                {group.title}
-              </h2>
+              <h2 className="text-small font-semibold uppercase tracking-[0.08em] text-paper/60">{group.title}</h2>
               <ul className="mt-3 flex flex-col gap-1.5">
                 {group.links.map((link) => (
                   <li key={link.label} className="text-[15px]">
-                    {link.href ? (
-                      <Link
-                        href={link.href}
-                        className="inline-block py-1 text-paper/85 transition-colors duration-200 hover:text-sun"
-                      >
+                    {link.href.startsWith("mailto:") ? (
+                      <a href={link.href} className="inline-block py-1 text-paper/85 transition-colors duration-200 hover:text-sun">
+                        {link.label}
+                      </a>
+                    ) : (
+                      <Link href={link.href} className="inline-block py-1 text-paper/85 transition-colors duration-200 hover:text-sun">
                         {link.label}
                       </Link>
-                    ) : "plain" in link && link.plain ? (
-                      <span className="text-paper/85">{link.label}</span>
-                    ) : (
-                      <span className="inline-flex items-center gap-2 text-paper/55">
-                        {link.label}
-                        <span className="rounded-full border border-paper/20 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.06em] text-paper/55">
-                          {footer.coming}
-                        </span>
-                      </span>
                     )}
                   </li>
                 ))}

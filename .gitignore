@@ -54,3 +54,6 @@ suncly-reports/
 .vscode/
 .DS_Store
 Thumbs.db
+
+# Local CLI home used while generating sample data
+.suncly-home/

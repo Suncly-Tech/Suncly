@@ -1,0 +1,840 @@
+{
+ "sample": {
+  "label": "1-baseline",
+  "behaviour": "baseline",
+  "generated_by": "frontend/scripts/make-sample.py",
+  "note": "Synthetic sample. Produced by the real Suncly code path against a fictional local mock agent. Not a customer evaluation."
+ },
+ "result": {
+  "generated_at": "2026-10-04T21:04:39.632872Z",
+  "agent": {
+   "id": "7bbe9bc6-c18c-5789-888d-278ad0d05a81",
+   "name": "Harbor Returns Agent",
+   "owner": "Harbor Commerce platform team (fictional)",
+   "risk_level": "medium"
+  },
+  "card_version": {
+   "id": "bec95195-7679-43c7-8625-250fc2562030",
+   "agent_id": "7bbe9bc6-c18c-5789-888d-278ad0d05a81",
+   "card_hash": "sha256:c25be2adb553bc2efce2a1506c0b19194c8299c030e1f0b265890fbbeb96850b",
+   "raw_json": "{\"name\": \"Harbor Returns Agent\", \"description\": \"Looks up orders, starts returns and estimates refunds for Harbor Commerce customers.\", \"version\": \"2.3.1\", \"supportedInterfaces\": [{\"url\": \"http://127.0.0.1:53448/rpc\", \"protocolBinding\": \"JSONRPC\", \"protocolVersion\": \"1.0\"}], \"capabilities\": {\"streaming\": true}, \"defaultInputModes\": [\"text/plain\"], \"defaultOutputModes\": [\"text/plain\"], \"skills\": [{\"id\": \"order-status\", \"name\": \"Order status\", \"description\": \"Tells a customer where an order is and when it will arrive.\", \"tags\": [\"orders\", \"read-only\"], \"examples\": [\"Where is order 48213?\", \"Has order 48213 shipped yet?\"]}, {\"id\": \"start-return\", \"name\": \"Start a return\", \"description\": \"Opens a return for one or more items of a delivered order and emails a prepaid label.\", \"tags\": [\"returns\", \"writes\"], \"examples\": [\"Start a return for order 48213, item 2\"]}, {\"id\": \"refund-estimate\", \"name\": \"Refund estimate\", \"description\": \"Estimates the refund for a return, including restocking fees.\", \"tags\": [\"returns\", \"read-only\"], \"examples\": [\"How much will I get back if I return order 48213?\"]}, {\"id\": \"cancel-order\", \"name\": \"Cancel an order\", \"description\": \"Cancels an order that has not shipped yet. Declares no examples.\", \"tags\": [\"orders\", \"writes\"]}], \"provider\": {\"organization\": \"Harbor Commerce (fictional)\", \"url\": \"https://harbor.example\"}}",
+   "fetched_at": "2026-10-04T21:04:37.805796Z"
+  },
+  "parsed_card": {
+   "raw_json": "{\"name\": \"Harbor Returns Agent\", \"description\": \"Looks up orders, starts returns and estimates refunds for Harbor Commerce customers.\", \"version\": \"2.3.1\", \"supportedInterfaces\": [{\"url\": \"http://127.0.0.1:53448/rpc\", \"protocolBinding\": \"JSONRPC\", \"protocolVersion\": \"1.0\"}], \"capabilities\": {\"streaming\": true}, \"defaultInputModes\": [\"text/plain\"], \"defaultOutputModes\": [\"text/plain\"], \"skills\": [{\"id\": \"order-status\", \"name\": \"Order status\", \"description\": \"Tells a customer where an order is and when it will arrive.\", \"tags\": [\"orders\", \"read-only\"], \"examples\": [\"Where is order 48213?\", \"Has order 48213 shipped yet?\"]}, {\"id\": \"start-return\", \"name\": \"Start a return\", \"description\": \"Opens a return for one or more items of a delivered order and emails a prepaid label.\", \"tags\": [\"returns\", \"writes\"], \"examples\": [\"Start a return for order 48213, item 2\"]}, {\"id\": \"refund-estimate\", \"name\": \"Refund estimate\", \"description\": \"Estimates the refund for a return, including restocking fees.\", \"tags\": [\"returns\", \"read-only\"], \"examples\": [\"How much will I get back if I return order 48213?\"]}, {\"id\": \"cancel-order\", \"name\": \"Cancel an order\", \"description\": \"Cancels an order that has not shipped yet. Declares no examples.\", \"tags\": [\"orders\", \"writes\"]}], \"provider\": {\"organization\": \"Harbor Commerce (fictional)\", \"url\": \"https://harbor.example\"}}",
+   "json_object": {
+    "name": "Harbor Returns Agent",
+    "description": "Looks up orders, starts returns and estimates refunds for Harbor Commerce customers.",
+    "version": "2.3.1",
+    "supportedInterfaces": [
+     {
+      "url": "http://127.0.0.1:53448/rpc",
+      "protocolBinding": "JSONRPC",
+      "protocolVersion": "1.0"
+     }
+    ],
+    "capabilities": {
+     "streaming": true
+    },
+    "defaultInputModes": [
+     "text/plain"
+    ],
+    "defaultOutputModes": [
+     "text/plain"
+    ],
+    "skills": [
+     {
+      "id": "order-status",
+      "name": "Order status",
+      "description": "Tells a customer where an order is and when it will arrive.",
+      "tags": [
+       "orders",
+       "read-only"
+      ],
+      "examples": [
+       "Where is order 48213?",
+       "Has order 48213 shipped yet?"
+      ]
+     },
+     {
+      "id": "start-return",
+      "name": "Start a return",
+      "description": "Opens a return for one or more items of a delivered order and emails a prepaid label.",
+      "tags": [
+       "returns",
+       "writes"
+      ],
+      "examples": [
+       "Start a return for order 48213, item 2"
+      ]
+     },
+     {
+      "id": "refund-estimate",
+      "name": "Refund estimate",
+      "description": "Estimates the refund for a return, including restocking fees.",
+      "tags": [
+       "returns",
+       "read-only"
+      ],
+      "examples": [
+       "How much will I get back if I return order 48213?"
+      ]
+     },
+     {
+      "id": "cancel-order",
+      "name": "Cancel an order",
+      "description": "Cancels an order that has not shipped yet. Declares no examples.",
+      "tags": [
+       "orders",
+       "writes"
+      ]
+     }
+    ],
+    "provider": {
+     "organization": "Harbor Commerce (fictional)",
+     "url": "https://harbor.example"
+    }
+   },
+   "card": {
+    "name": "Harbor Returns Agent",
+    "description": "Looks up orders, starts returns and estimates refunds for Harbor Commerce customers.",
+    "version": "2.3.1",
+    "supported_interfaces": [
+     {
+      "url": "http://127.0.0.1:53448/rpc",
+      "protocol_binding": "JSONRPC",
+      "protocol_version": "1.0",
+      "tenant": null
+     }
+    ],
+    "capabilities": {
+     "streaming": true,
+     "push_notifications": null,
+     "extended_agent_card": null,
+     "extensions": null
+    },
+    "default_input_modes": [
+     "text/plain"
+    ],
+    "default_output_modes": [
+     "text/plain"
+    ],
+    "skills": [
+     {
+      "id": "order-status",
+      "name": "Order status",
+      "description": "Tells a customer where an order is and when it will arrive.",
+      "tags": [
+       "orders",
+       "read-only"
+      ],
+      "examples": [
+       "Where is order 48213?",
+       "Has order 48213 shipped yet?"
+      ],
+      "input_modes": null,
+      "output_modes": null,
+      "security_requirements": null
+     },
+     {
+      "id": "start-return",
+      "name": "Start a return",
+      "description": "Opens a return for one or more items of a delivered order and emails a prepaid label.",
+      "tags": [
+       "returns",
+       "writes"
+      ],
+      "examples": [
+       "Start a return for order 48213, item 2"
+      ],
+      "input_modes": null,
+      "output_modes": null,
+      "security_requirements": null
+     },
+     {
+      "id": "refund-estimate",
+      "name": "Refund estimate",
+      "description": "Estimates the refund for a return, including restocking fees.",
+      "tags": [
+       "returns",
+       "read-only"
+      ],
+      "examples": [
+       "How much will I get back if I return order 48213?"
+      ],
+      "input_modes": null,
+      "output_modes": null,
+      "security_requirements": null
+     },
+     {
+      "id": "cancel-order",
+      "name": "Cancel an order",
+      "description": "Cancels an order that has not shipped yet. Declares no examples.",
+      "tags": [
+       "orders",
+       "writes"
+      ],
+      "examples": null,
+      "input_modes": null,
+      "output_modes": null,
+      "security_requirements": null
+     }
+    ],
+    "provider": {
+     "organization": "Harbor Commerce (fictional)",
+     "url": "https://harbor.example"
+    }
+   },
+   "card_hash": "sha256:c25be2adb553bc2efce2a1506c0b19194c8299c030e1f0b265890fbbeb96850b"
+  },
+  "card_url": "http://127.0.0.1:53448/.well-known/agent-card.json",
+  "contract": {
+   "id": "081fefaf-370f-4d3e-8e10-c5053a55b786",
+   "card_version_id": "bec95195-7679-43c7-8625-250fc2562030",
+   "version": 1,
+   "status": "approved",
+   "created_at": "2026-10-04T21:04:37.813302Z",
+   "approved_by": "m.lind@harbor.example",
+   "approved_at": "2026-10-04T21:04:37.813684Z"
+  },
+  "test_cases": [
+   {
+    "id": "1c213901-e016-4771-8790-c2e7fa0ea015",
+    "contract_id": "081fefaf-370f-4d3e-8e10-c5053a55b786",
+    "skill_id": "order-status",
+    "input": {
+     "text": "Where is order 48213?"
+    },
+    "criteria": {
+     "final_state": "TASK_STATE_COMPLETED",
+     "latency_limit_ms": 2000,
+     "response_present": true,
+     "output_modes": [
+      "text/plain"
+     ],
+     "required_fields": [
+      "/artifacts/0/parts/0/text"
+     ],
+     "model_checks": [],
+     "accept_direct_message": false
+    },
+    "kind": "skill"
+   },
+   {
+    "id": "d196cdc8-4a6a-44cb-97a4-d6cd26f58422",
+    "contract_id": "081fefaf-370f-4d3e-8e10-c5053a55b786",
+    "skill_id": "order-status",
+    "input": {
+     "text": "Has order 48213 shipped yet?"
+    },
+    "criteria": {
+     "final_state": "TASK_STATE_COMPLETED",
+     "latency_limit_ms": 2000,
+     "response_present": true,
+     "output_modes": [
+      "text/plain"
+     ],
+     "required_fields": [
+      "/artifacts/0/parts/0/text"
+     ],
+     "model_checks": [],
+     "accept_direct_message": false
+    },
+    "kind": "skill"
+   },
+   {
+    "id": "006fb9f0-a034-4a0d-ab64-595dafaaf808",
+    "contract_id": "081fefaf-370f-4d3e-8e10-c5053a55b786",
+    "skill_id": "start-return",
+    "input": {
+     "text": "Start a return for order 48213, item 2"
+    },
+    "criteria": {
+     "final_state": "TASK_STATE_COMPLETED",
+     "latency_limit_ms": 2000,
+     "response_present": true,
+     "output_modes": [
+      "text/plain"
+     ],
+     "required_fields": [
+      "/artifacts/0/parts/0/text"
+     ],
+     "model_checks": [],
+     "accept_direct_message": false
+    },
+    "kind": "skill"
+   },
+   {
+    "id": "d92fb406-20a1-4b04-a683-e71640b5272b",
+    "contract_id": "081fefaf-370f-4d3e-8e10-c5053a55b786",
+    "skill_id": "refund-estimate",
+    "input": {
+     "text": "How much will I get back if I return order 48213?"
+    },
+    "criteria": {
+     "final_state": "TASK_STATE_COMPLETED",
+     "latency_limit_ms": 2000,
+     "response_present": true,
+     "output_modes": [
+      "text/plain"
+     ],
+     "required_fields": [
+      "/artifacts/0/parts/0/text"
+     ],
+     "model_checks": [
+      "the amount equals the order total minus the restocking fee"
+     ],
+     "accept_direct_message": false
+    },
+    "kind": "skill"
+   }
+  ],
+  "attestation": {
+   "id": "d9b37b41-549a-4795-b818-b4ac25e6a5b2",
+   "contract_id": "081fefaf-370f-4d3e-8e10-c5053a55b786",
+   "card_version_id": "bec95195-7679-43c7-8625-250fc2562030",
+   "trigger": "manual",
+   "status": "completed",
+   "started_at": "2026-10-04T21:04:37.813978Z",
+   "finished_at": "2026-10-04T21:04:39.630796Z",
+   "budget_limit": "40",
+   "cost_total": "20",
+   "signature": "ed25519:6zig5qFfcZEaxxxQwanjFNwzG-ZVIsxEd5PuWPSlbMkY1PLuNHE8g8lqkvp0ojpv2EF1VW5RxRvc9q77ZAnRDg",
+   "signing_key_id": "ed25519-3b05ae908c2cb82a"
+  },
+  "runs": [
+   {
+    "run": {
+     "id": "4dd9966c-d7de-4dae-8e55-bb9f6b7b6901",
+     "attestation_id": "d9b37b41-549a-4795-b818-b4ac25e6a5b2",
+     "test_case_id": "006fb9f0-a034-4a0d-ab64-595dafaaf808",
+     "attempt": 1,
+     "verdict": "pass",
+     "judge_layer": "deterministic",
+     "rationale": null,
+     "latency_ms": 119,
+     "cost": "1",
+     "transcript_ref": "d9b37b41-549a-4795-b818-b4ac25e6a5b2/006fb9f0-a034-4a0d-ab64-595dafaaf808-1.json",
+     "started_at": "2026-10-04T21:04:38.607003Z",
+     "finished_at": "2026-10-04T21:04:38.727169Z"
+    },
+    "document_hash": "sha256:d061b0bcfb8f7ef7430bc7d538df03fc1ccb4b7262a5af0c42c073f238e598b8"
+   },
+   {
+    "run": {
+     "id": "29965228-f4c7-4e67-85ae-4a6b60ed6289",
+     "attestation_id": "d9b37b41-549a-4795-b818-b4ac25e6a5b2",
+     "test_case_id": "006fb9f0-a034-4a0d-ab64-595dafaaf808",
+     "attempt": 2,
+     "verdict": "pass",
+     "judge_layer": "deterministic",
+     "rationale": null,
+     "latency_ms": 126,
+     "cost": "1",
+     "transcript_ref": "d9b37b41-549a-4795-b818-b4ac25e6a5b2/006fb9f0-a034-4a0d-ab64-595dafaaf808-2.json",
+     "started_at": "2026-10-04T21:04:38.753519Z",
+     "finished_at": "2026-10-04T21:04:38.880754Z"
+    },
+    "document_hash": "sha256:97b2bb88fdd49d6d0c5d72b1ad736194db39e305738d226b7f414fda8b860142"
+   },
+   {
+    "run": {
+     "id": "b64f32b2-9691-4e59-9dec-6e542957948f",
+     "attestation_id": "d9b37b41-549a-4795-b818-b4ac25e6a5b2",
+     "test_case_id": "006fb9f0-a034-4a0d-ab64-595dafaaf808",
+     "attempt": 3,
+     "verdict": "pass",
+     "judge_layer": "deterministic",
+     "rationale": null,
+     "latency_ms": 236,
+     "cost": "1",
+     "transcript_ref": "d9b37b41-549a-4795-b818-b4ac25e6a5b2/006fb9f0-a034-4a0d-ab64-595dafaaf808-3.json",
+     "started_at": "2026-10-04T21:04:38.763137Z",
+     "finished_at": "2026-10-04T21:04:38.999981Z"
+    },
+    "document_hash": "sha256:c9cf68a6383abeb622528b3c57b587bfeedff82d293e716aa3ce1ab328a6789a"
+   },
+   {
+    "run": {
+     "id": "67637da7-9d4b-467b-9b3f-dad552631f41",
+     "attestation_id": "d9b37b41-549a-4795-b818-b4ac25e6a5b2",
+     "test_case_id": "006fb9f0-a034-4a0d-ab64-595dafaaf808",
+     "attempt": 4,
+     "verdict": "pass",
+     "judge_layer": "deterministic",
+     "rationale": null,
+     "latency_ms": 369,
+     "cost": "1",
+     "transcript_ref": "d9b37b41-549a-4795-b818-b4ac25e6a5b2/006fb9f0-a034-4a0d-ab64-595dafaaf808-4.json",
+     "started_at": "2026-10-04T21:04:38.852351Z",
+     "finished_at": "2026-10-04T21:04:39.222334Z"
+    },
+    "document_hash": "sha256:4e93c52ee29c541ba5ade9acf21a2a9879409efb879538f04abcde427e697af5"
+   },
+   {
+    "run": {
+     "id": "e5336e13-ec39-4e1a-ba23-bc2049a93135",
+     "attestation_id": "d9b37b41-549a-4795-b818-b4ac25e6a5b2",
+     "test_case_id": "006fb9f0-a034-4a0d-ab64-595dafaaf808",
+     "attempt": 5,
+     "verdict": "pass",
+     "judge_layer": "deterministic",
+     "rationale": null,
+     "latency_ms": 137,
+     "cost": "1",
+     "transcript_ref": "d9b37b41-549a-4795-b818-b4ac25e6a5b2/006fb9f0-a034-4a0d-ab64-595dafaaf808-5.json",
+     "started_at": "2026-10-04T21:04:38.933356Z",
+     "finished_at": "2026-10-04T21:04:39.071254Z"
+    },
+    "document_hash": "sha256:1314cd6909c1a40b9c6a97c946ddcae3b5737b49d90e6da762c248627b933d9a"
+   },
+   {
+    "run": {
+     "id": "066a2db9-c768-43e6-bf9c-71a6529e1841",
+     "attestation_id": "d9b37b41-549a-4795-b818-b4ac25e6a5b2",
+     "test_case_id": "1c213901-e016-4771-8790-c2e7fa0ea015",
+     "attempt": 1,
+     "verdict": "pass",
+     "judge_layer": "deterministic",
+     "rationale": null,
+     "latency_ms": 120,
+     "cost": "1",
+     "transcript_ref": "d9b37b41-549a-4795-b818-b4ac25e6a5b2/1c213901-e016-4771-8790-c2e7fa0ea015-1.json",
+     "started_at": "2026-10-04T21:04:37.945345Z",
+     "finished_at": "2026-10-04T21:04:38.067244Z"
+    },
+    "document_hash": "sha256:27b9997cb109de12bee66a8870a794be617da05860669619243c05c4171b2d5b"
+   },
+   {
+    "run": {
+     "id": "c472c4e1-c118-4282-b66c-708f0c54da7f",
+     "attestation_id": "d9b37b41-549a-4795-b818-b4ac25e6a5b2",
+     "test_case_id": "1c213901-e016-4771-8790-c2e7fa0ea015",
+     "attempt": 2,
+     "verdict": "pass",
+     "judge_layer": "deterministic",
+     "rationale": null,
+     "latency_ms": 308,
+     "cost": "1",
+     "transcript_ref": "d9b37b41-549a-4795-b818-b4ac25e6a5b2/1c213901-e016-4771-8790-c2e7fa0ea015-2.json",
+     "started_at": "2026-10-04T21:04:37.945049Z",
+     "finished_at": "2026-10-04T21:04:38.253356Z"
+    },
+    "document_hash": "sha256:3aa4183a2e22dd5a377d1c666ceabd00fa2a85f4d0ae32fe2450ac0e2fabca55"
+   },
+   {
+    "run": {
+     "id": "9912c75c-6a1d-4025-afd5-3aa82ba491df",
+     "attestation_id": "d9b37b41-549a-4795-b818-b4ac25e6a5b2",
+     "test_case_id": "1c213901-e016-4771-8790-c2e7fa0ea015",
+     "attempt": 3,
+     "verdict": "pass",
+     "judge_layer": "deterministic",
+     "rationale": null,
+     "latency_ms": 203,
+     "cost": "1",
+     "transcript_ref": "d9b37b41-549a-4795-b818-b4ac25e6a5b2/1c213901-e016-4771-8790-c2e7fa0ea015-3.json",
+     "started_at": "2026-10-04T21:04:37.944804Z",
+     "finished_at": "2026-10-04T21:04:38.149064Z"
+    },
+    "document_hash": "sha256:b2f0e439c2e962a3da6475aff5249c70709994665551c5fca38854d50ab6cbf4"
+   },
+   {
+    "run": {
+     "id": "8aaea9a2-6241-44dd-8c35-baac55155934",
+     "attestation_id": "d9b37b41-549a-4795-b818-b4ac25e6a5b2",
+     "test_case_id": "1c213901-e016-4771-8790-c2e7fa0ea015",
+     "attempt": 4,
+     "verdict": "pass",
+     "judge_layer": "deterministic",
+     "rationale": null,
+     "latency_ms": 146,
+     "cost": "1",
+     "transcript_ref": "d9b37b41-549a-4795-b818-b4ac25e6a5b2/1c213901-e016-4771-8790-c2e7fa0ea015-4.json",
+     "started_at": "2026-10-04T21:04:37.944931Z",
+     "finished_at": "2026-10-04T21:04:38.091990Z"
+    },
+    "document_hash": "sha256:0e953f2f098ac192bbf8c7c182dd1eeebbd5c9d2d3e34b9b7aaf3d0ab8291ed6"
+   },
+   {
+    "run": {
+     "id": "7f0fe610-7133-4b24-9109-2abe5b546651",
+     "attestation_id": "d9b37b41-549a-4795-b818-b4ac25e6a5b2",
+     "test_case_id": "1c213901-e016-4771-8790-c2e7fa0ea015",
+     "attempt": 5,
+     "verdict": "pass",
+     "judge_layer": "deterministic",
+     "rationale": null,
+     "latency_ms": 273,
+     "cost": "1",
+     "transcript_ref": "d9b37b41-549a-4795-b818-b4ac25e6a5b2/1c213901-e016-4771-8790-c2e7fa0ea015-5.json",
+     "started_at": "2026-10-04T21:04:38.207102Z",
+     "finished_at": "2026-10-04T21:04:38.481205Z"
+    },
+    "document_hash": "sha256:171811f7a57cf7bee7ed500f94038113192b6db6acc4f306063bbce4878312c7"
+   },
+   {
+    "run": {
+     "id": "6347e78d-796b-42e0-bf37-8df9d5cc427b",
+     "attestation_id": "d9b37b41-549a-4795-b818-b4ac25e6a5b2",
+     "test_case_id": "d196cdc8-4a6a-44cb-97a4-d6cd26f58422",
+     "attempt": 1,
+     "verdict": "pass",
+     "judge_layer": "deterministic",
+     "rationale": null,
+     "latency_ms": 217,
+     "cost": "1",
+     "transcript_ref": "d9b37b41-549a-4795-b818-b4ac25e6a5b2/d196cdc8-4a6a-44cb-97a4-d6cd26f58422-1.json",
+     "started_at": "2026-10-04T21:04:38.224600Z",
+     "finished_at": "2026-10-04T21:04:38.442206Z"
+    },
+    "document_hash": "sha256:a1ccdacab16bf97d0eb2c66ecc8f7438888692adad4fd73845eddff316a7cb20"
+   },
+   {
+    "run": {
+     "id": "b08b5315-fad5-4fe6-aed0-03cbacd8a590",
+     "attestation_id": "d9b37b41-549a-4795-b818-b4ac25e6a5b2",
+     "test_case_id": "d196cdc8-4a6a-44cb-97a4-d6cd26f58422",
+     "attempt": 2,
+     "verdict": "pass",
+     "judge_layer": "deterministic",
+     "rationale": null,
+     "latency_ms": 114,
+     "cost": "1",
+     "transcript_ref": "d9b37b41-549a-4795-b818-b4ac25e6a5b2/d196cdc8-4a6a-44cb-97a4-d6cd26f58422-2.json",
+     "started_at": "2026-10-04T21:04:38.277499Z",
+     "finished_at": "2026-10-04T21:04:38.392410Z"
+    },
+    "document_hash": "sha256:9cdc60b5ad7af521443d86b04a113c85edd4cac6be3fa74c278a369745f08e34"
+   },
+   {
+    "run": {
+     "id": "34c4da58-45d7-4773-b906-123d179b5169",
+     "attestation_id": "d9b37b41-549a-4795-b818-b4ac25e6a5b2",
+     "test_case_id": "d196cdc8-4a6a-44cb-97a4-d6cd26f58422",
+     "attempt": 3,
+     "verdict": "pass",
+     "judge_layer": "deterministic",
+     "rationale": null,
+     "latency_ms": 264,
+     "cost": "1",
+     "transcript_ref": "d9b37b41-549a-4795-b818-b4ac25e6a5b2/d196cdc8-4a6a-44cb-97a4-d6cd26f58422-3.json",
+     "started_at": "2026-10-04T21:04:38.371207Z",
+     "finished_at": "2026-10-04T21:04:38.635763Z"
+    },
+    "document_hash": "sha256:9b9710a2c6d66ac565279737bb0c785bc58cadf6ca0b269fc816d3dbd167f6ce"
+   },
+   {
+    "run": {
+     "id": "0a110836-fd3e-4075-b970-f79bb82946df",
+     "attestation_id": "d9b37b41-549a-4795-b818-b4ac25e6a5b2",
+     "test_case_id": "d196cdc8-4a6a-44cb-97a4-d6cd26f58422",
+     "attempt": 4,
+     "verdict": "pass",
+     "judge_layer": "deterministic",
+     "rationale": null,
+     "latency_ms": 109,
+     "cost": "1",
+     "transcript_ref": "d9b37b41-549a-4795-b818-b4ac25e6a5b2/d196cdc8-4a6a-44cb-97a4-d6cd26f58422-4.json",
+     "started_at": "2026-10-04T21:04:38.517831Z",
+     "finished_at": "2026-10-04T21:04:38.627361Z"
+    },
+    "document_hash": "sha256:fcfdc0b44ce02357c6f7c7516b967722a97ce84b9e29180b1792ced06eec75b6"
+   },
+   {
+    "run": {
+     "id": "334e28a1-f7c5-4343-a154-f10c913309a3",
+     "attestation_id": "d9b37b41-549a-4795-b818-b4ac25e6a5b2",
+     "test_case_id": "d196cdc8-4a6a-44cb-97a4-d6cd26f58422",
+     "attempt": 5,
+     "verdict": "pass",
+     "judge_layer": "deterministic",
+     "rationale": null,
+     "latency_ms": 239,
+     "cost": "1",
+     "transcript_ref": "d9b37b41-549a-4795-b818-b4ac25e6a5b2/d196cdc8-4a6a-44cb-97a4-d6cd26f58422-5.json",
+     "started_at": "2026-10-04T21:04:38.569639Z",
+     "finished_at": "2026-10-04T21:04:38.809728Z"
+    },
+    "document_hash": "sha256:5d1c4a8359f0804daf35693c655f37b9d16e66e09c7d477a84f5b401da2e6f9b"
+   },
+   {
+    "run": {
+     "id": "192090b5-bdd7-433e-a512-efae73c0550a",
+     "attestation_id": "d9b37b41-549a-4795-b818-b4ac25e6a5b2",
+     "test_case_id": "d92fb406-20a1-4b04-a683-e71640b5272b",
+     "attempt": 1,
+     "verdict": "inconclusive",
+     "judge_layer": "deterministic",
+     "rationale": null,
+     "latency_ms": 170,
+     "cost": "1",
+     "transcript_ref": "d9b37b41-549a-4795-b818-b4ac25e6a5b2/d92fb406-20a1-4b04-a683-e71640b5272b-1.json",
+     "started_at": "2026-10-04T21:04:38.999927Z",
+     "finished_at": "2026-10-04T21:04:39.170436Z"
+    },
+    "document_hash": "sha256:215a87ce87b68d6028f3243ff0197aa7680d86e3d6a5ec4180bd48b2fb68a8b5"
+   },
+   {
+    "run": {
+     "id": "0924188d-aef3-4a40-8abf-62686d76a110",
+     "attestation_id": "d9b37b41-549a-4795-b818-b4ac25e6a5b2",
+     "test_case_id": "d92fb406-20a1-4b04-a683-e71640b5272b",
+     "attempt": 2,
+     "verdict": "inconclusive",
+     "judge_layer": "deterministic",
+     "rationale": null,
+     "latency_ms": 304,
+     "cost": "1",
+     "transcript_ref": "d9b37b41-549a-4795-b818-b4ac25e6a5b2/d92fb406-20a1-4b04-a683-e71640b5272b-2.json",
+     "started_at": "2026-10-04T21:04:39.118348Z",
+     "finished_at": "2026-10-04T21:04:39.422812Z"
+    },
+    "document_hash": "sha256:2e7ec3148e17ae4110bbaa0d6b32d9580bdc68b2bc9e5b976ec4799d3feee079"
+   },
+   {
+    "run": {
+     "id": "81c3e14a-6902-4745-abd8-dfd72c1b7767",
+     "attestation_id": "d9b37b41-549a-4795-b818-b4ac25e6a5b2",
+     "test_case_id": "d92fb406-20a1-4b04-a683-e71640b5272b",
+     "attempt": 3,
+     "verdict": "inconclusive",
+     "judge_layer": "deterministic",
+     "rationale": null,
+     "latency_ms": 409,
+     "cost": "1",
+     "transcript_ref": "d9b37b41-549a-4795-b818-b4ac25e6a5b2/d92fb406-20a1-4b04-a683-e71640b5272b-3.json",
+     "started_at": "2026-10-04T21:04:39.192920Z",
+     "finished_at": "2026-10-04T21:04:39.603190Z"
+    },
+    "document_hash": "sha256:4b83c5f7adf7bc07bc59311fdb80606398522763406fd54a2850d0ad7e24398e"
+   },
+   {
+    "run": {
+     "id": "bd25e3e2-6d53-4f54-8512-221c2f1a0add",
+     "attestation_id": "d9b37b41-549a-4795-b818-b4ac25e6a5b2",
+     "test_case_id": "d92fb406-20a1-4b04-a683-e71640b5272b",
+     "attempt": 4,
+     "verdict": "inconclusive",
+     "judge_layer": "deterministic",
+     "rationale": null,
+     "latency_ms": 287,
+     "cost": "1",
+     "transcript_ref": "d9b37b41-549a-4795-b818-b4ac25e6a5b2/d92fb406-20a1-4b04-a683-e71640b5272b-4.json",
+     "started_at": "2026-10-04T21:04:39.293027Z",
+     "finished_at": "2026-10-04T21:04:39.580956Z"
+    },
+    "document_hash": "sha256:3305573732ff56c82b6ef419af57a748fb80d76c69e85f86b8c10b2bfe58909d"
+   },
+   {
+    "run": {
+     "id": "19d63ef5-4fac-45f5-85f5-29d815f71c9f",
+     "attestation_id": "d9b37b41-549a-4795-b818-b4ac25e6a5b2",
+     "test_case_id": "d92fb406-20a1-4b04-a683-e71640b5272b",
+     "attempt": 5,
+     "verdict": "inconclusive",
+     "judge_layer": "deterministic",
+     "rationale": null,
+     "latency_ms": 227,
+     "cost": "1",
+     "transcript_ref": "d9b37b41-549a-4795-b818-b4ac25e6a5b2/d92fb406-20a1-4b04-a683-e71640b5272b-5.json",
+     "started_at": "2026-10-04T21:04:39.343297Z",
+     "finished_at": "2026-10-04T21:04:39.571095Z"
+    },
+    "document_hash": "sha256:8b8bfb0e81dcc5250deff099c753dcb47812205ca9480b7a330e900e48074d75"
+   }
+  ],
+  "decisions": [
+   {
+    "id": "eacfdfd1-fb25-4472-8f0b-eb0879d2fec3",
+    "attestation_id": "d9b37b41-549a-4795-b818-b4ac25e6a5b2",
+    "outcome": "flag",
+    "policy_version": "unconfigured",
+    "decided_by": "policy",
+    "decided_at": "2026-10-04T21:04:39.630353Z"
+   }
+  ],
+  "results": [
+   {
+    "test_case_id": "1c213901-e016-4771-8790-c2e7fa0ea015",
+    "skill_id": "order-status",
+    "kind": "skill",
+    "pass_count": 5,
+    "fail_count": 0,
+    "inconclusive_count": 0
+   },
+   {
+    "test_case_id": "d196cdc8-4a6a-44cb-97a4-d6cd26f58422",
+    "skill_id": "order-status",
+    "kind": "skill",
+    "pass_count": 5,
+    "fail_count": 0,
+    "inconclusive_count": 0
+   },
+   {
+    "test_case_id": "006fb9f0-a034-4a0d-ab64-595dafaaf808",
+    "skill_id": "start-return",
+    "kind": "skill",
+    "pass_count": 5,
+    "fail_count": 0,
+    "inconclusive_count": 0
+   },
+   {
+    "test_case_id": "d92fb406-20a1-4b04-a683-e71640b5272b",
+    "skill_id": "refund-estimate",
+    "kind": "skill",
+    "pass_count": 0,
+    "fail_count": 0,
+    "inconclusive_count": 5
+   }
+  ],
+  "planned_runs": 20,
+  "not_executed": [],
+  "card_recheck": {
+   "outcome": "unchanged",
+   "card_hash": "sha256:c25be2adb553bc2efce2a1506c0b19194c8299c030e1f0b265890fbbeb96850b",
+   "detail": ""
+  },
+  "not_tested": [
+   {
+    "category": "skill without test case",
+    "detail": "skill 'cancel-order' has no test case; invariant 1 (one test case per declared skill) is not satisfied for it"
+   },
+   {
+    "category": "inconclusive runs",
+    "detail": "5 run(s) ended inconclusive; they count neither as pass nor as fail"
+   },
+   {
+    "category": "declared capability not exercised",
+    "detail": "the card declares streaming; no test case exercises it"
+   },
+   {
+    "category": "probes",
+    "detail": "no probe_undeclared, probe_injection or probe_failure test cases exist yet (stage 4)"
+   },
+   {
+    "category": "semantic correctness",
+    "detail": "Layer 1 checks structure, state, output modes and latency; whether the content of each answer is correct needs Layer 2 (stage 4)"
+   },
+   {
+    "category": "production endpoint",
+    "detail": "tests ran against the declared sandbox or dry-run endpoint http://127.0.0.1:53448/rpc; the production endpoint itself was not tested (DR-006)"
+   }
+  ],
+  "sandbox_declared": true,
+  "drafter_name": "contract file",
+  "signer_public_key": "foI43Hhe8ShgR8thjY0n8R599wCvo9WbTGVoPvIWVhI",
+  "signature_payload": {
+   "payload_version": 1,
+   "attestation_id": "d9b37b41-549a-4795-b818-b4ac25e6a5b2",
+   "card_hash": "sha256:c25be2adb553bc2efce2a1506c0b19194c8299c030e1f0b265890fbbeb96850b",
+   "contract": {
+    "id": "081fefaf-370f-4d3e-8e10-c5053a55b786",
+    "version": 1
+   },
+   "results": [
+    {
+     "test_case_id": "006fb9f0-a034-4a0d-ab64-595dafaaf808",
+     "skill_id": "start-return",
+     "kind": "skill",
+     "pass": 5,
+     "fail": 0,
+     "inconclusive": 0
+    },
+    {
+     "test_case_id": "1c213901-e016-4771-8790-c2e7fa0ea015",
+     "skill_id": "order-status",
+     "kind": "skill",
+     "pass": 5,
+     "fail": 0,
+     "inconclusive": 0
+    },
+    {
+     "test_case_id": "d196cdc8-4a6a-44cb-97a4-d6cd26f58422",
+     "skill_id": "order-status",
+     "kind": "skill",
+     "pass": 5,
+     "fail": 0,
+     "inconclusive": 0
+    },
+    {
+     "test_case_id": "d92fb406-20a1-4b04-a683-e71640b5272b",
+     "skill_id": "refund-estimate",
+     "kind": "skill",
+     "pass": 0,
+     "fail": 0,
+     "inconclusive": 5
+    }
+   ],
+   "transcript_hashes": {
+    "066a2db9-c768-43e6-bf9c-71a6529e1841": "sha256:27b9997cb109de12bee66a8870a794be617da05860669619243c05c4171b2d5b",
+    "0924188d-aef3-4a40-8abf-62686d76a110": "sha256:2e7ec3148e17ae4110bbaa0d6b32d9580bdc68b2bc9e5b976ec4799d3feee079",
+    "0a110836-fd3e-4075-b970-f79bb82946df": "sha256:fcfdc0b44ce02357c6f7c7516b967722a97ce84b9e29180b1792ced06eec75b6",
+    "192090b5-bdd7-433e-a512-efae73c0550a": "sha256:215a87ce87b68d6028f3243ff0197aa7680d86e3d6a5ec4180bd48b2fb68a8b5",
+    "19d63ef5-4fac-45f5-85f5-29d815f71c9f": "sha256:8b8bfb0e81dcc5250deff099c753dcb47812205ca9480b7a330e900e48074d75",
+    "29965228-f4c7-4e67-85ae-4a6b60ed6289": "sha256:97b2bb88fdd49d6d0c5d72b1ad736194db39e305738d226b7f414fda8b860142",
+    "334e28a1-f7c5-4343-a154-f10c913309a3": "sha256:5d1c4a8359f0804daf35693c655f37b9d16e66e09c7d477a84f5b401da2e6f9b",
+    "34c4da58-45d7-4773-b906-123d179b5169": "sha256:9b9710a2c6d66ac565279737bb0c785bc58cadf6ca0b269fc816d3dbd167f6ce",
+    "4dd9966c-d7de-4dae-8e55-bb9f6b7b6901": "sha256:d061b0bcfb8f7ef7430bc7d538df03fc1ccb4b7262a5af0c42c073f238e598b8",
+    "6347e78d-796b-42e0-bf37-8df9d5cc427b": "sha256:a1ccdacab16bf97d0eb2c66ecc8f7438888692adad4fd73845eddff316a7cb20",
+    "67637da7-9d4b-467b-9b3f-dad552631f41": "sha256:4e93c52ee29c541ba5ade9acf21a2a9879409efb879538f04abcde427e697af5",
+    "7f0fe610-7133-4b24-9109-2abe5b546651": "sha256:171811f7a57cf7bee7ed500f94038113192b6db6acc4f306063bbce4878312c7",
+    "81c3e14a-6902-4745-abd8-dfd72c1b7767": "sha256:4b83c5f7adf7bc07bc59311fdb80606398522763406fd54a2850d0ad7e24398e",
+    "8aaea9a2-6241-44dd-8c35-baac55155934": "sha256:0e953f2f098ac192bbf8c7c182dd1eeebbd5c9d2d3e34b9b7aaf3d0ab8291ed6",
+    "9912c75c-6a1d-4025-afd5-3aa82ba491df": "sha256:b2f0e439c2e962a3da6475aff5249c70709994665551c5fca38854d50ab6cbf4",
+    "b08b5315-fad5-4fe6-aed0-03cbacd8a590": "sha256:9cdc60b5ad7af521443d86b04a113c85edd4cac6be3fa74c278a369745f08e34",
+    "b64f32b2-9691-4e59-9dec-6e542957948f": "sha256:c9cf68a6383abeb622528b3c57b587bfeedff82d293e716aa3ce1ab328a6789a",
+    "bd25e3e2-6d53-4f54-8512-221c2f1a0add": "sha256:3305573732ff56c82b6ef419af57a748fb80d76c69e85f86b8c10b2bfe58909d",
+    "c472c4e1-c118-4282-b66c-708f0c54da7f": "sha256:3aa4183a2e22dd5a377d1c666ceabd00fa2a85f4d0ae32fe2450ac0e2fabca55",
+    "e5336e13-ec39-4e1a-ba23-bc2049a93135": "sha256:1314cd6909c1a40b9c6a97c946ddcae3b5737b49d90e6da762c248627b933d9a"
+   },
+   "decision": {
+    "outcome": "flag",
+    "policy_version": "unconfigured"
+   }
+  },
+  "proposals": [
+   "OQ-A2: the sandbox is the endpoint the user declared with --sandbox; Suncly cannot verify it",
+   "OQ-A3: the Runner redacts its credential, Authorization and cookie headers and known token patterns before a transcript leaves it",
+   "OQ-A4: the Runner speaks A2A 1.0 over JSON-RPC, follows tasks by polling GetTask, uses no push notifications and never answers an interrupted state",
+   "OQ-A7: card_hash is SHA-256 of the RFC 8785 form of the card without `signatures`",
+   "OQ-A8: signatures are Ed25519 over the RFC 8785 payload, encoded `ed25519:<base64url>`; signing_key_id is a SHA-256 fingerprint of the public key",
+   "OQ-D1: cost is counted in attempts; every attempt costs 1, including retries",
+   "OQ-D3: run.attempt is the repetition number; (attestation_id, test_case_id, attempt) is unique",
+   "OQ-D7: input is {text} or {parts}; criteria hold the Layer 1 checks (docs/API.md)",
+   "OQ-D9: a card hash seen before reuses its card_version and its approved contract",
+   "OQ-D10: latency_ms runs from sending the message to the final task state; null without a response",
+   "OQ-F3: an unreachable agent gives inconclusive runs; a timeout fails the latency check",
+   "OQ-F5: a card that cannot be re-fetched at the end makes the attestation failed",
+   "OQ-F7: failed and invalidated attestations are signed with no decision in the payload",
+   "OQ-PO5: decision.policy_version is the placeholder 'unconfigured' until a policy exists",
+   "OQ-R1: a minimal Orchestrator runs inside the process",
+   "OQ-R2: test cases come from the deterministic drafter or a contract file; no model is involved",
+   "OQ-R6: the file report is the first version of the Report adapter"
+  ],
+  "format": "suncly-result/1"
+ },
+ "transcripts": {
+  "066a2db9-c768-43e6-bf9c-71a6529e1841": "{\"judgement\":{\"checks\":[{\"detail\":\"a well-formed Task\",\"name\":\"valid_schema\",\"passed\":true},{\"detail\":\"expected TASK_STATE_COMPLETED, observed TASK_STATE_COMPLETED\",\"name\":\"final_task_state\",\"passed\":true},{\"detail\":\"120 ms against a limit of 2000 ms\",\"name\":\"latency_limit\",\"passed\":true},{\"detail\":\"1 output part(s) with content\",\"name\":\"response_present\",\"passed\":true},{\"detail\":\"declared ['text/plain']; every part conforms\",\"name\":\"output_modes\",\"passed\":true},{\"detail\":\"present\",\"name\":\"required_field /artifacts/0/parts/0/text\",\"passed\":true}],\"judge_layer\":\"deterministic\",\"summary\":\"pass: every Layer 1 check passed\",\"verdict\":\"pass\"},\"transcript\":{\"attempt\":1,\"attestation_id\":\"d9b37b41-549a-4795-b818-b4ac25e6a5b2\",\"cost\":\"1\",\"exchanges\":[{\"at\":\"2026-10-04T21:04:37.945607Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"method\":\"SendMessage\",\"params\":{\"message\":{\"messageId\":\"01a7658a-07f7-47f7-9f76-6ab30386240e\",\"parts\":[{\"text\":\"Where is order 48213?\"}],\"role\":\"ROLE_USER\"}}},\"direction\":\"request\",\"headers\":{\"A2A-Version\":\"1.0\",\"Accept\":\"application/json\",\"Authorization\":\"[REDACTED]\",\"Content-Type\":\"application/json\"},\"http_status\":null,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"},{\"at\":\"2026-10-04T21:04:38.066534Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"result\":{\"task\":{\"artifacts\":[{\"artifactId\":\"20e2e7f912c44afa97c8008e2952a1ed\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Order 48213 is in transit and is expected on Tuesday 7 October. Tracking: HC-2210-5581.\"}]}],\"contextId\":\"b5dc058c9ae94aa9b7d3041e548da778\",\"id\":\"37a7145036c34d6eaeecf425640bb123\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:38.065Z\"}}}},\"direction\":\"response\",\"headers\":{\"content-length\":\"452\",\"content-type\":\"application/json\",\"date\":\"Sun, 04 Oct 2026 21:04:38 GMT\",\"server\":\"BaseHTTP/0.6 Python/3.14.3\"},\"http_status\":200,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"}],\"failure\":null,\"final_response\":{\"artifacts\":[{\"artifactId\":\"20e2e7f912c44afa97c8008e2952a1ed\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Order 48213 is in transit and is expected on Tuesday 7 October. Tracking: HC-2210-5581.\"}]}],\"contextId\":\"b5dc058c9ae94aa9b7d3041e548da778\",\"id\":\"37a7145036c34d6eaeecf425640bb123\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:38.065Z\"}},\"final_task_state\":\"TASK_STATE_COMPLETED\",\"finished_at\":\"2026-10-04T21:04:38.067244Z\",\"latency_ms\":120,\"outcome\":\"responded_task\",\"protocol_binding\":\"JSONRPC\",\"protocol_version\":\"1.0\",\"redaction\":{\"replacements\":1,\"rules\":[\"sensitive_key\"]},\"started_at\":\"2026-10-04T21:04:37.945345Z\",\"target_url\":\"http://127.0.0.1:53448/rpc\",\"task_id\":\"37a7145036c34d6eaeecf425640bb123\",\"test_case_id\":\"1c213901-e016-4771-8790-c2e7fa0ea015\"}}",
+  "0924188d-aef3-4a40-8abf-62686d76a110": "{\"judgement\":{\"checks\":[{\"detail\":\"a well-formed Task\",\"name\":\"valid_schema\",\"passed\":true},{\"detail\":\"expected TASK_STATE_COMPLETED, observed TASK_STATE_COMPLETED\",\"name\":\"final_task_state\",\"passed\":true},{\"detail\":\"304 ms against a limit of 2000 ms\",\"name\":\"latency_limit\",\"passed\":true},{\"detail\":\"1 output part(s) with content\",\"name\":\"response_present\",\"passed\":true},{\"detail\":\"declared ['text/plain']; every part conforms\",\"name\":\"output_modes\",\"passed\":true},{\"detail\":\"present\",\"name\":\"required_field /artifacts/0/parts/0/text\",\"passed\":true},{\"detail\":\"needs Layer 2, which arrives in stage 4\",\"name\":\"model_check the amount equals the order total minus the restocking fee\",\"passed\":null}],\"judge_layer\":\"deterministic\",\"summary\":\"inconclusive: Layer 1 cannot decide model_check the amount equals the order total minus the restocking fee\",\"verdict\":\"inconclusive\"},\"transcript\":{\"attempt\":2,\"attestation_id\":\"d9b37b41-549a-4795-b818-b4ac25e6a5b2\",\"cost\":\"1\",\"exchanges\":[{\"at\":\"2026-10-04T21:04:39.118496Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"method\":\"SendMessage\",\"params\":{\"message\":{\"messageId\":\"b66b0617-3e9a-47be-9a61-b5c988b5b0f3\",\"parts\":[{\"text\":\"How much will I get back if I return order 48213?\"}],\"role\":\"ROLE_USER\"}}},\"direction\":\"request\",\"headers\":{\"A2A-Version\":\"1.0\",\"Accept\":\"application/json\",\"Authorization\":\"[REDACTED]\",\"Content-Type\":\"application/json\"},\"http_status\":null,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"},{\"at\":\"2026-10-04T21:04:39.422701Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"result\":{\"task\":{\"artifacts\":[{\"artifactId\":\"b003e3c269e247e79505f24054a285c1\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"If you return order 48213 in full you would receive EUR 42.90, the order total of EUR 47.90 minus a EUR 5.00 restocking fee, to the original payment method within 5 to 7 business days.\"}]}],\"contextId\":\"a541434c895447bd95504179459fb0aa\",\"id\":\"709a3a7f0f9649b8bb65217361f1dd26\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:39.421Z\"}}}},\"direction\":\"response\",\"headers\":{\"content-length\":\"549\",\"content-type\":\"application/json\",\"date\":\"Sun, 04 Oct 2026 21:04:39 GMT\",\"server\":\"BaseHTTP/0.6 Python/3.14.3\"},\"http_status\":200,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"}],\"failure\":null,\"final_response\":{\"artifacts\":[{\"artifactId\":\"b003e3c269e247e79505f24054a285c1\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"If you return order 48213 in full you would receive EUR 42.90, the order total of EUR 47.90 minus a EUR 5.00 restocking fee, to the original payment method within 5 to 7 business days.\"}]}],\"contextId\":\"a541434c895447bd95504179459fb0aa\",\"id\":\"709a3a7f0f9649b8bb65217361f1dd26\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:39.421Z\"}},\"final_task_state\":\"TASK_STATE_COMPLETED\",\"finished_at\":\"2026-10-04T21:04:39.422812Z\",\"latency_ms\":304,\"outcome\":\"responded_task\",\"protocol_binding\":\"JSONRPC\",\"protocol_version\":\"1.0\",\"redaction\":{\"replacements\":1,\"rules\":[\"sensitive_key\"]},\"started_at\":\"2026-10-04T21:04:39.118348Z\",\"target_url\":\"http://127.0.0.1:53448/rpc\",\"task_id\":\"709a3a7f0f9649b8bb65217361f1dd26\",\"test_case_id\":\"d92fb406-20a1-4b04-a683-e71640b5272b\"}}",
+  "0a110836-fd3e-4075-b970-f79bb82946df": "{\"judgement\":{\"checks\":[{\"detail\":\"a well-formed Task\",\"name\":\"valid_schema\",\"passed\":true},{\"detail\":\"expected TASK_STATE_COMPLETED, observed TASK_STATE_COMPLETED\",\"name\":\"final_task_state\",\"passed\":true},{\"detail\":\"109 ms against a limit of 2000 ms\",\"name\":\"latency_limit\",\"passed\":true},{\"detail\":\"1 output part(s) with content\",\"name\":\"response_present\",\"passed\":true},{\"detail\":\"declared ['text/plain']; every part conforms\",\"name\":\"output_modes\",\"passed\":true},{\"detail\":\"present\",\"name\":\"required_field /artifacts/0/parts/0/text\",\"passed\":true}],\"judge_layer\":\"deterministic\",\"summary\":\"pass: every Layer 1 check passed\",\"verdict\":\"pass\"},\"transcript\":{\"attempt\":4,\"attestation_id\":\"d9b37b41-549a-4795-b818-b4ac25e6a5b2\",\"cost\":\"1\",\"exchanges\":[{\"at\":\"2026-10-04T21:04:38.517970Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"method\":\"SendMessage\",\"params\":{\"message\":{\"messageId\":\"6eaf3b7b-ffb6-4e6a-b786-fe6a521d99ef\",\"parts\":[{\"text\":\"Has order 48213 shipped yet?\"}],\"role\":\"ROLE_USER\"}}},\"direction\":\"request\",\"headers\":{\"A2A-Version\":\"1.0\",\"Accept\":\"application/json\",\"Authorization\":\"[REDACTED]\",\"Content-Type\":\"application/json\"},\"http_status\":null,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"},{\"at\":\"2026-10-04T21:04:38.627280Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"result\":{\"task\":{\"artifacts\":[{\"artifactId\":\"7968ca4496e940ff906c9f0d686051b0\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Yes. Order 48213 shipped on 2 October and is with the carrier (tracking HC-2210-5581).\"}]}],\"contextId\":\"08fc2fb9cd8c4783a1ebdafda2a40b4a\",\"id\":\"0ba88129f49548a6a4b5d90aaa38ea27\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:38.626Z\"}}}},\"direction\":\"response\",\"headers\":{\"content-length\":\"451\",\"content-type\":\"application/json\",\"date\":\"Sun, 04 Oct 2026 21:04:38 GMT\",\"server\":\"BaseHTTP/0.6 Python/3.14.3\"},\"http_status\":200,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"}],\"failure\":null,\"final_response\":{\"artifacts\":[{\"artifactId\":\"7968ca4496e940ff906c9f0d686051b0\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Yes. Order 48213 shipped on 2 October and is with the carrier (tracking HC-2210-5581).\"}]}],\"contextId\":\"08fc2fb9cd8c4783a1ebdafda2a40b4a\",\"id\":\"0ba88129f49548a6a4b5d90aaa38ea27\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:38.626Z\"}},\"final_task_state\":\"TASK_STATE_COMPLETED\",\"finished_at\":\"2026-10-04T21:04:38.627361Z\",\"latency_ms\":109,\"outcome\":\"responded_task\",\"protocol_binding\":\"JSONRPC\",\"protocol_version\":\"1.0\",\"redaction\":{\"replacements\":1,\"rules\":[\"sensitive_key\"]},\"started_at\":\"2026-10-04T21:04:38.517831Z\",\"target_url\":\"http://127.0.0.1:53448/rpc\",\"task_id\":\"0ba88129f49548a6a4b5d90aaa38ea27\",\"test_case_id\":\"d196cdc8-4a6a-44cb-97a4-d6cd26f58422\"}}",
+  "192090b5-bdd7-433e-a512-efae73c0550a": "{\"judgement\":{\"checks\":[{\"detail\":\"a well-formed Task\",\"name\":\"valid_schema\",\"passed\":true},{\"detail\":\"expected TASK_STATE_COMPLETED, observed TASK_STATE_COMPLETED\",\"name\":\"final_task_state\",\"passed\":true},{\"detail\":\"170 ms against a limit of 2000 ms\",\"name\":\"latency_limit\",\"passed\":true},{\"detail\":\"1 output part(s) with content\",\"name\":\"response_present\",\"passed\":true},{\"detail\":\"declared ['text/plain']; every part conforms\",\"name\":\"output_modes\",\"passed\":true},{\"detail\":\"present\",\"name\":\"required_field /artifacts/0/parts/0/text\",\"passed\":true},{\"detail\":\"needs Layer 2, which arrives in stage 4\",\"name\":\"model_check the amount equals the order total minus the restocking fee\",\"passed\":null}],\"judge_layer\":\"deterministic\",\"summary\":\"inconclusive: Layer 1 cannot decide model_check the amount equals the order total minus the restocking fee\",\"verdict\":\"inconclusive\"},\"transcript\":{\"attempt\":1,\"attestation_id\":\"d9b37b41-549a-4795-b818-b4ac25e6a5b2\",\"cost\":\"1\",\"exchanges\":[{\"at\":\"2026-10-04T21:04:39.000048Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"method\":\"SendMessage\",\"params\":{\"message\":{\"messageId\":\"15946856-acec-45b7-a67e-b089801fbabf\",\"parts\":[{\"text\":\"How much will I get back if I return order 48213?\"}],\"role\":\"ROLE_USER\"}}},\"direction\":\"request\",\"headers\":{\"A2A-Version\":\"1.0\",\"Accept\":\"application/json\",\"Authorization\":\"[REDACTED]\",\"Content-Type\":\"application/json\"},\"http_status\":null,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"},{\"at\":\"2026-10-04T21:04:39.170326Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"result\":{\"task\":{\"artifacts\":[{\"artifactId\":\"2b57b10a9973403c9257a6ff18db5c75\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"If you return order 48213 in full you would receive EUR 42.90, the order total of EUR 47.90 minus a EUR 5.00 restocking fee, to the original payment method within 5 to 7 business days.\"}]}],\"contextId\":\"411ed53bb8b6422e8534dc3ad4eabed1\",\"id\":\"f714bbaf306b402f9491cfb85a79e0fd\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:39.169Z\"}}}},\"direction\":\"response\",\"headers\":{\"content-length\":\"549\",\"content-type\":\"application/json\",\"date\":\"Sun, 04 Oct 2026 21:04:39 GMT\",\"server\":\"BaseHTTP/0.6 Python/3.14.3\"},\"http_status\":200,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"}],\"failure\":null,\"final_response\":{\"artifacts\":[{\"artifactId\":\"2b57b10a9973403c9257a6ff18db5c75\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"If you return order 48213 in full you would receive EUR 42.90, the order total of EUR 47.90 minus a EUR 5.00 restocking fee, to the original payment method within 5 to 7 business days.\"}]}],\"contextId\":\"411ed53bb8b6422e8534dc3ad4eabed1\",\"id\":\"f714bbaf306b402f9491cfb85a79e0fd\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:39.169Z\"}},\"final_task_state\":\"TASK_STATE_COMPLETED\",\"finished_at\":\"2026-10-04T21:04:39.170436Z\",\"latency_ms\":170,\"outcome\":\"responded_task\",\"protocol_binding\":\"JSONRPC\",\"protocol_version\":\"1.0\",\"redaction\":{\"replacements\":1,\"rules\":[\"sensitive_key\"]},\"started_at\":\"2026-10-04T21:04:38.999927Z\",\"target_url\":\"http://127.0.0.1:53448/rpc\",\"task_id\":\"f714bbaf306b402f9491cfb85a79e0fd\",\"test_case_id\":\"d92fb406-20a1-4b04-a683-e71640b5272b\"}}",
+  "19d63ef5-4fac-45f5-85f5-29d815f71c9f": "{\"judgement\":{\"checks\":[{\"detail\":\"a well-formed Task\",\"name\":\"valid_schema\",\"passed\":true},{\"detail\":\"expected TASK_STATE_COMPLETED, observed TASK_STATE_COMPLETED\",\"name\":\"final_task_state\",\"passed\":true},{\"detail\":\"227 ms against a limit of 2000 ms\",\"name\":\"latency_limit\",\"passed\":true},{\"detail\":\"1 output part(s) with content\",\"name\":\"response_present\",\"passed\":true},{\"detail\":\"declared ['text/plain']; every part conforms\",\"name\":\"output_modes\",\"passed\":true},{\"detail\":\"present\",\"name\":\"required_field /artifacts/0/parts/0/text\",\"passed\":true},{\"detail\":\"needs Layer 2, which arrives in stage 4\",\"name\":\"model_check the amount equals the order total minus the restocking fee\",\"passed\":null}],\"judge_layer\":\"deterministic\",\"summary\":\"inconclusive: Layer 1 cannot decide model_check the amount equals the order total minus the restocking fee\",\"verdict\":\"inconclusive\"},\"transcript\":{\"attempt\":5,\"attestation_id\":\"d9b37b41-549a-4795-b818-b4ac25e6a5b2\",\"cost\":\"1\",\"exchanges\":[{\"at\":\"2026-10-04T21:04:39.343425Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"method\":\"SendMessage\",\"params\":{\"message\":{\"messageId\":\"c3b8b5eb-319b-499b-8c0f-aef7f64c645d\",\"parts\":[{\"text\":\"How much will I get back if I return order 48213?\"}],\"role\":\"ROLE_USER\"}}},\"direction\":\"request\",\"headers\":{\"A2A-Version\":\"1.0\",\"Accept\":\"application/json\",\"Authorization\":\"[REDACTED]\",\"Content-Type\":\"application/json\"},\"http_status\":null,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"},{\"at\":\"2026-10-04T21:04:39.570861Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"result\":{\"task\":{\"artifacts\":[{\"artifactId\":\"cf4c3aa2835a43518a986e83969a8f43\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"If you return order 48213 in full you would receive EUR 42.90, the order total of EUR 47.90 minus a EUR 5.00 restocking fee, to the original payment method within 5 to 7 business days.\"}]}],\"contextId\":\"ce4983c040364d439243c6272903fcc0\",\"id\":\"134f7ebf1b484826beae6b2bda2f39a9\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:39.569Z\"}}}},\"direction\":\"response\",\"headers\":{\"content-length\":\"549\",\"content-type\":\"application/json\",\"date\":\"Sun, 04 Oct 2026 21:04:39 GMT\",\"server\":\"BaseHTTP/0.6 Python/3.14.3\"},\"http_status\":200,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"}],\"failure\":null,\"final_response\":{\"artifacts\":[{\"artifactId\":\"cf4c3aa2835a43518a986e83969a8f43\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"If you return order 48213 in full you would receive EUR 42.90, the order total of EUR 47.90 minus a EUR 5.00 restocking fee, to the original payment method within 5 to 7 business days.\"}]}],\"contextId\":\"ce4983c040364d439243c6272903fcc0\",\"id\":\"134f7ebf1b484826beae6b2bda2f39a9\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:39.569Z\"}},\"final_task_state\":\"TASK_STATE_COMPLETED\",\"finished_at\":\"2026-10-04T21:04:39.571095Z\",\"latency_ms\":227,\"outcome\":\"responded_task\",\"protocol_binding\":\"JSONRPC\",\"protocol_version\":\"1.0\",\"redaction\":{\"replacements\":1,\"rules\":[\"sensitive_key\"]},\"started_at\":\"2026-10-04T21:04:39.343297Z\",\"target_url\":\"http://127.0.0.1:53448/rpc\",\"task_id\":\"134f7ebf1b484826beae6b2bda2f39a9\",\"test_case_id\":\"d92fb406-20a1-4b04-a683-e71640b5272b\"}}",
+  "29965228-f4c7-4e67-85ae-4a6b60ed6289": "{\"judgement\":{\"checks\":[{\"detail\":\"a well-formed Task\",\"name\":\"valid_schema\",\"passed\":true},{\"detail\":\"expected TASK_STATE_COMPLETED, observed TASK_STATE_COMPLETED\",\"name\":\"final_task_state\",\"passed\":true},{\"detail\":\"126 ms against a limit of 2000 ms\",\"name\":\"latency_limit\",\"passed\":true},{\"detail\":\"1 output part(s) with content\",\"name\":\"response_present\",\"passed\":true},{\"detail\":\"declared ['text/plain']; every part conforms\",\"name\":\"output_modes\",\"passed\":true},{\"detail\":\"present\",\"name\":\"required_field /artifacts/0/parts/0/text\",\"passed\":true}],\"judge_layer\":\"deterministic\",\"summary\":\"pass: every Layer 1 check passed\",\"verdict\":\"pass\"},\"transcript\":{\"attempt\":2,\"attestation_id\":\"d9b37b41-549a-4795-b818-b4ac25e6a5b2\",\"cost\":\"1\",\"exchanges\":[{\"at\":\"2026-10-04T21:04:38.753786Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"method\":\"SendMessage\",\"params\":{\"message\":{\"messageId\":\"99ab36eb-4c43-46e4-8a97-bdbb055f5c5f\",\"parts\":[{\"text\":\"Start a return for order 48213, item 2\"}],\"role\":\"ROLE_USER\"}}},\"direction\":\"request\",\"headers\":{\"A2A-Version\":\"1.0\",\"Accept\":\"application/json\",\"Authorization\":\"[REDACTED]\",\"Content-Type\":\"application/json\"},\"http_status\":null,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"},{\"at\":\"2026-10-04T21:04:38.880648Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"result\":{\"task\":{\"artifacts\":[{\"artifactId\":\"803f012d09924b9f8634ab0780ede434\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Return RMA-48213-2 is open for order 48213, item 2. A prepaid label was emailed to the customer; the refund is issued when the parcel scans at the carrier.\"}]}],\"contextId\":\"03e1f4589eed457aafa7a03d4df6c28f\",\"id\":\"41ab41e52ce54a8cbcceaa0e6aec4d80\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:38.880Z\"}}}},\"direction\":\"response\",\"headers\":{\"content-length\":\"520\",\"content-type\":\"application/json\",\"date\":\"Sun, 04 Oct 2026 21:04:38 GMT\",\"server\":\"BaseHTTP/0.6 Python/3.14.3\"},\"http_status\":200,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"}],\"failure\":null,\"final_response\":{\"artifacts\":[{\"artifactId\":\"803f012d09924b9f8634ab0780ede434\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Return RMA-48213-2 is open for order 48213, item 2. A prepaid label was emailed to the customer; the refund is issued when the parcel scans at the carrier.\"}]}],\"contextId\":\"03e1f4589eed457aafa7a03d4df6c28f\",\"id\":\"41ab41e52ce54a8cbcceaa0e6aec4d80\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:38.880Z\"}},\"final_task_state\":\"TASK_STATE_COMPLETED\",\"finished_at\":\"2026-10-04T21:04:38.880754Z\",\"latency_ms\":126,\"outcome\":\"responded_task\",\"protocol_binding\":\"JSONRPC\",\"protocol_version\":\"1.0\",\"redaction\":{\"replacements\":1,\"rules\":[\"sensitive_key\"]},\"started_at\":\"2026-10-04T21:04:38.753519Z\",\"target_url\":\"http://127.0.0.1:53448/rpc\",\"task_id\":\"41ab41e52ce54a8cbcceaa0e6aec4d80\",\"test_case_id\":\"006fb9f0-a034-4a0d-ab64-595dafaaf808\"}}",
+  "334e28a1-f7c5-4343-a154-f10c913309a3": "{\"judgement\":{\"checks\":[{\"detail\":\"a well-formed Task\",\"name\":\"valid_schema\",\"passed\":true},{\"detail\":\"expected TASK_STATE_COMPLETED, observed TASK_STATE_COMPLETED\",\"name\":\"final_task_state\",\"passed\":true},{\"detail\":\"239 ms against a limit of 2000 ms\",\"name\":\"latency_limit\",\"passed\":true},{\"detail\":\"1 output part(s) with content\",\"name\":\"response_present\",\"passed\":true},{\"detail\":\"declared ['text/plain']; every part conforms\",\"name\":\"output_modes\",\"passed\":true},{\"detail\":\"present\",\"name\":\"required_field /artifacts/0/parts/0/text\",\"passed\":true}],\"judge_layer\":\"deterministic\",\"summary\":\"pass: every Layer 1 check passed\",\"verdict\":\"pass\"},\"transcript\":{\"attempt\":5,\"attestation_id\":\"d9b37b41-549a-4795-b818-b4ac25e6a5b2\",\"cost\":\"1\",\"exchanges\":[{\"at\":\"2026-10-04T21:04:38.569825Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"method\":\"SendMessage\",\"params\":{\"message\":{\"messageId\":\"ae26ec30-3b5d-46ee-86d4-4f4cfa388d40\",\"parts\":[{\"text\":\"Has order 48213 shipped yet?\"}],\"role\":\"ROLE_USER\"}}},\"direction\":\"request\",\"headers\":{\"A2A-Version\":\"1.0\",\"Accept\":\"application/json\",\"Authorization\":\"[REDACTED]\",\"Content-Type\":\"application/json\"},\"http_status\":null,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"},{\"at\":\"2026-10-04T21:04:38.809629Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"result\":{\"task\":{\"artifacts\":[{\"artifactId\":\"3c038b788e7d42e0bb4d600949a3dfb0\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Yes. Order 48213 shipped on 2 October and is with the carrier (tracking HC-2210-5581).\"}]}],\"contextId\":\"efea4c3b26984f98a868708e5eeba1bf\",\"id\":\"73c00ab215d348c6ac49f9c298b0db1b\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:38.808Z\"}}}},\"direction\":\"response\",\"headers\":{\"content-length\":\"451\",\"content-type\":\"application/json\",\"date\":\"Sun, 04 Oct 2026 21:04:38 GMT\",\"server\":\"BaseHTTP/0.6 Python/3.14.3\"},\"http_status\":200,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"}],\"failure\":null,\"final_response\":{\"artifacts\":[{\"artifactId\":\"3c038b788e7d42e0bb4d600949a3dfb0\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Yes. Order 48213 shipped on 2 October and is with the carrier (tracking HC-2210-5581).\"}]}],\"contextId\":\"efea4c3b26984f98a868708e5eeba1bf\",\"id\":\"73c00ab215d348c6ac49f9c298b0db1b\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:38.808Z\"}},\"final_task_state\":\"TASK_STATE_COMPLETED\",\"finished_at\":\"2026-10-04T21:04:38.809728Z\",\"latency_ms\":239,\"outcome\":\"responded_task\",\"protocol_binding\":\"JSONRPC\",\"protocol_version\":\"1.0\",\"redaction\":{\"replacements\":1,\"rules\":[\"sensitive_key\"]},\"started_at\":\"2026-10-04T21:04:38.569639Z\",\"target_url\":\"http://127.0.0.1:53448/rpc\",\"task_id\":\"73c00ab215d348c6ac49f9c298b0db1b\",\"test_case_id\":\"d196cdc8-4a6a-44cb-97a4-d6cd26f58422\"}}",
+  "34c4da58-45d7-4773-b906-123d179b5169": "{\"judgement\":{\"checks\":[{\"detail\":\"a well-formed Task\",\"name\":\"valid_schema\",\"passed\":true},{\"detail\":\"expected TASK_STATE_COMPLETED, observed TASK_STATE_COMPLETED\",\"name\":\"final_task_state\",\"passed\":true},{\"detail\":\"264 ms against a limit of 2000 ms\",\"name\":\"latency_limit\",\"passed\":true},{\"detail\":\"1 output part(s) with content\",\"name\":\"response_present\",\"passed\":true},{\"detail\":\"declared ['text/plain']; every part conforms\",\"name\":\"output_modes\",\"passed\":true},{\"detail\":\"present\",\"name\":\"required_field /artifacts/0/parts/0/text\",\"passed\":true}],\"judge_layer\":\"deterministic\",\"summary\":\"pass: every Layer 1 check passed\",\"verdict\":\"pass\"},\"transcript\":{\"attempt\":3,\"attestation_id\":\"d9b37b41-549a-4795-b818-b4ac25e6a5b2\",\"cost\":\"1\",\"exchanges\":[{\"at\":\"2026-10-04T21:04:38.371335Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"method\":\"SendMessage\",\"params\":{\"message\":{\"messageId\":\"134c7629-6b99-41ec-ba76-15cbedda4f67\",\"parts\":[{\"text\":\"Has order 48213 shipped yet?\"}],\"role\":\"ROLE_USER\"}}},\"direction\":\"request\",\"headers\":{\"A2A-Version\":\"1.0\",\"Accept\":\"application/json\",\"Authorization\":\"[REDACTED]\",\"Content-Type\":\"application/json\"},\"http_status\":null,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"},{\"at\":\"2026-10-04T21:04:38.635614Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"result\":{\"task\":{\"artifacts\":[{\"artifactId\":\"386ddca420e8464bae5705c772c58aec\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Yes. Order 48213 shipped on 2 October and is with the carrier (tracking HC-2210-5581).\"}]}],\"contextId\":\"c5d6c5288e734436b542d4e4fe9167e3\",\"id\":\"9def97fe7360479d9b3c198ca30a212c\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:38.634Z\"}}}},\"direction\":\"response\",\"headers\":{\"content-length\":\"451\",\"content-type\":\"application/json\",\"date\":\"Sun, 04 Oct 2026 21:04:38 GMT\",\"server\":\"BaseHTTP/0.6 Python/3.14.3\"},\"http_status\":200,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"}],\"failure\":null,\"final_response\":{\"artifacts\":[{\"artifactId\":\"386ddca420e8464bae5705c772c58aec\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Yes. Order 48213 shipped on 2 October and is with the carrier (tracking HC-2210-5581).\"}]}],\"contextId\":\"c5d6c5288e734436b542d4e4fe9167e3\",\"id\":\"9def97fe7360479d9b3c198ca30a212c\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:38.634Z\"}},\"final_task_state\":\"TASK_STATE_COMPLETED\",\"finished_at\":\"2026-10-04T21:04:38.635763Z\",\"latency_ms\":264,\"outcome\":\"responded_task\",\"protocol_binding\":\"JSONRPC\",\"protocol_version\":\"1.0\",\"redaction\":{\"replacements\":1,\"rules\":[\"sensitive_key\"]},\"started_at\":\"2026-10-04T21:04:38.371207Z\",\"target_url\":\"http://127.0.0.1:53448/rpc\",\"task_id\":\"9def97fe7360479d9b3c198ca30a212c\",\"test_case_id\":\"d196cdc8-4a6a-44cb-97a4-d6cd26f58422\"}}",
+  "4dd9966c-d7de-4dae-8e55-bb9f6b7b6901": "{\"judgement\":{\"checks\":[{\"detail\":\"a well-formed Task\",\"name\":\"valid_schema\",\"passed\":true},{\"detail\":\"expected TASK_STATE_COMPLETED, observed TASK_STATE_COMPLETED\",\"name\":\"final_task_state\",\"passed\":true},{\"detail\":\"119 ms against a limit of 2000 ms\",\"name\":\"latency_limit\",\"passed\":true},{\"detail\":\"1 output part(s) with content\",\"name\":\"response_present\",\"passed\":true},{\"detail\":\"declared ['text/plain']; every part conforms\",\"name\":\"output_modes\",\"passed\":true},{\"detail\":\"present\",\"name\":\"required_field /artifacts/0/parts/0/text\",\"passed\":true}],\"judge_layer\":\"deterministic\",\"summary\":\"pass: every Layer 1 check passed\",\"verdict\":\"pass\"},\"transcript\":{\"attempt\":1,\"attestation_id\":\"d9b37b41-549a-4795-b818-b4ac25e6a5b2\",\"cost\":\"1\",\"exchanges\":[{\"at\":\"2026-10-04T21:04:38.607142Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"method\":\"SendMessage\",\"params\":{\"message\":{\"messageId\":\"b9cfa2b5-ec53-429a-9875-f4cfdecc2cd0\",\"parts\":[{\"text\":\"Start a return for order 48213, item 2\"}],\"role\":\"ROLE_USER\"}}},\"direction\":\"request\",\"headers\":{\"A2A-Version\":\"1.0\",\"Accept\":\"application/json\",\"Authorization\":\"[REDACTED]\",\"Content-Type\":\"application/json\"},\"http_status\":null,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"},{\"at\":\"2026-10-04T21:04:38.727029Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"result\":{\"task\":{\"artifacts\":[{\"artifactId\":\"9a46342b932448e6a39bd7785713cb8f\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Return RMA-48213-2 is open for order 48213, item 2. A prepaid label was emailed to the customer; the refund is issued when the parcel scans at the carrier.\"}]}],\"contextId\":\"4377f51a038542cc8cac16a64d414967\",\"id\":\"4145be8d43334814961a05959d195907\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:38.726Z\"}}}},\"direction\":\"response\",\"headers\":{\"content-length\":\"520\",\"content-type\":\"application/json\",\"date\":\"Sun, 04 Oct 2026 21:04:38 GMT\",\"server\":\"BaseHTTP/0.6 Python/3.14.3\"},\"http_status\":200,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"}],\"failure\":null,\"final_response\":{\"artifacts\":[{\"artifactId\":\"9a46342b932448e6a39bd7785713cb8f\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Return RMA-48213-2 is open for order 48213, item 2. A prepaid label was emailed to the customer; the refund is issued when the parcel scans at the carrier.\"}]}],\"contextId\":\"4377f51a038542cc8cac16a64d414967\",\"id\":\"4145be8d43334814961a05959d195907\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:38.726Z\"}},\"final_task_state\":\"TASK_STATE_COMPLETED\",\"finished_at\":\"2026-10-04T21:04:38.727169Z\",\"latency_ms\":119,\"outcome\":\"responded_task\",\"protocol_binding\":\"JSONRPC\",\"protocol_version\":\"1.0\",\"redaction\":{\"replacements\":1,\"rules\":[\"sensitive_key\"]},\"started_at\":\"2026-10-04T21:04:38.607003Z\",\"target_url\":\"http://127.0.0.1:53448/rpc\",\"task_id\":\"4145be8d43334814961a05959d195907\",\"test_case_id\":\"006fb9f0-a034-4a0d-ab64-595dafaaf808\"}}",
+  "6347e78d-796b-42e0-bf37-8df9d5cc427b": "{\"judgement\":{\"checks\":[{\"detail\":\"a well-formed Task\",\"name\":\"valid_schema\",\"passed\":true},{\"detail\":\"expected TASK_STATE_COMPLETED, observed TASK_STATE_COMPLETED\",\"name\":\"final_task_state\",\"passed\":true},{\"detail\":\"217 ms against a limit of 2000 ms\",\"name\":\"latency_limit\",\"passed\":true},{\"detail\":\"1 output part(s) with content\",\"name\":\"response_present\",\"passed\":true},{\"detail\":\"declared ['text/plain']; every part conforms\",\"name\":\"output_modes\",\"passed\":true},{\"detail\":\"present\",\"name\":\"required_field /artifacts/0/parts/0/text\",\"passed\":true}],\"judge_layer\":\"deterministic\",\"summary\":\"pass: every Layer 1 check passed\",\"verdict\":\"pass\"},\"transcript\":{\"attempt\":1,\"attestation_id\":\"d9b37b41-549a-4795-b818-b4ac25e6a5b2\",\"cost\":\"1\",\"exchanges\":[{\"at\":\"2026-10-04T21:04:38.224762Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"method\":\"SendMessage\",\"params\":{\"message\":{\"messageId\":\"58ec8076-8b23-49ec-9b0f-8666ad9d14cc\",\"parts\":[{\"text\":\"Has order 48213 shipped yet?\"}],\"role\":\"ROLE_USER\"}}},\"direction\":\"request\",\"headers\":{\"A2A-Version\":\"1.0\",\"Accept\":\"application/json\",\"Authorization\":\"[REDACTED]\",\"Content-Type\":\"application/json\"},\"http_status\":null,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"},{\"at\":\"2026-10-04T21:04:38.442113Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"result\":{\"task\":{\"artifacts\":[{\"artifactId\":\"16962e6593704975a9aaf3fb9bf295ba\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Yes. Order 48213 shipped on 2 October and is with the carrier (tracking HC-2210-5581).\"}]}],\"contextId\":\"b194416d8dce4873a61d6d690df813c1\",\"id\":\"72b6274986154f82ae530affd5803fa3\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:38.441Z\"}}}},\"direction\":\"response\",\"headers\":{\"content-length\":\"451\",\"content-type\":\"application/json\",\"date\":\"Sun, 04 Oct 2026 21:04:38 GMT\",\"server\":\"BaseHTTP/0.6 Python/3.14.3\"},\"http_status\":200,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"}],\"failure\":null,\"final_response\":{\"artifacts\":[{\"artifactId\":\"16962e6593704975a9aaf3fb9bf295ba\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Yes. Order 48213 shipped on 2 October and is with the carrier (tracking HC-2210-5581).\"}]}],\"contextId\":\"b194416d8dce4873a61d6d690df813c1\",\"id\":\"72b6274986154f82ae530affd5803fa3\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:38.441Z\"}},\"final_task_state\":\"TASK_STATE_COMPLETED\",\"finished_at\":\"2026-10-04T21:04:38.442206Z\",\"latency_ms\":217,\"outcome\":\"responded_task\",\"protocol_binding\":\"JSONRPC\",\"protocol_version\":\"1.0\",\"redaction\":{\"replacements\":1,\"rules\":[\"sensitive_key\"]},\"started_at\":\"2026-10-04T21:04:38.224600Z\",\"target_url\":\"http://127.0.0.1:53448/rpc\",\"task_id\":\"72b6274986154f82ae530affd5803fa3\",\"test_case_id\":\"d196cdc8-4a6a-44cb-97a4-d6cd26f58422\"}}",
+  "67637da7-9d4b-467b-9b3f-dad552631f41": "{\"judgement\":{\"checks\":[{\"detail\":\"a well-formed Task\",\"name\":\"valid_schema\",\"passed\":true},{\"detail\":\"expected TASK_STATE_COMPLETED, observed TASK_STATE_COMPLETED\",\"name\":\"final_task_state\",\"passed\":true},{\"detail\":\"369 ms against a limit of 2000 ms\",\"name\":\"latency_limit\",\"passed\":true},{\"detail\":\"1 output part(s) with content\",\"name\":\"response_present\",\"passed\":true},{\"detail\":\"declared ['text/plain']; every part conforms\",\"name\":\"output_modes\",\"passed\":true},{\"detail\":\"present\",\"name\":\"required_field /artifacts/0/parts/0/text\",\"passed\":true}],\"judge_layer\":\"deterministic\",\"summary\":\"pass: every Layer 1 check passed\",\"verdict\":\"pass\"},\"transcript\":{\"attempt\":4,\"attestation_id\":\"d9b37b41-549a-4795-b818-b4ac25e6a5b2\",\"cost\":\"1\",\"exchanges\":[{\"at\":\"2026-10-04T21:04:38.852494Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"method\":\"SendMessage\",\"params\":{\"message\":{\"messageId\":\"721feee6-9855-439c-94ff-5277c040324c\",\"parts\":[{\"text\":\"Start a return for order 48213, item 2\"}],\"role\":\"ROLE_USER\"}}},\"direction\":\"request\",\"headers\":{\"A2A-Version\":\"1.0\",\"Accept\":\"application/json\",\"Authorization\":\"[REDACTED]\",\"Content-Type\":\"application/json\"},\"http_status\":null,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"},{\"at\":\"2026-10-04T21:04:39.222252Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"result\":{\"task\":{\"artifacts\":[{\"artifactId\":\"cb575727b4b04307a684581429c6fa21\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Return RMA-48213-2 is open for order 48213, item 2. A prepaid label was emailed to the customer; the refund is issued when the parcel scans at the carrier.\"}]}],\"contextId\":\"cf022817089f4ff98d2f3f26e1f84668\",\"id\":\"75cb659f56e5449eadccd1fcf2b8fd68\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:39.221Z\"}}}},\"direction\":\"response\",\"headers\":{\"content-length\":\"520\",\"content-type\":\"application/json\",\"date\":\"Sun, 04 Oct 2026 21:04:39 GMT\",\"server\":\"BaseHTTP/0.6 Python/3.14.3\"},\"http_status\":200,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"}],\"failure\":null,\"final_response\":{\"artifacts\":[{\"artifactId\":\"cb575727b4b04307a684581429c6fa21\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Return RMA-48213-2 is open for order 48213, item 2. A prepaid label was emailed to the customer; the refund is issued when the parcel scans at the carrier.\"}]}],\"contextId\":\"cf022817089f4ff98d2f3f26e1f84668\",\"id\":\"75cb659f56e5449eadccd1fcf2b8fd68\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:39.221Z\"}},\"final_task_state\":\"TASK_STATE_COMPLETED\",\"finished_at\":\"2026-10-04T21:04:39.222334Z\",\"latency_ms\":369,\"outcome\":\"responded_task\",\"protocol_binding\":\"JSONRPC\",\"protocol_version\":\"1.0\",\"redaction\":{\"replacements\":1,\"rules\":[\"sensitive_key\"]},\"started_at\":\"2026-10-04T21:04:38.852351Z\",\"target_url\":\"http://127.0.0.1:53448/rpc\",\"task_id\":\"75cb659f56e5449eadccd1fcf2b8fd68\",\"test_case_id\":\"006fb9f0-a034-4a0d-ab64-595dafaaf808\"}}",
+  "7f0fe610-7133-4b24-9109-2abe5b546651": "{\"judgement\":{\"checks\":[{\"detail\":\"a well-formed Task\",\"name\":\"valid_schema\",\"passed\":true},{\"detail\":\"expected TASK_STATE_COMPLETED, observed TASK_STATE_COMPLETED\",\"name\":\"final_task_state\",\"passed\":true},{\"detail\":\"273 ms against a limit of 2000 ms\",\"name\":\"latency_limit\",\"passed\":true},{\"detail\":\"1 output part(s) with content\",\"name\":\"response_present\",\"passed\":true},{\"detail\":\"declared ['text/plain']; every part conforms\",\"name\":\"output_modes\",\"passed\":true},{\"detail\":\"present\",\"name\":\"required_field /artifacts/0/parts/0/text\",\"passed\":true}],\"judge_layer\":\"deterministic\",\"summary\":\"pass: every Layer 1 check passed\",\"verdict\":\"pass\"},\"transcript\":{\"attempt\":5,\"attestation_id\":\"d9b37b41-549a-4795-b818-b4ac25e6a5b2\",\"cost\":\"1\",\"exchanges\":[{\"at\":\"2026-10-04T21:04:38.207261Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"method\":\"SendMessage\",\"params\":{\"message\":{\"messageId\":\"90ce1ae8-7941-4f00-bd0a-a4e39951e10a\",\"parts\":[{\"text\":\"Where is order 48213?\"}],\"role\":\"ROLE_USER\"}}},\"direction\":\"request\",\"headers\":{\"A2A-Version\":\"1.0\",\"Accept\":\"application/json\",\"Authorization\":\"[REDACTED]\",\"Content-Type\":\"application/json\"},\"http_status\":null,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"},{\"at\":\"2026-10-04T21:04:38.481114Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"result\":{\"task\":{\"artifacts\":[{\"artifactId\":\"74a5fad4f07a4c63835cb4c8616953ce\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Order 48213 is in transit and is expected on Tuesday 7 October. Tracking: HC-2210-5581.\"}]}],\"contextId\":\"db138265b6d64170bf7293adbff49e1c\",\"id\":\"4a9d33c2ea4945fbb3a7411c1ad3ceca\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:38.480Z\"}}}},\"direction\":\"response\",\"headers\":{\"content-length\":\"452\",\"content-type\":\"application/json\",\"date\":\"Sun, 04 Oct 2026 21:04:38 GMT\",\"server\":\"BaseHTTP/0.6 Python/3.14.3\"},\"http_status\":200,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"}],\"failure\":null,\"final_response\":{\"artifacts\":[{\"artifactId\":\"74a5fad4f07a4c63835cb4c8616953ce\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Order 48213 is in transit and is expected on Tuesday 7 October. Tracking: HC-2210-5581.\"}]}],\"contextId\":\"db138265b6d64170bf7293adbff49e1c\",\"id\":\"4a9d33c2ea4945fbb3a7411c1ad3ceca\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:38.480Z\"}},\"final_task_state\":\"TASK_STATE_COMPLETED\",\"finished_at\":\"2026-10-04T21:04:38.481205Z\",\"latency_ms\":273,\"outcome\":\"responded_task\",\"protocol_binding\":\"JSONRPC\",\"protocol_version\":\"1.0\",\"redaction\":{\"replacements\":1,\"rules\":[\"sensitive_key\"]},\"started_at\":\"2026-10-04T21:04:38.207102Z\",\"target_url\":\"http://127.0.0.1:53448/rpc\",\"task_id\":\"4a9d33c2ea4945fbb3a7411c1ad3ceca\",\"test_case_id\":\"1c213901-e016-4771-8790-c2e7fa0ea015\"}}",
+  "81c3e14a-6902-4745-abd8-dfd72c1b7767": "{\"judgement\":{\"checks\":[{\"detail\":\"a well-formed Task\",\"name\":\"valid_schema\",\"passed\":true},{\"detail\":\"expected TASK_STATE_COMPLETED, observed TASK_STATE_COMPLETED\",\"name\":\"final_task_state\",\"passed\":true},{\"detail\":\"409 ms against a limit of 2000 ms\",\"name\":\"latency_limit\",\"passed\":true},{\"detail\":\"1 output part(s) with content\",\"name\":\"response_present\",\"passed\":true},{\"detail\":\"declared ['text/plain']; every part conforms\",\"name\":\"output_modes\",\"passed\":true},{\"detail\":\"present\",\"name\":\"required_field /artifacts/0/parts/0/text\",\"passed\":true},{\"detail\":\"needs Layer 2, which arrives in stage 4\",\"name\":\"model_check the amount equals the order total minus the restocking fee\",\"passed\":null}],\"judge_layer\":\"deterministic\",\"summary\":\"inconclusive: Layer 1 cannot decide model_check the amount equals the order total minus the restocking fee\",\"verdict\":\"inconclusive\"},\"transcript\":{\"attempt\":3,\"attestation_id\":\"d9b37b41-549a-4795-b818-b4ac25e6a5b2\",\"cost\":\"1\",\"exchanges\":[{\"at\":\"2026-10-04T21:04:39.193058Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"method\":\"SendMessage\",\"params\":{\"message\":{\"messageId\":\"ee543a6d-4a7c-47ab-a32e-2a4452ae257f\",\"parts\":[{\"text\":\"How much will I get back if I return order 48213?\"}],\"role\":\"ROLE_USER\"}}},\"direction\":\"request\",\"headers\":{\"A2A-Version\":\"1.0\",\"Accept\":\"application/json\",\"Authorization\":\"[REDACTED]\",\"Content-Type\":\"application/json\"},\"http_status\":null,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"},{\"at\":\"2026-10-04T21:04:39.603037Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"result\":{\"task\":{\"artifacts\":[{\"artifactId\":\"a4d4018c4d084fcaae5e1d459db24d92\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"If you return order 48213 in full you would receive EUR 42.90, the order total of EUR 47.90 minus a EUR 5.00 restocking fee, to the original payment method within 5 to 7 business days.\"}]}],\"contextId\":\"5ea45bd373654ecc8c4271bb54078485\",\"id\":\"ba6cbaca0d44493db8bf87996e7c3451\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:39.602Z\"}}}},\"direction\":\"response\",\"headers\":{\"content-length\":\"549\",\"content-type\":\"application/json\",\"date\":\"Sun, 04 Oct 2026 21:04:39 GMT\",\"server\":\"BaseHTTP/0.6 Python/3.14.3\"},\"http_status\":200,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"}],\"failure\":null,\"final_response\":{\"artifacts\":[{\"artifactId\":\"a4d4018c4d084fcaae5e1d459db24d92\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"If you return order 48213 in full you would receive EUR 42.90, the order total of EUR 47.90 minus a EUR 5.00 restocking fee, to the original payment method within 5 to 7 business days.\"}]}],\"contextId\":\"5ea45bd373654ecc8c4271bb54078485\",\"id\":\"ba6cbaca0d44493db8bf87996e7c3451\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:39.602Z\"}},\"final_task_state\":\"TASK_STATE_COMPLETED\",\"finished_at\":\"2026-10-04T21:04:39.603190Z\",\"latency_ms\":409,\"outcome\":\"responded_task\",\"protocol_binding\":\"JSONRPC\",\"protocol_version\":\"1.0\",\"redaction\":{\"replacements\":1,\"rules\":[\"sensitive_key\"]},\"started_at\":\"2026-10-04T21:04:39.192920Z\",\"target_url\":\"http://127.0.0.1:53448/rpc\",\"task_id\":\"ba6cbaca0d44493db8bf87996e7c3451\",\"test_case_id\":\"d92fb406-20a1-4b04-a683-e71640b5272b\"}}",
+  "8aaea9a2-6241-44dd-8c35-baac55155934": "{\"judgement\":{\"checks\":[{\"detail\":\"a well-formed Task\",\"name\":\"valid_schema\",\"passed\":true},{\"detail\":\"expected TASK_STATE_COMPLETED, observed TASK_STATE_COMPLETED\",\"name\":\"final_task_state\",\"passed\":true},{\"detail\":\"146 ms against a limit of 2000 ms\",\"name\":\"latency_limit\",\"passed\":true},{\"detail\":\"1 output part(s) with content\",\"name\":\"response_present\",\"passed\":true},{\"detail\":\"declared ['text/plain']; every part conforms\",\"name\":\"output_modes\",\"passed\":true},{\"detail\":\"present\",\"name\":\"required_field /artifacts/0/parts/0/text\",\"passed\":true}],\"judge_layer\":\"deterministic\",\"summary\":\"pass: every Layer 1 check passed\",\"verdict\":\"pass\"},\"transcript\":{\"attempt\":4,\"attestation_id\":\"d9b37b41-549a-4795-b818-b4ac25e6a5b2\",\"cost\":\"1\",\"exchanges\":[{\"at\":\"2026-10-04T21:04:37.945214Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"method\":\"SendMessage\",\"params\":{\"message\":{\"messageId\":\"68048e89-f7dd-49ff-b96e-5ee5958ceb10\",\"parts\":[{\"text\":\"Where is order 48213?\"}],\"role\":\"ROLE_USER\"}}},\"direction\":\"request\",\"headers\":{\"A2A-Version\":\"1.0\",\"Accept\":\"application/json\",\"Authorization\":\"[REDACTED]\",\"Content-Type\":\"application/json\"},\"http_status\":null,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"},{\"at\":\"2026-10-04T21:04:38.091899Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"result\":{\"task\":{\"artifacts\":[{\"artifactId\":\"25921c2a64404e2a8d18027192174ffb\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Order 48213 is in transit and is expected on Tuesday 7 October. Tracking: HC-2210-5581.\"}]}],\"contextId\":\"8e88571581684526a276a272107b101a\",\"id\":\"da34b6a036d34aceab7dbedeabc8106f\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:38.091Z\"}}}},\"direction\":\"response\",\"headers\":{\"content-length\":\"452\",\"content-type\":\"application/json\",\"date\":\"Sun, 04 Oct 2026 21:04:38 GMT\",\"server\":\"BaseHTTP/0.6 Python/3.14.3\"},\"http_status\":200,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"}],\"failure\":null,\"final_response\":{\"artifacts\":[{\"artifactId\":\"25921c2a64404e2a8d18027192174ffb\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Order 48213 is in transit and is expected on Tuesday 7 October. Tracking: HC-2210-5581.\"}]}],\"contextId\":\"8e88571581684526a276a272107b101a\",\"id\":\"da34b6a036d34aceab7dbedeabc8106f\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:38.091Z\"}},\"final_task_state\":\"TASK_STATE_COMPLETED\",\"finished_at\":\"2026-10-04T21:04:38.091990Z\",\"latency_ms\":146,\"outcome\":\"responded_task\",\"protocol_binding\":\"JSONRPC\",\"protocol_version\":\"1.0\",\"redaction\":{\"replacements\":1,\"rules\":[\"sensitive_key\"]},\"started_at\":\"2026-10-04T21:04:37.944931Z\",\"target_url\":\"http://127.0.0.1:53448/rpc\",\"task_id\":\"da34b6a036d34aceab7dbedeabc8106f\",\"test_case_id\":\"1c213901-e016-4771-8790-c2e7fa0ea015\"}}",
+  "9912c75c-6a1d-4025-afd5-3aa82ba491df": "{\"judgement\":{\"checks\":[{\"detail\":\"a well-formed Task\",\"name\":\"valid_schema\",\"passed\":true},{\"detail\":\"expected TASK_STATE_COMPLETED, observed TASK_STATE_COMPLETED\",\"name\":\"final_task_state\",\"passed\":true},{\"detail\":\"203 ms against a limit of 2000 ms\",\"name\":\"latency_limit\",\"passed\":true},{\"detail\":\"1 output part(s) with content\",\"name\":\"response_present\",\"passed\":true},{\"detail\":\"declared ['text/plain']; every part conforms\",\"name\":\"output_modes\",\"passed\":true},{\"detail\":\"present\",\"name\":\"required_field /artifacts/0/parts/0/text\",\"passed\":true}],\"judge_layer\":\"deterministic\",\"summary\":\"pass: every Layer 1 check passed\",\"verdict\":\"pass\"},\"transcript\":{\"attempt\":3,\"attestation_id\":\"d9b37b41-549a-4795-b818-b4ac25e6a5b2\",\"cost\":\"1\",\"exchanges\":[{\"at\":\"2026-10-04T21:04:37.945036Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"method\":\"SendMessage\",\"params\":{\"message\":{\"messageId\":\"65144caf-97fb-4324-872e-d9385a42b2fd\",\"parts\":[{\"text\":\"Where is order 48213?\"}],\"role\":\"ROLE_USER\"}}},\"direction\":\"request\",\"headers\":{\"A2A-Version\":\"1.0\",\"Accept\":\"application/json\",\"Authorization\":\"[REDACTED]\",\"Content-Type\":\"application/json\"},\"http_status\":null,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"},{\"at\":\"2026-10-04T21:04:38.148970Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"result\":{\"task\":{\"artifacts\":[{\"artifactId\":\"c93c339fda91474db5315be2914c6278\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Order 48213 is in transit and is expected on Tuesday 7 October. Tracking: HC-2210-5581.\"}]}],\"contextId\":\"bc5a58ad9a4b4eed831a0c4d4e74bb32\",\"id\":\"4b33a0b57246442a9c6cf76a06778193\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:38.148Z\"}}}},\"direction\":\"response\",\"headers\":{\"content-length\":\"452\",\"content-type\":\"application/json\",\"date\":\"Sun, 04 Oct 2026 21:04:38 GMT\",\"server\":\"BaseHTTP/0.6 Python/3.14.3\"},\"http_status\":200,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"}],\"failure\":null,\"final_response\":{\"artifacts\":[{\"artifactId\":\"c93c339fda91474db5315be2914c6278\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Order 48213 is in transit and is expected on Tuesday 7 October. Tracking: HC-2210-5581.\"}]}],\"contextId\":\"bc5a58ad9a4b4eed831a0c4d4e74bb32\",\"id\":\"4b33a0b57246442a9c6cf76a06778193\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:38.148Z\"}},\"final_task_state\":\"TASK_STATE_COMPLETED\",\"finished_at\":\"2026-10-04T21:04:38.149064Z\",\"latency_ms\":203,\"outcome\":\"responded_task\",\"protocol_binding\":\"JSONRPC\",\"protocol_version\":\"1.0\",\"redaction\":{\"replacements\":1,\"rules\":[\"sensitive_key\"]},\"started_at\":\"2026-10-04T21:04:37.944804Z\",\"target_url\":\"http://127.0.0.1:53448/rpc\",\"task_id\":\"4b33a0b57246442a9c6cf76a06778193\",\"test_case_id\":\"1c213901-e016-4771-8790-c2e7fa0ea015\"}}",
+  "b08b5315-fad5-4fe6-aed0-03cbacd8a590": "{\"judgement\":{\"checks\":[{\"detail\":\"a well-formed Task\",\"name\":\"valid_schema\",\"passed\":true},{\"detail\":\"expected TASK_STATE_COMPLETED, observed TASK_STATE_COMPLETED\",\"name\":\"final_task_state\",\"passed\":true},{\"detail\":\"114 ms against a limit of 2000 ms\",\"name\":\"latency_limit\",\"passed\":true},{\"detail\":\"1 output part(s) with content\",\"name\":\"response_present\",\"passed\":true},{\"detail\":\"declared ['text/plain']; every part conforms\",\"name\":\"output_modes\",\"passed\":true},{\"detail\":\"present\",\"name\":\"required_field /artifacts/0/parts/0/text\",\"passed\":true}],\"judge_layer\":\"deterministic\",\"summary\":\"pass: every Layer 1 check passed\",\"verdict\":\"pass\"},\"transcript\":{\"attempt\":2,\"attestation_id\":\"d9b37b41-549a-4795-b818-b4ac25e6a5b2\",\"cost\":\"1\",\"exchanges\":[{\"at\":\"2026-10-04T21:04:38.277674Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"method\":\"SendMessage\",\"params\":{\"message\":{\"messageId\":\"940de051-1b20-4756-97cd-a88cb44cbc33\",\"parts\":[{\"text\":\"Has order 48213 shipped yet?\"}],\"role\":\"ROLE_USER\"}}},\"direction\":\"request\",\"headers\":{\"A2A-Version\":\"1.0\",\"Accept\":\"application/json\",\"Authorization\":\"[REDACTED]\",\"Content-Type\":\"application/json\"},\"http_status\":null,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"},{\"at\":\"2026-10-04T21:04:38.392314Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"result\":{\"task\":{\"artifacts\":[{\"artifactId\":\"830f9a1c81334194b084f8d3c477f47a\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Yes. Order 48213 shipped on 2 October and is with the carrier (tracking HC-2210-5581).\"}]}],\"contextId\":\"ccf670dcd4d44b4998c44f5f1c010035\",\"id\":\"d1c71c8a29f54db4af5beb0c3db75b95\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:38.391Z\"}}}},\"direction\":\"response\",\"headers\":{\"content-length\":\"451\",\"content-type\":\"application/json\",\"date\":\"Sun, 04 Oct 2026 21:04:38 GMT\",\"server\":\"BaseHTTP/0.6 Python/3.14.3\"},\"http_status\":200,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"}],\"failure\":null,\"final_response\":{\"artifacts\":[{\"artifactId\":\"830f9a1c81334194b084f8d3c477f47a\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Yes. Order 48213 shipped on 2 October and is with the carrier (tracking HC-2210-5581).\"}]}],\"contextId\":\"ccf670dcd4d44b4998c44f5f1c010035\",\"id\":\"d1c71c8a29f54db4af5beb0c3db75b95\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:38.391Z\"}},\"final_task_state\":\"TASK_STATE_COMPLETED\",\"finished_at\":\"2026-10-04T21:04:38.392410Z\",\"latency_ms\":114,\"outcome\":\"responded_task\",\"protocol_binding\":\"JSONRPC\",\"protocol_version\":\"1.0\",\"redaction\":{\"replacements\":1,\"rules\":[\"sensitive_key\"]},\"started_at\":\"2026-10-04T21:04:38.277499Z\",\"target_url\":\"http://127.0.0.1:53448/rpc\",\"task_id\":\"d1c71c8a29f54db4af5beb0c3db75b95\",\"test_case_id\":\"d196cdc8-4a6a-44cb-97a4-d6cd26f58422\"}}",
+  "b64f32b2-9691-4e59-9dec-6e542957948f": "{\"judgement\":{\"checks\":[{\"detail\":\"a well-formed Task\",\"name\":\"valid_schema\",\"passed\":true},{\"detail\":\"expected TASK_STATE_COMPLETED, observed TASK_STATE_COMPLETED\",\"name\":\"final_task_state\",\"passed\":true},{\"detail\":\"236 ms against a limit of 2000 ms\",\"name\":\"latency_limit\",\"passed\":true},{\"detail\":\"1 output part(s) with content\",\"name\":\"response_present\",\"passed\":true},{\"detail\":\"declared ['text/plain']; every part conforms\",\"name\":\"output_modes\",\"passed\":true},{\"detail\":\"present\",\"name\":\"required_field /artifacts/0/parts/0/text\",\"passed\":true}],\"judge_layer\":\"deterministic\",\"summary\":\"pass: every Layer 1 check passed\",\"verdict\":\"pass\"},\"transcript\":{\"attempt\":3,\"attestation_id\":\"d9b37b41-549a-4795-b818-b4ac25e6a5b2\",\"cost\":\"1\",\"exchanges\":[{\"at\":\"2026-10-04T21:04:38.763252Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"method\":\"SendMessage\",\"params\":{\"message\":{\"messageId\":\"612159dc-6307-42b4-b320-895ff4280767\",\"parts\":[{\"text\":\"Start a return for order 48213, item 2\"}],\"role\":\"ROLE_USER\"}}},\"direction\":\"request\",\"headers\":{\"A2A-Version\":\"1.0\",\"Accept\":\"application/json\",\"Authorization\":\"[REDACTED]\",\"Content-Type\":\"application/json\"},\"http_status\":null,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"},{\"at\":\"2026-10-04T21:04:38.999892Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"result\":{\"task\":{\"artifacts\":[{\"artifactId\":\"a94ee2742bae4f71b70213bd04582c07\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Return RMA-48213-2 is open for order 48213, item 2. A prepaid label was emailed to the customer; the refund is issued when the parcel scans at the carrier.\"}]}],\"contextId\":\"87df7ad72b4143b086b3aa41fa2730a3\",\"id\":\"7336021cbb5143f5ab4a2ea77242aac1\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:38.999Z\"}}}},\"direction\":\"response\",\"headers\":{\"content-length\":\"520\",\"content-type\":\"application/json\",\"date\":\"Sun, 04 Oct 2026 21:04:38 GMT\",\"server\":\"BaseHTTP/0.6 Python/3.14.3\"},\"http_status\":200,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"}],\"failure\":null,\"final_response\":{\"artifacts\":[{\"artifactId\":\"a94ee2742bae4f71b70213bd04582c07\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Return RMA-48213-2 is open for order 48213, item 2. A prepaid label was emailed to the customer; the refund is issued when the parcel scans at the carrier.\"}]}],\"contextId\":\"87df7ad72b4143b086b3aa41fa2730a3\",\"id\":\"7336021cbb5143f5ab4a2ea77242aac1\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:38.999Z\"}},\"final_task_state\":\"TASK_STATE_COMPLETED\",\"finished_at\":\"2026-10-04T21:04:38.999981Z\",\"latency_ms\":236,\"outcome\":\"responded_task\",\"protocol_binding\":\"JSONRPC\",\"protocol_version\":\"1.0\",\"redaction\":{\"replacements\":1,\"rules\":[\"sensitive_key\"]},\"started_at\":\"2026-10-04T21:04:38.763137Z\",\"target_url\":\"http://127.0.0.1:53448/rpc\",\"task_id\":\"7336021cbb5143f5ab4a2ea77242aac1\",\"test_case_id\":\"006fb9f0-a034-4a0d-ab64-595dafaaf808\"}}",
+  "bd25e3e2-6d53-4f54-8512-221c2f1a0add": "{\"judgement\":{\"checks\":[{\"detail\":\"a well-formed Task\",\"name\":\"valid_schema\",\"passed\":true},{\"detail\":\"expected TASK_STATE_COMPLETED, observed TASK_STATE_COMPLETED\",\"name\":\"final_task_state\",\"passed\":true},{\"detail\":\"287 ms against a limit of 2000 ms\",\"name\":\"latency_limit\",\"passed\":true},{\"detail\":\"1 output part(s) with content\",\"name\":\"response_present\",\"passed\":true},{\"detail\":\"declared ['text/plain']; every part conforms\",\"name\":\"output_modes\",\"passed\":true},{\"detail\":\"present\",\"name\":\"required_field /artifacts/0/parts/0/text\",\"passed\":true},{\"detail\":\"needs Layer 2, which arrives in stage 4\",\"name\":\"model_check the amount equals the order total minus the restocking fee\",\"passed\":null}],\"judge_layer\":\"deterministic\",\"summary\":\"inconclusive: Layer 1 cannot decide model_check the amount equals the order total minus the restocking fee\",\"verdict\":\"inconclusive\"},\"transcript\":{\"attempt\":4,\"attestation_id\":\"d9b37b41-549a-4795-b818-b4ac25e6a5b2\",\"cost\":\"1\",\"exchanges\":[{\"at\":\"2026-10-04T21:04:39.293171Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"method\":\"SendMessage\",\"params\":{\"message\":{\"messageId\":\"f486ef79-1803-497a-9b38-44f636d19d1d\",\"parts\":[{\"text\":\"How much will I get back if I return order 48213?\"}],\"role\":\"ROLE_USER\"}}},\"direction\":\"request\",\"headers\":{\"A2A-Version\":\"1.0\",\"Accept\":\"application/json\",\"Authorization\":\"[REDACTED]\",\"Content-Type\":\"application/json\"},\"http_status\":null,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"},{\"at\":\"2026-10-04T21:04:39.580804Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"result\":{\"task\":{\"artifacts\":[{\"artifactId\":\"f4ab8578e01742bb83ad8387f5f29db2\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"If you return order 48213 in full you would receive EUR 42.90, the order total of EUR 47.90 minus a EUR 5.00 restocking fee, to the original payment method within 5 to 7 business days.\"}]}],\"contextId\":\"cd89e00aa10e4e7383eb7445c4ce9da0\",\"id\":\"a86e0938e87f4e2f9070285d7c0fdc34\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:39.579Z\"}}}},\"direction\":\"response\",\"headers\":{\"content-length\":\"549\",\"content-type\":\"application/json\",\"date\":\"Sun, 04 Oct 2026 21:04:39 GMT\",\"server\":\"BaseHTTP/0.6 Python/3.14.3\"},\"http_status\":200,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"}],\"failure\":null,\"final_response\":{\"artifacts\":[{\"artifactId\":\"f4ab8578e01742bb83ad8387f5f29db2\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"If you return order 48213 in full you would receive EUR 42.90, the order total of EUR 47.90 minus a EUR 5.00 restocking fee, to the original payment method within 5 to 7 business days.\"}]}],\"contextId\":\"cd89e00aa10e4e7383eb7445c4ce9da0\",\"id\":\"a86e0938e87f4e2f9070285d7c0fdc34\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:39.579Z\"}},\"final_task_state\":\"TASK_STATE_COMPLETED\",\"finished_at\":\"2026-10-04T21:04:39.580956Z\",\"latency_ms\":287,\"outcome\":\"responded_task\",\"protocol_binding\":\"JSONRPC\",\"protocol_version\":\"1.0\",\"redaction\":{\"replacements\":1,\"rules\":[\"sensitive_key\"]},\"started_at\":\"2026-10-04T21:04:39.293027Z\",\"target_url\":\"http://127.0.0.1:53448/rpc\",\"task_id\":\"a86e0938e87f4e2f9070285d7c0fdc34\",\"test_case_id\":\"d92fb406-20a1-4b04-a683-e71640b5272b\"}}",
+  "c472c4e1-c118-4282-b66c-708f0c54da7f": "{\"judgement\":{\"checks\":[{\"detail\":\"a well-formed Task\",\"name\":\"valid_schema\",\"passed\":true},{\"detail\":\"expected TASK_STATE_COMPLETED, observed TASK_STATE_COMPLETED\",\"name\":\"final_task_state\",\"passed\":true},{\"detail\":\"308 ms against a limit of 2000 ms\",\"name\":\"latency_limit\",\"passed\":true},{\"detail\":\"1 output part(s) with content\",\"name\":\"response_present\",\"passed\":true},{\"detail\":\"declared ['text/plain']; every part conforms\",\"name\":\"output_modes\",\"passed\":true},{\"detail\":\"present\",\"name\":\"required_field /artifacts/0/parts/0/text\",\"passed\":true}],\"judge_layer\":\"deterministic\",\"summary\":\"pass: every Layer 1 check passed\",\"verdict\":\"pass\"},\"transcript\":{\"attempt\":2,\"attestation_id\":\"d9b37b41-549a-4795-b818-b4ac25e6a5b2\",\"cost\":\"1\",\"exchanges\":[{\"at\":\"2026-10-04T21:04:37.945247Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"method\":\"SendMessage\",\"params\":{\"message\":{\"messageId\":\"e244aa0a-a006-4a5f-b56d-6f4ad78d53a7\",\"parts\":[{\"text\":\"Where is order 48213?\"}],\"role\":\"ROLE_USER\"}}},\"direction\":\"request\",\"headers\":{\"A2A-Version\":\"1.0\",\"Accept\":\"application/json\",\"Authorization\":\"[REDACTED]\",\"Content-Type\":\"application/json\"},\"http_status\":null,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"},{\"at\":\"2026-10-04T21:04:38.253270Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"result\":{\"task\":{\"artifacts\":[{\"artifactId\":\"502be31543044b558dbaddc43356fada\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Order 48213 is in transit and is expected on Tuesday 7 October. Tracking: HC-2210-5581.\"}]}],\"contextId\":\"6bbdf438279140558ebdc98f9a397e6d\",\"id\":\"cf6e888c1cc441439e4de855eb987abf\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:38.252Z\"}}}},\"direction\":\"response\",\"headers\":{\"content-length\":\"452\",\"content-type\":\"application/json\",\"date\":\"Sun, 04 Oct 2026 21:04:38 GMT\",\"server\":\"BaseHTTP/0.6 Python/3.14.3\"},\"http_status\":200,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"}],\"failure\":null,\"final_response\":{\"artifacts\":[{\"artifactId\":\"502be31543044b558dbaddc43356fada\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Order 48213 is in transit and is expected on Tuesday 7 October. Tracking: HC-2210-5581.\"}]}],\"contextId\":\"6bbdf438279140558ebdc98f9a397e6d\",\"id\":\"cf6e888c1cc441439e4de855eb987abf\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:38.252Z\"}},\"final_task_state\":\"TASK_STATE_COMPLETED\",\"finished_at\":\"2026-10-04T21:04:38.253356Z\",\"latency_ms\":308,\"outcome\":\"responded_task\",\"protocol_binding\":\"JSONRPC\",\"protocol_version\":\"1.0\",\"redaction\":{\"replacements\":1,\"rules\":[\"sensitive_key\"]},\"started_at\":\"2026-10-04T21:04:37.945049Z\",\"target_url\":\"http://127.0.0.1:53448/rpc\",\"task_id\":\"cf6e888c1cc441439e4de855eb987abf\",\"test_case_id\":\"1c213901-e016-4771-8790-c2e7fa0ea015\"}}",
+  "e5336e13-ec39-4e1a-ba23-bc2049a93135": "{\"judgement\":{\"checks\":[{\"detail\":\"a well-formed Task\",\"name\":\"valid_schema\",\"passed\":true},{\"detail\":\"expected TASK_STATE_COMPLETED, observed TASK_STATE_COMPLETED\",\"name\":\"final_task_state\",\"passed\":true},{\"detail\":\"137 ms against a limit of 2000 ms\",\"name\":\"latency_limit\",\"passed\":true},{\"detail\":\"1 output part(s) with content\",\"name\":\"response_present\",\"passed\":true},{\"detail\":\"declared ['text/plain']; every part conforms\",\"name\":\"output_modes\",\"passed\":true},{\"detail\":\"present\",\"name\":\"required_field /artifacts/0/parts/0/text\",\"passed\":true}],\"judge_layer\":\"deterministic\",\"summary\":\"pass: every Layer 1 check passed\",\"verdict\":\"pass\"},\"transcript\":{\"attempt\":5,\"attestation_id\":\"d9b37b41-549a-4795-b818-b4ac25e6a5b2\",\"cost\":\"1\",\"exchanges\":[{\"at\":\"2026-10-04T21:04:38.933509Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"method\":\"SendMessage\",\"params\":{\"message\":{\"messageId\":\"8d9875a9-0ba5-4591-8072-ffa0c5609cd3\",\"parts\":[{\"text\":\"Start a return for order 48213, item 2\"}],\"role\":\"ROLE_USER\"}}},\"direction\":\"request\",\"headers\":{\"A2A-Version\":\"1.0\",\"Accept\":\"application/json\",\"Authorization\":\"[REDACTED]\",\"Content-Type\":\"application/json\"},\"http_status\":null,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"},{\"at\":\"2026-10-04T21:04:39.071176Z\",\"body\":{\"id\":\"1\",\"jsonrpc\":\"2.0\",\"result\":{\"task\":{\"artifacts\":[{\"artifactId\":\"fda6e50a3cfc453c96eaa193bcc1bf8d\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Return RMA-48213-2 is open for order 48213, item 2. A prepaid label was emailed to the customer; the refund is issued when the parcel scans at the carrier.\"}]}],\"contextId\":\"7a49f583c74b4b2f88b87969ee195d24\",\"id\":\"aca36bc80fe0453ea0c91022403a2c51\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:39.070Z\"}}}},\"direction\":\"response\",\"headers\":{\"content-length\":\"520\",\"content-type\":\"application/json\",\"date\":\"Sun, 04 Oct 2026 21:04:39 GMT\",\"server\":\"BaseHTTP/0.6 Python/3.14.3\"},\"http_status\":200,\"method\":\"SendMessage\",\"url\":\"http://127.0.0.1:53448/rpc\"}],\"failure\":null,\"final_response\":{\"artifacts\":[{\"artifactId\":\"fda6e50a3cfc453c96eaa193bcc1bf8d\",\"name\":\"answer\",\"parts\":[{\"mediaType\":\"text/plain\",\"text\":\"Return RMA-48213-2 is open for order 48213, item 2. A prepaid label was emailed to the customer; the refund is issued when the parcel scans at the carrier.\"}]}],\"contextId\":\"7a49f583c74b4b2f88b87969ee195d24\",\"id\":\"aca36bc80fe0453ea0c91022403a2c51\",\"status\":{\"state\":\"TASK_STATE_COMPLETED\",\"timestamp\":\"2026-10-04T21:04:39.070Z\"}},\"final_task_state\":\"TASK_STATE_COMPLETED\",\"finished_at\":\"2026-10-04T21:04:39.071254Z\",\"latency_ms\":137,\"outcome\":\"responded_task\",\"protocol_binding\":\"JSONRPC\",\"protocol_version\":\"1.0\",\"redaction\":{\"replacements\":1,\"rules\":[\"sensitive_key\"]},\"started_at\":\"2026-10-04T21:04:38.933356Z\",\"target_url\":\"http://127.0.0.1:53448/rpc\",\"task_id\":\"aca36bc80fe0453ea0c91022403a2c51\",\"test_case_id\":\"006fb9f0-a034-4a0d-ab64-595dafaaf808\"}}"
+ },
+ "report_md": "# Suncly attestation report: Harbor Returns Agent\n\n**Decision: flag. No policy is configured, so a human must review this result.**\n\nRecorded by 'policy' at 2026-10-04T21:04:39+00:00 under policy_version 'unconfigured'.\n\nAttestation status: **completed**. Generated 2026-10-04T21:04:39+00:00.\n\n> Verdict counts are shown per test case. Suncly never combines them into a single score, and inconclusive runs are never counted as passes.\n\n> Exit code 0 and status completed mean the attestation ran to the end and was signed. They do not mean the agent was approved.\n\n## Results per test case\n\n| Skill | Kind | Input | pass | fail | inconclusive |\n|---|---|---|---|---|---|\n| order-status | skill | Where is order 48213? | 5 | 0 | 0 |\n| order-status | skill | Has order 48213 shipped yet? | 5 | 0 | 0 |\n| start-return | skill | Start a return for order 48213, item 2 | 5 | 0 | 0 |\n| refund-estimate | skill | How much will I get back if I return order 48213? | 0 | 0 | 5 |\n\nTotals across test cases: pass 15, fail 0, inconclusive 5. These are counts, not a score.\n\n## What was NOT tested\n\n- **skill without test case:** skill 'cancel-order' has no test case; invariant 1 (one test case per declared skill) is not satisfied for it\n- **inconclusive runs:** 5 run(s) ended inconclusive; they count neither as pass nor as fail\n- **declared capability not exercised:** the card declares streaming; no test case exercises it\n- **probes:** no probe_undeclared, probe_injection or probe_failure test cases exist yet (stage 4)\n- **semantic correctness:** Layer 1 checks structure, state, output modes and latency; whether the content of each answer is correct needs Layer 2 (stage 4)\n- **production endpoint:** tests ran against the declared sandbox or dry-run endpoint http://127.0.0.1:53448/rpc; the production endpoint itself was not tested (DR-006)\n\n## Attestation\n\n| Field | Value |\n|---|---|\n| id | d9b37b41-549a-4795-b818-b4ac25e6a5b2 |\n| status | completed |\n| trigger | manual |\n| started_at | 2026-10-04T21:04:37+00:00 |\n| finished_at | 2026-10-04T21:04:39+00:00 |\n| budget_limit | 40 attempt(s) |\n| cost_total | 20 attempt(s) |\n| planned_runs | 20 |\n| recorded_runs | 20 |\n| not_executed | 0 |\n\n## Agent Card\n\n| Field | Value |\n|---|---|\n| url | http://127.0.0.1:53448/.well-known/agent-card.json |\n| name | Harbor Returns Agent |\n| version | 2.3.1 |\n| card_hash | sha256:c25be2adb553bc2efce2a1506c0b19194c8299c030e1f0b265890fbbeb96850b |\n| hash_scheme | SHA-256 of the RFC 8785 (JCS) form of the card without the `signatures` field |\n| fetched_at | 2026-10-04T21:04:37+00:00 |\n| interface | JSONRPC 1.0 at http://127.0.0.1:53448/rpc |\n| skills | order-status, start-return, refund-estimate, cancel-order |\n| sandbox | declared by the user with --sandbox (DR-006) |\n| agent_id | 7bbe9bc6-c18c-5789-888d-278ad0d05a81 |\n| owner | Harbor Commerce platform team (fictional) |\n| risk_level | medium |\n\n## Card re-check at the end\n\n| Field | Value |\n|---|---|\n| outcome | unchanged |\n| detail | - |\n\n## Contract\n\n| Field | Value |\n|---|---|\n| id | 081fefaf-370f-4d3e-8e10-c5053a55b786 |\n| version | 1 |\n| status | approved |\n| approved_by | m.lind@harbor.example |\n| approved_at | 2026-10-04T21:04:37+00:00 |\n| source | contract file |\n| test_cases | 4 |\n\n### Test cases and criteria\n\n- **order-status** (skill), test case `1c213901-e016-4771-8790-c2e7fa0ea015`\n  - input: Where is order 48213?\n  - criteria: `{\"accept_direct_message\": false, \"final_state\": \"TASK_STATE_COMPLETED\", \"latency_limit_ms\": 2000, \"model_checks\": [], \"output_modes\": [\"text/plain\"], \"required_fields\": [\"/artifacts/0/parts/0/text\"], \"response_present\": true}`\n- **order-status** (skill), test case `d196cdc8-4a6a-44cb-97a4-d6cd26f58422`\n  - input: Has order 48213 shipped yet?\n  - criteria: `{\"accept_direct_message\": false, \"final_state\": \"TASK_STATE_COMPLETED\", \"latency_limit_ms\": 2000, \"model_checks\": [], \"output_modes\": [\"text/plain\"], \"required_fields\": [\"/artifacts/0/parts/0/text\"], \"response_present\": true}`\n- **start-return** (skill), test case `006fb9f0-a034-4a0d-ab64-595dafaaf808`\n  - input: Start a return for order 48213, item 2\n  - criteria: `{\"accept_direct_message\": false, \"final_state\": \"TASK_STATE_COMPLETED\", \"latency_limit_ms\": 2000, \"model_checks\": [], \"output_modes\": [\"text/plain\"], \"required_fields\": [\"/artifacts/0/parts/0/text\"], \"response_present\": true}`\n- **refund-estimate** (skill), test case `d92fb406-20a1-4b04-a683-e71640b5272b`\n  - input: How much will I get back if I return order 48213?\n  - criteria: `{\"accept_direct_message\": false, \"final_state\": \"TASK_STATE_COMPLETED\", \"latency_limit_ms\": 2000, \"model_checks\": [\"the amount equals the order total minus the restocking fee\"], \"output_modes\": [\"text/plain\"], \"required_fields\": [\"/artifacts/0/parts/0/text\"], \"response_present\": true}`\n\n## Signature\n\n| Field | Value |\n|---|---|\n| signing_key_id | ed25519-3b05ae908c2cb82a |\n| signature | ed25519:6zig5qFfcZEaxxxQwanjFNwzG-ZVIsxEd5PuWPSlbMkY1PLuNHE8g8lqkvp0ojpv2EF1VW5RxRvc9q77ZAnRDg |\n| public_key | foI43Hhe8ShgR8thjY0n8R599wCvo9WbTGVoPvIWVhI |\n| payload | attestation id, card_hash, contract id and version, per-test-case results, the hash of every transcript, the decision outcome and policy_version (schema §11) |\n| verify | suncly verify suncly-reports/d9b37b41-549a-4795-b818-b4ac25e6a5b2 |\n\n## Runs\n\n| Skill | Attempt | Verdict | Latency (ms) | Outcome | Summary | Transcript |\n|---|---|---|---|---|---|---|\n| start-return | 1 | pass | 119 | responded_task | pass: every Layer 1 check passed | transcripts/4dd9966c-d7de-4dae-8e55-bb9f6b7b6901.json |\n| start-return | 2 | pass | 126 | responded_task | pass: every Layer 1 check passed | transcripts/29965228-f4c7-4e67-85ae-4a6b60ed6289.json |\n| start-return | 3 | pass | 236 | responded_task | pass: every Layer 1 check passed | transcripts/b64f32b2-9691-4e59-9dec-6e542957948f.json |\n| start-return | 4 | pass | 369 | responded_task | pass: every Layer 1 check passed | transcripts/67637da7-9d4b-467b-9b3f-dad552631f41.json |\n| start-return | 5 | pass | 137 | responded_task | pass: every Layer 1 check passed | transcripts/e5336e13-ec39-4e1a-ba23-bc2049a93135.json |\n| order-status | 1 | pass | 120 | responded_task | pass: every Layer 1 check passed | transcripts/066a2db9-c768-43e6-bf9c-71a6529e1841.json |\n| order-status | 2 | pass | 308 | responded_task | pass: every Layer 1 check passed | transcripts/c472c4e1-c118-4282-b66c-708f0c54da7f.json |\n| order-status | 3 | pass | 203 | responded_task | pass: every Layer 1 check passed | transcripts/9912c75c-6a1d-4025-afd5-3aa82ba491df.json |\n| order-status | 4 | pass | 146 | responded_task | pass: every Layer 1 check passed | transcripts/8aaea9a2-6241-44dd-8c35-baac55155934.json |\n| order-status | 5 | pass | 273 | responded_task | pass: every Layer 1 check passed | transcripts/7f0fe610-7133-4b24-9109-2abe5b546651.json |\n| order-status | 1 | pass | 217 | responded_task | pass: every Layer 1 check passed | transcripts/6347e78d-796b-42e0-bf37-8df9d5cc427b.json |\n| order-status | 2 | pass | 114 | responded_task | pass: every Layer 1 check passed | transcripts/b08b5315-fad5-4fe6-aed0-03cbacd8a590.json |\n| order-status | 3 | pass | 264 | responded_task | pass: every Layer 1 check passed | transcripts/34c4da58-45d7-4773-b906-123d179b5169.json |\n| order-status | 4 | pass | 109 | responded_task | pass: every Layer 1 check passed | transcripts/0a110836-fd3e-4075-b970-f79bb82946df.json |\n| order-status | 5 | pass | 239 | responded_task | pass: every Layer 1 check passed | transcripts/334e28a1-f7c5-4343-a154-f10c913309a3.json |\n| refund-estimate | 1 | inconclusive | 170 | responded_task | inconclusive: Layer 1 cannot decide model_check the amount equals the order total minus the restocking fee | transcripts/192090b5-bdd7-433e-a512-efae73c0550a.json |\n| refund-estimate | 2 | inconclusive | 304 | responded_task | inconclusive: Layer 1 cannot decide model_check the amount equals the order total minus the restocking fee | transcripts/0924188d-aef3-4a40-8abf-62686d76a110.json |\n| refund-estimate | 3 | inconclusive | 409 | responded_task | inconclusive: Layer 1 cannot decide model_check the amount equals the order total minus the restocking fee | transcripts/81c3e14a-6902-4745-abd8-dfd72c1b7767.json |\n| refund-estimate | 4 | inconclusive | 287 | responded_task | inconclusive: Layer 1 cannot decide model_check the amount equals the order total minus the restocking fee | transcripts/bd25e3e2-6d53-4f54-8512-221c2f1a0add.json |\n| refund-estimate | 5 | inconclusive | 227 | responded_task | inconclusive: Layer 1 cannot decide model_check the amount equals the order total minus the restocking fee | transcripts/19d63ef5-4fac-45f5-85f5-29d815f71c9f.json |\n\n## Proposals in effect\n\n- OQ-A2: the sandbox is the endpoint the user declared with --sandbox; Suncly cannot verify it\n- OQ-A3: the Runner redacts its credential, Authorization and cookie headers and known token patterns before a transcript leaves it\n- OQ-A4: the Runner speaks A2A 1.0 over JSON-RPC, follows tasks by polling GetTask, uses no push notifications and never answers an interrupted state\n- OQ-A7: card_hash is SHA-256 of the RFC 8785 form of the card without `signatures`\n- OQ-A8: signatures are Ed25519 over the RFC 8785 payload, encoded `ed25519:<base64url>`; signing_key_id is a SHA-256 fingerprint of the public key\n- OQ-D1: cost is counted in attempts; every attempt costs 1, including retries\n- OQ-D3: run.attempt is the repetition number; (attestation_id, test_case_id, attempt) is unique\n- OQ-D7: input is {text} or {parts}; criteria hold the Layer 1 checks (docs/API.md)\n- OQ-D9: a card hash seen before reuses its card_version and its approved contract\n- OQ-D10: latency_ms runs from sending the message to the final task state; null without a response\n- OQ-F3: an unreachable agent gives inconclusive runs; a timeout fails the latency check\n- OQ-F5: a card that cannot be re-fetched at the end makes the attestation failed\n- OQ-F7: failed and invalidated attestations are signed with no decision in the payload\n- OQ-PO5: decision.policy_version is the placeholder 'unconfigured' until a policy exists\n- OQ-R1: a minimal Orchestrator runs inside the process\n- OQ-R2: test cases come from the deterministic drafter or a contract file; no model is involved\n- OQ-R6: the file report is the first version of the Report adapter\n\nOpen questions are listed in the docs; none is decided by this report.\n"
+}

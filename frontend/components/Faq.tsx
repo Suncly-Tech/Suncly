@@ -5,15 +5,25 @@ import { faq } from "@/lib/content";
 import { Reveal } from "./Reveal";
 import { SectionHeader } from "./SectionHeader";
 
-export function Faq() {
+export function Faq({
+  items = faq.items,
+  label = faq.label,
+  headline = faq.headline,
+  id = "faq",
+}: {
+  items?: ReadonlyArray<{ q: string; a: string }>;
+  label?: string;
+  headline?: string;
+  id?: string;
+}) {
   return (
-    <section id="faq" className="scroll-mt-20 bg-cream py-24 md:py-32" aria-labelledby="faq-heading">
+    <section id={id} className="scroll-mt-20 bg-cream py-24 md:py-32" aria-labelledby={`${id}-heading`}>
       <div className="container-site">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:gap-16">
-          <SectionHeader label={faq.label} headline={faq.headline} />
+          <SectionHeader label={label} headline={headline} id={`${id}-heading`} />
           <Reveal>
             <div className="divide-y divide-ink/10 border-y border-ink/10">
-              {faq.items.map((item) => (
+              {items.map((item) => (
                 <details key={item.q} className="group">
                   <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-6 py-5 text-heading-md text-ink [&::-webkit-details-marker]:hidden">
                     <span>{item.q}</span>

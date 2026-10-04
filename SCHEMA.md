@@ -130,8 +130,8 @@ CLI and API call the same core library. Build the library first.
 
 ```text
 Language   Python (most mature A2A SDK)
-Storage    Cloudflare D1 for tables, R2 object storage for transcripts
-Queue      D1-backed job table first; real queue only when needed
+Storage    Postgres for tables, object storage for transcripts
+Queue      Postgres-backed job table first; real queue only when needed
 Signing    asymmetric signatures over the canonicalized attestation
 Models     customer brings own keys; judge model pinned by version
 ```
@@ -151,7 +151,7 @@ Models     customer brings own keys; judge model pinned by version
 
 1. Core library: runner + deterministic judge + CLI + file report.
 2. Contract builder with human approval step.
-3. Cloudflare D1, evidence store, signing.
+3. Postgres, evidence store, signing.
 4. Model-based judge and probes.
 5. API, policy engine, CI adapter.
 6. Registry adapters.

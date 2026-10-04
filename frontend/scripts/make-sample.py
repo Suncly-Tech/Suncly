@@ -27,19 +27,24 @@ Output: ``frontend/lib/sample/harbor-*.json``. Each file holds ``result``
 and ``report_md``. Nothing in the output is a real customer, endpoint or
 credential; the Authorization header below is a made-up value that exists only
 to show the Runner's redaction at work.
+
+``main()`` takes the output folder, the Suncly home, the repetitions per test
+case and the budget of the third attestation as parameters, so that
+``tests/e2e/test_make_sample.py`` can run it into a temporary folder with fewer
+runs. The defaults are what the website ships.
 """
 
 from __future__ import annotations
 
 import json
 import os
-import random
 import sys
 import tempfile
 import threading
 import time
 import uuid
 from collections import Counter
+from collections.abc import Mapping
 from decimal import Decimal
 from pathlib import Path
 from typing import Any, ClassVar
@@ -70,6 +75,10 @@ OUT_DIR = ROOT / "frontend" / "lib" / "sample"
 FAKE_CREDENTIAL = "Bearer hc-sandbox-7f3a9c1e-sample-token-not-real"
 OWNER = "Harbor Commerce platform team (fictional)"
 
+#: The agent answers after one of these delays, in turn, so the sample latencies vary
+#: without a pseudo-random generator and are the same on every regeneration.
+DELAYS_S: tuple[float, ...] = (0.09, 0.31, 0.17, 0.42, 0.24, 0.12)
+
 ORDER_STATUS: JsonObject = {
     "id": "order-status",
     "name": "Order status",
@@ -80,7 +89,9 @@ ORDER_STATUS: JsonObject = {
 START_RETURN: JsonObject = {
     "id": "start-return",
     "name": "Start a return",
-    "description": "Opens a return for one or more items of a delivered order and emails a prepaid label.",
+    "description": (
+        "Opens a return for one or more items of a delivered order and emails a prepaid label."
+    ),
     "tags": ["returns", "writes"],
     "examples": ["Start a return for order 48213, item 2"],
 }
@@ -111,6 +122,12 @@ def _text(answer: str) -> list[JsonObject]:
     return [{"text": answer, "mediaType": "text/plain"}]
 
 
+def credential_leaked(transcripts: Mapping[str, str], credential: str = FAKE_CREDENTIAL) -> bool:
+    """True if the credential, or its token part alone, appears in any transcript text."""
+    needles = {credential, credential.split()[1]}
+    return any(needle in text for text in transcripts.values() for needle in needles)
+
+
 def input_required_task(question: str) -> JsonObject:
     return {
         "id": uuid.uuid4().hex,
@@ -139,8 +156,8 @@ class HarborReturns(Behaviour):
     def __init__(self) -> None:
         self.mode = "baseline"
         self._per_input: Counter[str] = Counter()
+        self._calls = 0
         self._lock = threading.Lock()
-        self._rng = random.Random(7)
 
     def card(self, base_url: str, context: CallContext) -> JsonObject:
         card = base_card(
@@ -159,15 +176,14 @@ class HarborReturns(Behaviour):
         with self._lock:
             self._per_input[text] += 1
             calls_for_input = self._per_input[text]
-            delay = self._rng.uniform(0.09, 0.42)
+            self._calls += 1
+            delay = DELAYS_S[(self._calls - 1) % len(DELAYS_S)]
         time.sleep(delay)
 
         if lowered.startswith("start a return"):
             if self.mode == "regressed":
                 return {
-                    "task": input_required_task(
-                        "Which pickup address should the return label use?"
-                    )
+                    "task": input_required_task("Which pickup address should the return label use?")
                 }
             return {
                 "task": completed_task(
@@ -215,9 +231,18 @@ class HarborReturns(Behaviour):
         }
 
 
-def main() -> int:
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
-    home = Path(tempfile.mkdtemp(prefix="suncly-sample-home-"))
+def main(
+    out_dir: Path = OUT_DIR,
+    *,
+    home: Path | None = None,
+    runs: int = 5,
+    budget_stop: Decimal = Decimal(7),
+    pause_s: float = 1.5,
+) -> int:
+    """Write the contract and the three bundles to ``out_dir``; 0 on success."""
+    out_dir.mkdir(parents=True, exist_ok=True)
+    if home is None:
+        home = Path(tempfile.mkdtemp(prefix="suncly-sample-home-"))
     reports = home / "reports"
     env = {
         **os.environ,
@@ -243,7 +268,7 @@ def main() -> int:
                 AttestRequest(
                     card_url=server.card_url,
                     sandbox_declared=True,
-                    runs=5,
+                    runs=runs,
                     owner=OWNER,
                     risk_level=RiskLevel.MEDIUM,
                     export_draft=True,
@@ -262,7 +287,7 @@ def main() -> int:
                     "the amount equals the order total minus the restocking fee"
                 ]
         contract_file = parse_contract_file(json.dumps(draft))
-        (OUT_DIR / "harbor-contract.json").write_text(
+        (out_dir / "harbor-contract.json").write_text(
             json.dumps(draft, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
         )
 
@@ -270,7 +295,7 @@ def main() -> int:
             return AttestRequest(
                 card_url=server.card_url,
                 sandbox_declared=True,
-                runs=5,
+                runs=runs,
                 budget_limit=budget,
                 owner=OWNER,
                 risk_level=RiskLevel.MEDIUM,
@@ -281,7 +306,7 @@ def main() -> int:
         plan = (
             ("1-baseline", "baseline", None),
             ("2-regression", "regressed", None),
-            ("3-budget-stop", "regressed", Decimal(7)),
+            ("3-budget-stop", "regressed", budget_stop),
         )
         for label, mode, budget in plan:
             behaviour.mode = mode
@@ -312,15 +337,16 @@ def main() -> int:
                 "transcripts": transcripts,
                 "report_md": (folder / "report.md").read_text(encoding="utf-8"),
             }
-            target = OUT_DIR / f"harbor-{label}.json"
-            target.write_text(json.dumps(bundle, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+            target = out_dir / f"harbor-{label}.json"
+            target.write_text(
+                json.dumps(bundle, indent=1, ensure_ascii=False) + "\n", encoding="utf-8"
+            )
             console.line(f"wrote {target} ({target.stat().st_size} bytes)")
-            for text in transcripts.values():
-                if FAKE_CREDENTIAL in text or FAKE_CREDENTIAL.split()[1] in text:
-                    console.line("ERROR: the fake credential leaked into a transcript", fg="red")
-                    return 1
-            time.sleep(1.5)
-    console.line(f"\nSample bundles written to {OUT_DIR}. Suncly home used: {home}")
+            if credential_leaked(transcripts):
+                console.line("ERROR: the fake credential leaked into a transcript", fg="red")
+                return 1
+            time.sleep(pause_s)
+    console.line(f"\nSample bundles written to {out_dir}. Suncly home used: {home}")
     return 0
 
 

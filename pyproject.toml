@@ -91,7 +91,7 @@ quote-style = "double"
 # ---------------------------------------------------------------------------
 [tool.mypy]
 python_version = "3.12"
-files = ["src/suncly", "tests", "tasks.py"]
+files = ["src/suncly", "tests", "tasks.py", "frontend/scripts/make-sample.py"]
 strict = true
 warn_unreachable = true
 warn_unused_ignores = true

@@ -65,10 +65,12 @@ suncly attest https://agent.example.com/.well-known/agent-card.json --runs 50
 
 What it does depends on the stage:
 
-- **Stage 1.** Fetches the card, runs each test case `--runs` times against a
-  sandbox or dry-run endpoint, judges each run with Layer 1, and writes a file
-  report that states what was NOT tested. Where stage 1 gets its test cases
-  from is open ([OQ-R2](ROADMAP.md#open-questions)).
+- **This MVP.** Fetches the card, gets a contract approved (drafted or from a
+  contract file), runs each test case `--runs` times against the declared
+  sandbox or dry-run endpoint, judges each run with Layer 1, records a `flag`
+  decision, signs the attestation, and writes a report that states what was
+  NOT tested. Where the test cases come from is the OQ-R2 proposal
+  ([ROADMAP.md](ROADMAP.md#open-questions)).
 - **From stage 2.** Runs only an approved contract. If the card's hash is new,
   a draft contract is created and must be approved first.
 - **Proposed:** an attestation started from the CLI has the trigger `manual`
@@ -208,9 +210,10 @@ asynchronously.
 ```
 
 This example assumes the card's hash matches a card version that already has
-an approved contract. If the hash is new, a draft contract is created and the
-attestation waits for approval ([OQ-F1](FLOW.md#open-questions)). The response
-for that case is open ([OQ-P1](#open-questions)).
+an approved contract. If the hash is new, a draft contract is created and no
+attestation exists until a human approves it ([OQ-F1](FLOW.md#open-questions),
+decided 2026-10-04). The response for that case is open
+([OQ-P1](#open-questions)).
 
 ### GET /attestations/{id}
 

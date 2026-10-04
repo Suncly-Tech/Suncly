@@ -26,10 +26,11 @@ Each step names the schema §4 step it expands.
 
 ### 2. Fetch the card and hash it (schema §4, step 2)
 
-- **Proposed:** the Orchestrator fetches the Agent Card from its URL,
-  canonicalizes it and computes `card_hash`. The URL is not stored anywhere
-  ([OQ-D2](DATA_MODEL.md#open-questions)), and canonicalization and the hash
-  algorithm are open ([OQ-A7](ARCHITECTURE.md#open-questions)).
+- The card service (`core/cards.py`), called by the attestation use case,
+  fetches the Agent Card from its URL, canonicalizes it and computes
+  `card_hash` (decided 2026-10-04; the Orchestrator does the re-fetch at the
+  end). The URL is not stored anywhere ([OQ-D2](DATA_MODEL.md#open-questions)),
+  and the hash scheme is a proposal ([OQ-A7](ARCHITECTURE.md#open-questions)).
 - **If the hash matches the agent's current `card_version`,** its approved
   contract is used. A hash seen earlier in the agent's history is a separate
   question ([OQ-D9](DATA_MODEL.md#open-questions)).
@@ -38,13 +39,12 @@ Each step names the schema §4 step it expands.
      `fetched_at`.
   2. The Contract builder drafts a `contract` with `status` `draft`. It has at
      least one `test_case` per declared skill, plus probes from stage 4.
-- **Proposed:** the Orchestrator creates the `attestation` with `status`
-  `queued`, `started_at`, `budget_limit`, `contract_id` and `card_version_id`
-  ([OQ-A7](ARCHITECTURE.md#open-questions)).
 - A draft contract must be approved by a human before anything runs. Approval
   sets `status` to `approved` and fills in `approved_by` and `approved_at`.
-  **Proposed:** the attestation stays `queued` until then
-  ([OQ-F1](#open-questions)).
+- Only then does the attestation use case create the `attestation`, with
+  `status` `queued`, `started_at`, `budget_limit`, `contract_id` and
+  `card_version_id`. No attestation ever waits for an approval
+  ([OQ-F1](#open-questions), decided 2026-10-04).
 
 ### 3. Orchestrator enqueues the runs (schema §4, step 3)
 
@@ -138,6 +138,7 @@ The main flow, including the card check and the budget stop.
 sequenceDiagram
     autonumber
     participant T as Trigger
+    participant S as Attestation use case
     participant O as Orchestrator
     participant CB as Contract builder
     actor H as Human reviewer
@@ -148,17 +149,18 @@ sequenceDiagram
     participant P as Policy engine
     participant AD as Adapters
 
-    T->>O: trigger (ci, schedule, card_change or manual)
-    O->>O: fetch Agent Card, canonicalize, compute card_hash
+    T->>S: trigger (ci, schedule, card_change or manual)
+    S->>S: fetch Agent Card, canonicalize, compute card_hash
     alt card_hash is new
-        O->>CB: new card_version (raw_json, card_hash)
+        S->>CB: new card_version (raw_json, card_hash)
         CB->>CB: model drafts test cases, at least one per declared skill
     end
-    O->>E: attestation with status queued
     opt contract is a draft
         CB->>H: contract with status draft
         H->>CB: approve (approved_by, approved_at)
     end
+    S->>E: attestation with status queued
+    S->>O: approved contract and attestation
     O->>E: status running
     loop every test case x repetitions, run key (attestation_id, test_case_id, attempt)
         O->>R: run
@@ -206,7 +208,7 @@ stateDiagram-v2
     running --> completed: decision recorded and attestation signed
     running --> failed: cost_total reached budget_limit
     running --> invalidated: card_hash changed
-    queued --> cancelled: not defined (OQ-F1, OQ-F6)
+    queued --> cancelled: not defined (OQ-F6)
     running --> cancelled: not defined (OQ-F6)
     completed --> [*]
     failed --> [*]
@@ -216,7 +218,7 @@ stateDiagram-v2
 
 | Status | Meaning | Decision |
 |---|---|---|
-| `queued` | Created; runs have not started. **Proposed:** also used while the contract waits for approval ([OQ-F1](#open-questions)). | Not yet. |
+| `queued` | Created, after the contract is approved; runs have not started. | Not yet. |
 | `running` | Runs are being executed and judged. | Not yet. |
 | `completed` | **Proposed definition:** all runs judged, the card unchanged, a decision recorded and the attestation signed ([OQ-D6](DATA_MODEL.md#open-questions)). | Yes: `approve`, `flag` or `block`. A `flag` can be followed by a human decision. |
 | `failed` | `cost_total` reached `budget_limit` (schema §11). Other causes are open ([OQ-F3](#open-questions), [OQ-F5](#open-questions)). | None (schema §11). |
@@ -320,8 +322,8 @@ From schema §11:
 
 ### Other cases the schema does not define
 
-- A contract is rejected while an attestation waits for it
-  ([OQ-F1](#open-questions)).
+- A draft contract is rejected: no attestation exists for it yet, so nothing
+  else changes ([OQ-F1](#open-questions), decided).
 - The card cannot be re-fetched at the end ([OQ-F5](#open-questions)).
 - An attestation is cancelled ([OQ-F6](#open-questions)).
 - Signing fails. **Proposed:** the attestation is not marked `completed`
@@ -334,14 +336,12 @@ From schema §11:
 
 ## Open questions
 
-- **OQ-F1 Waiting for approval.** No `attestation.status` describes "waiting
-  for contract approval". **Proposed:** the attestation stays `queued`, and
-  its `contract_id` points at the draft.
-  - What happens if the draft is edited into a new version?
-  - What happens if the draft is rejected? **Proposed:** the attestation is
-    `cancelled`.
-  - Alternatively, should an attestation be created only once an approved
-    contract exists?
+- **OQ-F1 Waiting for approval (decided 2026-10-04).** An attestation is
+  created only once an approved contract exists. Nothing waits in `queued`,
+  and an `attestation.contract_id` never points at a draft, so a draft that is
+  edited into a new version or rejected has no attestation to affect. What the
+  stage 5 API answers to a caller whose card still needs an approved contract
+  remains part of [OQ-P1](API.md#open-questions).
 - **OQ-F2 Noticing card changes.** A `card_change` trigger needs something to
   notice that the card changed, but no polling or notification mechanism is
   defined. Continuous monitoring is out of scope (schema §10), so this has to

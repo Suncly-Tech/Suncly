@@ -9,7 +9,7 @@ forms are given.
 You need Python 3.12 or newer and git.
 
 ```powershell
-git clone https://github.com/Kristjanh2/Suncly.git
+git clone https://github.com/Suncly-Tech/Suncly.git
 cd Suncly
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1          # macOS/Linux: source .venv/bin/activate

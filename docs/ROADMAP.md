@@ -99,16 +99,17 @@ file report is the first version of the Report adapter
       `::test_demo_runs_both_agents_and_both_end_flagged`, and the walkthrough in
       [QUICKSTART.md](QUICKSTART.md).
 
-**Not in this stage:** the Contract builder, Postgres, signing, Layer 2 and
-the Policy engine. Stage 1 as defined here produces unsigned results with no
-decision; the MVP goes further and signs every attestation and records a
-`flag` decision (see the status above).
+**Beyond stage 1 as planned:** the implemented MVP also includes the
+deterministic Contract builder with the recorded approval, the Postgres store
+and signing, and the flag-only Policy engine, so every attestation is signed
+and records a `flag` decision (decided 2026-10-04; see the status above).
+Layer 2 is not implemented.
 
 **Open:** [OQ-R1](#open-questions) (repetitions, and the non-negotiable budget
 cap of [DR-005](DECISIONS.md#dr-005-budget-caps-live-in-the-orchestrator),
-without an Orchestrator), [OQ-R2](#open-questions) (where test cases come from),
-[OQ-P4](API.md#open-questions) (credentials), and A2A-T7, whether the Python
-SDK supports protocol 1.0
+without an Orchestrator), [OQ-R2](#open-questions) (where test cases come from)
+and [OQ-P4](API.md#open-questions) (credentials). A2A-T7, whether the Python
+SDK supports protocol 1.0, is verified, and the own client is decided
 ([ARCHITECTURE.md](ARCHITECTURE.md#protocol-details-still-to-verify)).
 
 ## Stage 2: Contract builder with human approval

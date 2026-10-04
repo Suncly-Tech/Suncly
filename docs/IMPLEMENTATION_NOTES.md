@@ -1,8 +1,9 @@
 # Implementation notes
 
 What the code decided, where, and how to change it. No open question is
-resolved here; only the founders resolve them. Every proposal below is behind
-one named function, constant or configuration value.
+resolved by the code; section 3 records the choices the founders decided, and
+only the founders resolve the rest. Every proposal below is behind one named
+function, constant or configuration value.
 
 Conventions are as in [ARCHITECTURE.md](ARCHITECTURE.md): "schema §N" refers
 to [SCHEMA.md](../SCHEMA.md) and `OQ-…` to the open questions listed in the
@@ -38,26 +39,39 @@ documents. "NEEDS DECISION" marks a choice the documents gave no proposal for.
 
 ## 2. Needs decision
 
-Choices the documents gave no proposal for. Each is behind the named place.
+Choices the documents gave no proposal for and that are still open. Each is
+behind the named place. The ones decided on 2026-10-04 are in section 3.
 
 | Topic | What the code does | Where | Why this way |
 |---|---|---|---|
-| A2A client (A2A-T7) | A minimal JSON-RPC client of Suncly's own, behind the `A2ATransport` port, instead of `a2a-sdk`. | `runner/protocol.py`, `runner/http_transport.py`, `ports/a2a.py` | The SDK does support 1.0 (see section 3), but it brings protobuf, google-api-core and json-rpc into the one process that holds credentials. The Runner's job in this version is `SendMessage` plus `GetTask` polling. Switching means one new adapter for the port. CLAUDE_CODE_BRIEF.md 3.1 would have preferred the SDK. |
 | Cost unit (OQ-D1) | Every attempt costs 1; `budget_limit` and `cost_total` count attempts, retries included; `cost_total` can exceed the sum of `run.cost`. | `domain/transcript.py::COST_PER_ATTEMPT`, `core/orchestrator.py::_Budget` | A2A has no price signal; counting calls is the one unit that is always true. |
 | Agent identity (OQ-P2, OQ-P5) | `agent.id` = UUID v5 of the card URL under a fixed namespace; `owner` defaults to `unspecified`; `risk_level` defaults to `high`. | `core/cards.py::AGENT_ID_NAMESPACE`, `agent_id_for_url`; `core/attestation.py::DEFAULT_OWNER`, `DEFAULT_RISK_LEVEL` | Nothing outside the seven entities is stored; `high` is the most restrictive level. |
-| When the attestation record is created (OQ-F1) | Only after the contract is approved. There is no `queued` attestation waiting for approval. | `core/attestation.py::attest` | This is the alternative OQ-F1 itself raises; it avoids an attestation pointing at a draft. |
 | Superseding (OQ-D5) | Approving version N moves older approved versions of the same card version to `superseded`. | `core/contract_builder.py::ContractService.approve` | Otherwise "the approved contract" of a card version is ambiguous. |
-| Uncovered skills in contract files (OQ-R2, invariant 1) | A drafted contract may leave a skill without examples untested; it is listed as not testable and reported. A hand-written file must list such skills under `skills_without_test_case`, or it is refused. | `core/contract_builder.py::draft_from_contract_file`, `DeterministicDrafter` | Reconciles the brief's refusal rule with the prompt's "never invent input". |
 | Who signs failed and invalidated attestations (OQ-F7) | The attestation use case, not the Policy engine, which signs only after deciding. | `core/attestation.py::_sign_without_decision` | The Policy engine makes no decision for them (schema §11). |
 | In-flight attempts at the budget stop (OQ-F4) | Attempts already started finish and are charged; nothing new starts once `cost_total` reaches `budget_limit`, checked before every attempt. | `core/orchestrator.py::_Budget.charge` | Charging before starting keeps `cost_total` from exceeding the limit. |
 | Judging rule for media types | A `text` part without `mediaType` is treated as `text/plain`. | `domain/a2a.py::TEXT_PART_DEFAULT_MEDIA_TYPE`, `part_media_type` | The spec gives no default; this is Suncly's rule, not the spec's. |
 | Deployment key on first use | `suncly attest` and `suncly demo` create the Ed25519 key if none exists, and say so. `suncly keys init` creates it explicitly. | `core/attestation.py::_signer`, `adapters/file_keys.py` | A first run should not fail for lack of a key. |
 | Plain http for loopback | Card URLs and agent endpoints must be https, except loopback addresses, where local sandboxes run. | `runner/http_transport.py::require_https_or_loopback` | A2A §7.1 requires TLS in production; the demo runs on 127.0.0.1. |
-| Minimum Python | 3.12 minimum; CI tests 3.12, 3.13 and 3.14. | `pyproject.toml`, `.github/workflows/ci.yml` | 3.14 is the newest every dependency ships wheels for; 3.12 is what the founders' machines run. |
 | Migration state | No bookkeeping table; `suncly db migrate` reads `information_schema` and applies the file only to an empty database. | `adapters/postgres/migrate.py` | An eighth table would break "seven entities are the complete list". |
 | Evidence document | The stored transcript file holds the transcript and the judgement; its hash is what the signature covers. | `core/judge.py::JudgeService.evidence_document` | The checks are evidence too. |
 
-## 3. Verified facts
+## 3. Decided (2026-10-04)
+
+Choices the founders confirmed on 2026-10-04. The first four moved here from
+section 2; the last two record what ROADMAP.md, ARCHITECTURE.md and FLOW.md had
+stated differently. Each stays behind the named place so it can be revisited;
+the documents now describe this behaviour as the current one, not as a proposal.
+
+| Topic | What the code does | Where | Reason, and when to revisit |
+|---|---|---|---|
+| A2A client (A2A-T7; CLAUDE_CODE_BRIEF.md 3.1) | Suncly uses its own minimal JSON-RPC client behind the `A2ATransport` port, not `a2a-sdk`: `SendMessage`, then `GetTask` polling. | `runner/protocol.py`, `runner/http_transport.py`, `ports/a2a.py` | The SDK supports 1.0 (section 4), but the Runner's isolation (one target host) and its redaction are easier to audit in a few hundred lines of Suncly's own than through the SDK and its dependencies inside the one process that holds credentials. Revisit when streaming or push notifications are needed; the switch is one new adapter for the port. |
+| When the attestation record is created (OQ-F1) | Only after the contract is approved. Nothing waits in `queued`, and no attestation points at a draft. | `core/attestation.py::attest` | Avoids an attestation that references a draft, the alternative OQ-F1 itself raised. Revisit when the stage 5 API must accept a request before an approval exists (OQ-P1). |
+| Uncovered skills in contracts (OQ-R2, invariant 1; CLAUDE_CODE_BRIEF.md 3.4) | A drafted contract may leave a skill without examples untested; it is listed as not testable and reported. A hand-written file must list such skills under `skills_without_test_case`, or it is refused. A file never carries an approval; `--approve-as` or the prompt records it. | `core/contract_builder.py::draft_from_contract_file`, `DeterministicDrafter`, `domain/contract_file.py` | Suncly never invents input; the acknowledgement keeps the brief's refusal rule for files a human writes. Revisit when the stage 2 drafter can produce inputs for skills without examples. |
+| Minimum Python (CLAUDE_CODE_BRIEF.md 2.1) | `requires-python = ">=3.12"`; CI tests 3.12, 3.13 and 3.14. | `pyproject.toml`, `.github/workflows/ci.yml` | 3.12 is what the founders' machines run; 3.14 is the newest version every dependency ships wheels for (section 4). Revisit when 3.12 reaches end of life (October 2028) or a dependency drops it. |
+| Initial card fetch (OQ-A7, which component) | The card service, called by the attestation use case, fetches and hashes the card and records the `card_version`; the Orchestrator re-fetches it at the end. | `core/cards.py::CardService`, `core/orchestrator.py::_recheck_card` | The Orchestrator exists only once there is an approved contract to run. The hash scheme itself stays a proposal (section 1). |
+| Stage 1 results are signed and decided (ROADMAP.md, ARCHITECTURE.md) | Every attestation is signed; a completed one records a `flag` decision; `failed` and `invalidated` ones are signed with no decision. | `core/policy_engine.py`, `core/attestation.py::_sign_without_decision` | The stage 1 plan said unsigned and undecided; the MVP prompt required signing and a decision. Revisit with the stage 5 policy configuration, which adds `approve` and `block`. |
+
+## 4. Verified facts
 
 | Fact | Checked | Source |
 |---|---|---|
@@ -85,36 +99,48 @@ version handles without taking a side:
   attestable and runs nothing.
 - **A2A-T6** (`SubscribeToTask` HTTP verb): not used; JSON-RPC only.
 
-## 4. Document problems found
+## 5. Document problems found
 
-Contradictions or errors noticed while implementing. None was fixed silently.
+Contradictions or errors noticed while implementing. None was fixed silently;
+the ones marked resolved were decided by the founders on 2026-10-04, and the
+documents now say what the code does.
 
-1. **Definition of done, item 9.** The literal grep for the former storage vendor's
-   names can never be empty while the documents contain the open-question ids
-   `OQ-D1`, `OQ-D10` and `OQ-D11`. The check that passes excludes those ids:
+1. **Definition of done, item 9 (resolved 2026-10-04).** A literal grep for the
+   former storage vendor's names can never be empty while the documents contain
+   the open-question ids `OQ-D1`, `OQ-D10` and `OQ-D11`, and while
+   CLAUDE_CODE_BRIEF.md quotes the names it asked to remove. The check is this
+   command, which prints nothing:
    `git grep -n -i -P "(?<!OQ-)\bD[1]\b|Cloud[f]lare|wrang[l]er" -- . ':!CLAUDE_CODE_BRIEF.md'`
-   (the bracketed letters keep this sentence itself out of the result).
+   The lookbehind excludes the `OQ-` ids, the word boundaries exclude `D10` and
+   `D11`, the brief is excluded by path, and the bracketed letters keep this
+   sentence itself out of the result. CLAUDE_CODE_BRIEF.md 1.4 carries the same
+   command.
 2. **CLAUDE_CODE_BRIEF.md 3.1 vs the MVP prompt** on the A2A SDK: the brief
-   says to use the SDK if it supports 1.0; the prompt leaves the choice open.
-   See "A2A client" above.
+   said to use the SDK if it supports 1.0; the prompt left the choice open.
+   Resolved 2026-10-04: Suncly keeps its own minimal client (section 3); the brief
+   now carries the decision.
 3. **CLAUDE_CODE_BRIEF.md 3.4 vs the MVP prompt** on skills without a test
-   case: the brief refuses such a contract; the prompt wants the drafter to list
-   the skill as not testable. See "Uncovered skills" above.
-4. **FLOW.md OQ-F1** proposes an attestation that waits in `queued` for
-   approval; the implementation creates the attestation only after approval,
-   which OQ-F1 lists as the alternative.
-5. **ROADMAP.md and ARCHITECTURE.md** say stage 1 results are not signed and
-   carry no decision; this MVP signs every attestation and records a `flag`
-   decision, as the prompt requires. ROADMAP.md's status says so.
-6. **ARCHITECTURE.md (Orchestrator)** proposes that the Orchestrator performs
+   case: the brief refused such a contract; the prompt wanted the drafter to
+   list the skill as not testable. Resolved 2026-10-04: the acknowledgement rule in
+   section 3; the brief now carries the decision.
+4. **FLOW.md OQ-F1** proposed an attestation that waits in `queued` for
+   approval; the implementation creates the attestation only after approval.
+   Resolved 2026-10-04: FLOW.md and API.md now describe the implemented order.
+5. **ROADMAP.md and ARCHITECTURE.md** said stage 1 results are not signed and
+   carry no decision. Resolved 2026-10-04: both now say every attestation is signed
+   and a completed one records a `flag` decision; the brief carries the same
+   note.
+6. **ARCHITECTURE.md (Orchestrator)** proposed that the Orchestrator performs
    the initial card fetch; the code performs it in `core/cards.py`, called by
-   the attestation use case before the Orchestrator exists for that run. The
-   end-of-run re-fetch is the Orchestrator's.
+   the attestation use case. Resolved 2026-10-04: ARCHITECTURE.md, FLOW.md and
+   DATA_MODEL.md now name the card service; the Orchestrator keeps the re-fetch.
+   The module docstring of `core/cards.py` still calls it a proposal.
 7. **The A2A specification v1.0.1 contradicts itself** on whether `SendMessage`
    blocks (§3.1.1, §3.3.3 vs §3.2.2), on stream closing at interrupted states
    (§3.1.2 vs §11.7), on the field name `security` vs `securityRequirements`,
    and on the HTTP verb of `SubscribeToTask`. These stay as A2A-T2, T3, T4 and
    T6 in ARCHITECTURE.md.
-8. **CLAUDE_CODE_BRIEF.md 2.1** asks for "a pinned minimum Python version" and
+8. **CLAUDE_CODE_BRIEF.md 2.1** asked for "a pinned minimum Python version" and
    to "pick the newest Python version that all dependencies support"; the two
-   cannot both be the minimum. The minimum is 3.12 and the newest tested is 3.14.
+   cannot both be the minimum. Resolved 2026-10-04: the minimum is 3.12 and the
+   newest tested is 3.14; the brief now carries the decision.

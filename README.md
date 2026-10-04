@@ -43,7 +43,7 @@ You need Python 3.12 or newer. The same commands work on Windows PowerShell,
 macOS and Linux; the one line that differs is marked.
 
 ```powershell
-git clone https://github.com/Kristjanh2/Suncly.git
+git clone https://github.com/Suncly-Tech/Suncly.git
 cd Suncly
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1          # macOS/Linux: source .venv/bin/activate
@@ -142,7 +142,7 @@ From [SCHEMA.md](SCHEMA.md) §1:
 | [docs/POLICY.md](docs/POLICY.md) | Risk levels, approval rules, and when a human is required. |
 | [docs/DECISIONS.md](docs/DECISIONS.md) | The non-negotiable rules, as decision records. |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | The six build stages, what this MVP implements, and what it does not. |
-| [docs/IMPLEMENTATION_NOTES.md](docs/IMPLEMENTATION_NOTES.md) | Every proposal the code implements, every choice that needs a decision, and the facts that were verified. |
+| [docs/IMPLEMENTATION_NOTES.md](docs/IMPLEMENTATION_NOTES.md) | Every proposal the code implements, the choices the founders decided, every choice that still needs a decision, and the facts that were verified. |
 | [db/README.md](db/README.md) | What the migration enforces, and which open questions it leaves open. |
 
 **How to read these documents.** Where a document and

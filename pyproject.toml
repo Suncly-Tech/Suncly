@@ -33,7 +33,7 @@ dev = [
 suncly = "suncly.cli.main:main"
 
 [project.urls]
-Repository = "https://github.com/Kristjanh2/Suncly"
+Repository = "https://github.com/Suncly-Tech/Suncly"
 
 [tool.setuptools.packages.find]
 where = ["src"]

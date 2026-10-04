@@ -134,7 +134,7 @@ documents now say what the code does.
    the initial card fetch; the code performs it in `core/cards.py`, called by
    the attestation use case. Resolved 2026-10-04: ARCHITECTURE.md, FLOW.md and
    DATA_MODEL.md now name the card service; the Orchestrator keeps the re-fetch.
-   The module docstring of `core/cards.py` still calls it a proposal.
+   The module docstring of `core/cards.py` says the same.
 7. **The A2A specification v1.0.1 contradicts itself** on whether `SendMessage`
    blocks (§3.1.1, §3.3.3 vs §3.2.2), on stream closing at interrupted states
    (§3.1.2 vs §11.7), on the field name `security` vs `securityRequirements`,

@@ -1,8 +1,8 @@
 """Card handling: fetch, parse, hash, and the agent and card_version records.
 
-Schema §4, step 2. The component doing this is proposed to be the
-Orchestrator (OQ-A7); it is kept in its own module so the proposal is easy to
-move.
+Schema §4, step 2. Decided 2026-10-04 (OQ-A7): the card service performs the
+initial fetch on behalf of the attestation use case, not the Orchestrator, which
+only re-fetches the card at the end of a run.
 """
 
 from __future__ import annotations

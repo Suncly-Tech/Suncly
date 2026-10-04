@@ -1,3 +1,5 @@
+"use client";
+
 /** The two diagonal cuts from the mark, used as a divider or inline glyph. */
 export function Cuts({
   className = "",

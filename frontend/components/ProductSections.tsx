@@ -1,13 +1,22 @@
+"use client";
+
 import { product } from "@/lib/content";
 import { Reveal } from "./Reveal";
 import { SectionLabel } from "./SectionHeader";
-import { AttestDiagram, StressDiagram, GateDiagram, ApproveDiagram } from "./Diagrams";
+import {
+  ContractDiagram,
+  RunsDiagram,
+  ProbesDiagram,
+  JudgeDiagram,
+  EvidenceDiagram,
+  DecisionDiagram,
+} from "./Diagrams";
 
-const diagrams = [AttestDiagram, StressDiagram, GateDiagram, ApproveDiagram];
+const diagrams = [ContractDiagram, RunsDiagram, ProbesDiagram, JudgeDiagram, EvidenceDiagram, DecisionDiagram];
 
 export function ProductSections() {
   return (
-    <section id="product" className="scroll-mt-20 bg-cream pb-24 md:pb-32" aria-labelledby="product-heading">
+    <section id="product" className="scroll-mt-20 bg-cream py-24 md:py-32" aria-labelledby="product-heading">
       <div className="container-site">
         <SectionLabel as="h2" id="product-heading">
           {product.label}
@@ -28,9 +37,7 @@ export function ProductSections() {
                     <div className="flex items-center gap-3">
                       <span className="font-mono text-[14px] font-semibold text-sky">{s.number}</span>
                       <span className="h-px w-6 bg-ink/15" aria-hidden="true" />
-                      <span className="text-small font-semibold uppercase tracking-[0.08em] text-ink-soft">
-                        {s.name}
-                      </span>
+                      <span className="text-small font-semibold uppercase tracking-[0.08em] text-ink-soft">{s.name}</span>
                     </div>
                     <h3 className="mt-5 text-display-md text-balance text-ink">{s.title}</h3>
                     <p className="mt-5 max-w-[480px] text-body text-ink-soft">{s.body}</p>

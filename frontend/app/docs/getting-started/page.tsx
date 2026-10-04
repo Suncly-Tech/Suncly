@@ -3,12 +3,33 @@ import Link from "next/link";
 import { DocLayout } from "@/components/site/DocLayout";
 import { CodeBlock } from "@/components/ui/CodeBlock";
 import { Notice } from "@/components/ui/Notice";
+import { howToLd, KEYWORDS, pageMeta } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Getting started",
-  description: "Install Suncly, run the bundled demo, evaluate your own sandbox agent, read the report and verify it. Five minutes.",
-  alternates: { canonical: "/docs/getting-started" },
-};
+const description =
+  "Evaluate an A2A AI agent with Suncly in five minutes: install the CLI, run the demo, run suncly attest against your sandbox agent, read and verify the signed report.";
+
+export const metadata: Metadata = pageMeta({
+  title: "Getting started: evaluate an A2A agent in 5 minutes",
+  description,
+  path: "/docs/getting-started",
+  type: "article",
+  keywords: [...KEYWORDS.protocol, "suncly attest", "suncly demo", "how to test an A2A agent", "install suncly"],
+});
+
+const howTo = howToLd({
+  name: "How to evaluate an A2A agent with Suncly",
+  description,
+  path: "/docs/getting-started",
+  totalTime: "PT5M",
+  steps: [
+    { name: "Install", text: "Clone the repository, create a virtual environment and run pip install -e . with Python 3.12 or newer.", anchor: "install" },
+    { name: "See it work", text: "Run suncly demo: two bundled mock agents are evaluated and both end with the decision flag.", anchor: "demo" },
+    { name: "Evaluate your sandbox agent", text: "Run suncly attest <card-url> --sandbox, review the drafted test cases and approve them under your identifier.", anchor: "attest" },
+    { name: "Use a credential", text: "Put the Authorization header value in SUNCLY_AGENT_AUTHORIZATION; only the Runner reads it and it is redacted from transcripts.", anchor: "credential" },
+    { name: "Read the report", text: "Open report.html or report.md in suncly-reports/<attestation-id>/; result.json holds the evidence bundle and transcripts/ the redacted transcripts.", anchor: "report" },
+    { name: "Verify the attestation", text: "Run suncly verify suncly-reports/<attestation-id> to check the signature, card hash, transcript hashes, decision and counts.", anchor: "verify" },
+  ],
+});
 
 const toc = [
   { id: "install", title: "1. Install" },
@@ -31,6 +52,7 @@ export default function GettingStartedPage() {
       intro="The same commands work on Windows PowerShell, macOS and Linux; where a command differs, both forms are given. Repository access comes with the pilot."
       current="/docs/getting-started"
       toc={toc}
+      extraLd={[howTo]}
     >
       <h2 id="install">1. Install</h2>
       <p>You need Python 3.12 or newer and git.</p>

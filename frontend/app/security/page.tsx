@@ -4,13 +4,19 @@ import { SiteLayout, PageHeader, Section } from "@/components/site/SiteLayout";
 import { FinalCta } from "@/components/site/FinalCta";
 import { Notice } from "@/components/ui/Notice";
 import { limitations, securityPage } from "@/lib/content";
+import { JsonLd } from "@/components/site/JsonLd";
+import { breadcrumbLd, graph, KEYWORDS, pageMeta, techArticleLd, webPageLd } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Security and data handling",
-  description:
-    "What data Suncly accesses, where credentials are handled, what reaches external providers, what evidence is stored, how retention and deletion work, deployment options, sandbox requirements and evaluation limitations.",
-  alternates: { canonical: "/security" },
-};
+const description =
+  "What Suncly accesses, where credentials are held and redacted, what reaches model providers (nothing), what evidence is stored, retention, deployment and evaluation limits.";
+
+export const metadata: Metadata = pageMeta({
+  title: "Security and data handling for AI agent evaluation",
+  description,
+  path: "/security",
+  type: "article",
+  keywords: [...KEYWORDS.evidence, "AI agent security review", "credential redaction", "sandbox testing AI agents", "self-hosted agent evaluation"],
+});
 
 const sections = [
   { id: "data", title: "What Suncly accesses" },
@@ -27,6 +33,13 @@ const sections = [
 export default function SecurityPage() {
   return (
     <SiteLayout>
+      <JsonLd
+        data={graph(
+          webPageLd({ path: "/security", name: "Security and data handling", description }),
+          techArticleLd({ path: "/security", headline: securityPage.headline, description }),
+          breadcrumbLd([{ name: "Suncly", path: "/" }, { name: "Security", path: "/security" }]),
+        )}
+      />
       <PageHeader eyebrow={securityPage.title} headline={securityPage.headline} intro={securityPage.intro} />
       <Section>
         <div className="grid gap-12 lg:grid-cols-[minmax(0,3fr)_minmax(0,9fr)] lg:gap-16">

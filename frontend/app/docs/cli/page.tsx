@@ -1,12 +1,16 @@
 import type { Metadata } from "next";
 import { DocLayout } from "@/components/site/DocLayout";
 import { CodeBlock } from "@/components/ui/CodeBlock";
+import { pageMeta } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Command reference",
-  description: "Every suncly command, option, exit code, environment variable and the contract file format.",
-  alternates: { canonical: "/docs/cli" },
-};
+export const metadata: Metadata = pageMeta({
+  title: "suncly CLI reference: attest, verify, exit codes",
+  description:
+    "Every suncly command and option: attest, demo, verify, keys init, db migrate, db check, doctor, the exit codes, environment variables and the contract file format.",
+  path: "/docs/cli",
+  type: "article",
+  keywords: ["suncly attest", "suncly verify", "suncly CLI", "A2A agent testing CLI", "contract file", "agent evaluation exit codes"],
+});
 
 const toc = [
   { id: "commands", title: "Commands" },

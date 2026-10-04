@@ -11,7 +11,7 @@ export const site = {
   domain: "https://suncly.com",
   title: "Suncly — Evaluate AI agents before you approve them",
   description:
-    "Suncly tests what an A2A agent claims in its Agent Card, repeatedly, in a sandbox, and gives platform and security teams signed evidence to approve on, including what was not tested.",
+    "AI agent evaluation for the A2A protocol: Suncly tests each declared skill repeatedly in a sandbox and gives security and platform teams signed evidence to approve on.",
   mission: "Evaluate AI agents before you approve them.",
   email: "team@suncly.com",
   city: "Tallinn, Estonia",
@@ -374,6 +374,28 @@ export const companyPage = {
     location: "Tallinn, Estonia",
     registration: "Company registration details will be published here.",
   },
+  faq: [
+    {
+      q: "What is Suncly?",
+      a: "Suncly is an evaluation tool for AI agents that speak the A2A (Agent2Agent) protocol. It reads an agent's Agent Card, tests every declared skill repeatedly in a sandbox, judges each run deterministically, signs the evidence, and reports what passed, what failed, what stayed inconclusive and what was never tested.",
+    },
+    {
+      q: "Who is Suncly for?",
+      a: "Platform and security teams that approve AI agents for use in their organisation and currently do that review by hand.",
+    },
+    {
+      q: "Is Suncly a model or an agent?",
+      a: "Neither. Suncly is a command-line evaluation tool that tests agents built on any model or framework through their A2A interface. In the current version it calls no model provider at all.",
+    },
+    {
+      q: "Where is Suncly based?",
+      a: "Tallinn, Estonia. Contact the team at team@suncly.com.",
+    },
+    {
+      q: "How is Suncly pronounced and spelled?",
+      a: "Sun-clee, one word, capital S: Suncly. The domain is suncly.com.",
+    },
+  ],
 } as const;
 
 export const docsPage = {
@@ -478,6 +500,7 @@ export const footer = {
         { label: "Getting started", href: "/docs/getting-started" },
         { label: "Command reference", href: "/docs/cli" },
         { label: "Evidence and reports", href: "/docs/evidence" },
+        { label: "Glossary", href: "/glossary" },
       ],
     },
     {

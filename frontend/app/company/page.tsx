@@ -3,17 +3,31 @@ import { SiteLayout, PageHeader, Section } from "@/components/site/SiteLayout";
 import { FinalCta } from "@/components/site/FinalCta";
 import { SectionHeader } from "@/components/SectionHeader";
 import { KeyValue } from "@/components/ui/Stat";
+import { Faq } from "@/components/Faq";
 import { companyPage } from "@/lib/content";
+import { JsonLd } from "@/components/site/JsonLd";
+import { breadcrumbLd, faqLd, graph, pageMeta, webPageLd } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Company",
-  description: companyPage.intro,
-  alternates: { canonical: "/company" },
-};
+const description =
+  "Suncly is an AI agent evaluation tool for the A2A protocol, built by a small team in Tallinn, Estonia. What we build, how we work, and how to reach us.";
+
+export const metadata: Metadata = pageMeta({
+  title: "About Suncly: AI agent evaluation from Tallinn",
+  description,
+  path: "/company",
+  keywords: ["about Suncly", "Suncly company", "Suncly Tallinn", "Suncly contact", "who makes Suncly"],
+});
 
 export default function CompanyPage() {
   return (
     <SiteLayout>
+      <JsonLd
+        data={graph(
+          webPageLd({ path: "/company", name: "About Suncly", description, type: "AboutPage" }),
+          breadcrumbLd([{ name: "Suncly", path: "/" }, { name: "Company", path: "/company" }]),
+          faqLd(companyPage.faq),
+        )}
+      />
       <PageHeader eyebrow={companyPage.title} headline={companyPage.headline} intro={companyPage.intro} />
       <Section>
         <SectionHeader label="How we work" headline="Three rules we apply to ourselves." />
@@ -38,6 +52,7 @@ export default function CompanyPage() {
           />
         </div>
       </Section>
+      <Faq items={companyPage.faq} label="About Suncly" headline="Questions about Suncly." id="about-faq" />
       <FinalCta />
     </SiteLayout>
   );

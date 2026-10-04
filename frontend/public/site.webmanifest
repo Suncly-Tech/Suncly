@@ -1,0 +1,17 @@
+{
+  "name": "Suncly",
+  "short_name": "Suncly",
+  "description": "Suncly evaluates A2A AI agents before approval: repeated sandbox tests of every declared skill, deterministic verdicts, signed evidence and an explicit list of what was not tested.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "browser",
+  "background_color": "#fbf6ec",
+  "theme_color": "#3461d1",
+  "lang": "en",
+  "categories": ["developer tools", "security", "productivity"],
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

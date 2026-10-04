@@ -6,16 +6,28 @@ import { FinalCta } from "@/components/site/FinalCta";
 import { SectionHeader } from "@/components/SectionHeader";
 import { Badge } from "@/components/ui/Badge";
 import { docsPage } from "@/lib/content";
+import { JsonLd } from "@/components/site/JsonLd";
+import { breadcrumbLd, graph, KEYWORDS, pageMeta, webPageLd } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Documentation",
-  description: docsPage.intro,
-  alternates: { canonical: "/docs" },
-};
+const description =
+  "Suncly documentation: getting started with the suncly CLI, the command reference, the evidence and report format, and the repository's architecture documents.";
+
+export const metadata: Metadata = pageMeta({
+  title: "Documentation: the suncly CLI for A2A agent evaluation",
+  description,
+  path: "/docs",
+  keywords: [...KEYWORDS.protocol, "suncly CLI", "suncly attest", "suncly verify", "agent evaluation documentation"],
+});
 
 export default function DocsPage() {
   return (
     <SiteLayout>
+      <JsonLd
+        data={graph(
+          webPageLd({ path: "/docs", name: "Documentation", description, type: "CollectionPage" }),
+          breadcrumbLd([{ name: "Suncly", path: "/" }, { name: "Docs", path: "/docs" }]),
+        )}
+      />
       <PageHeader eyebrow={docsPage.title} headline={docsPage.headline} intro={docsPage.intro} />
 
       <Section>

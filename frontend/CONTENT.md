@@ -127,6 +127,13 @@ Getting started — `QUICKSTART` verbatim where possible. Command reference — 
 - Privacy and Terms: drafts, visibly marked; factual statements from `CODE`; legal
   identity, retention, governing law, licence, effective dates: pending owner input.
 
+## Glossary (`/glossary`) and SEO surfaces
+
+`lib/glossary.ts` definitions — `ARCH` (A2A facts), `DATA` (entities), `POLICY`, `DR`,
+`CODE`. `lib/seo.ts` `DEFINITION` is the one canonical description reused in JSON-LD,
+the manifest, `public/llms.txt`, `public/llms-full.txt` and the company FAQ. Structured
+data carries no ratings, reviews, offers or prices. See `SEO.md`.
+
 ## Workspace (`/app`)
 
 Reads `result.json` + `transcripts/*.json` (format `suncly-result/1`,

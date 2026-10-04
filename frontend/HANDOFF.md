@@ -22,6 +22,11 @@ comes from) and `VERIFICATION.md` (how it was checked).
   budget stop). Regenerate with `.venv/bin/python frontend/scripts/make-sample.py`.
 - A design system in `app/globals.css` and `components/ui/`: tokens, badges, cards,
   tables, fields, dialog, tabs, notices, empty states, stats, code blocks, meter.
+- Search and answer-engine optimisation: `lib/seo.ts` (brand entity, keyword
+  clusters, metadata helper, JSON-LD builders), structured data on every public page,
+  a `/glossary` page, `public/llms.txt` and `llms-full.txt`, an AI-crawler-aware
+  `robots.txt`, a full sitemap and a web manifest. Strategy, keyword map and the
+  off-site checklist are in `SEO.md`.
 
 ## 2. Capability map used throughout
 

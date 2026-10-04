@@ -1,0 +1,93 @@
+# Suncly — full text for language models
+
+Last updated: 2026-10-05. Source: suncly.com. Everything below is verified against the implementation in the Suncly repository; where a capability is planned rather than built, it says so.
+
+## What Suncly is
+
+Suncly is an evaluation tool for AI agents that speak the A2A (Agent2Agent) protocol. It reads an agent's Agent Card, tests every declared skill repeatedly in a sandbox, judges each run deterministically, signs the evidence, and gives platform and security teams a report that states what passed, what failed, what stayed inconclusive and what was never tested, so they can approve the agent on evidence instead of a spreadsheet.
+
+Suncly is built for platform and security teams that have to say yes or no to an agent before it is used. The immediate alternative is manual review: reading the card, sending a few prompts, pasting answers into a ticket. Suncly turns that into a recorded, repeatable procedure with a named approver, repeated runs, deterministic verdicts, signed evidence and an explicit statement of coverage gaps.
+
+Suncly is a command-line tool (`suncly`) in pilot. It runs on Windows, macOS and Linux with Python 3.12 or newer, on your machine or inside your network. There is no hosted service in this version. Company: Suncly, Tallinn, Estonia. Contact: team@suncly.com. Website: https://suncly.com.
+
+## What Suncly is not
+
+- Not runtime monitoring: it tests a sandbox endpoint before approval; it does not observe production traffic or act as a gateway.
+- Not a protocol conformance suite: it checks that responses are well-formed A2A Tasks or Messages as part of judging, not the whole protocol surface.
+- Not a scoring service: counts are reported per test case and never combined into a single score, because a score would hide what was not tested.
+- Not a registry, identity system or payments product.
+- Not an automatic approver: in the current version every decision is "flag for human review".
+
+## How an evaluation works
+
+1. Point Suncly at the Agent Card URL. The card is fetched over https, kept byte for byte and hashed (SHA-256 of its RFC 8785 form without the signatures field). The hash pins the evaluation to that exact version of the claims.
+2. Review the test plan. One test case is drafted per declared example of each skill, with structural criteria: the task reaches TASK_STATE_COMPLETED, answers with content, uses the declared output modes, within a latency limit. The draft can be exported, edited (required fields, JSON Schema, tighter limits) and imported. A person approves the contract; their identifier is recorded as approved_by. Nothing runs before approval. Approved contracts are immutable.
+3. Run it repeatedly in a sandbox. Each test case runs N times (default 5), each from a separate isolated Runner process. The caller must declare the endpoint a sandbox (--sandbox); Suncly cannot verify a sandbox and records the declaration as such. Every attempt counts against a budget (default twice the planned runs).
+4. Judge every run deterministically. Checks: valid A2A response, expected final task state, latency limit, response present, declared output modes, required fields, response schema. Verdict: pass, fail or inconclusive. Inconclusive is never a pass.
+5. Sign the evidence. The attestation is signed with the deployment's Ed25519 key over the attestation id, card hash, contract id and version, per-test-case counts, the SHA-256 of every transcript, and the decision. `suncly verify` re-checks a report folder offline.
+6. Decide with the gaps in view. The report lists what was NOT tested. The Policy engine records a decision (flag in this version). A human reviews the evidence and decides.
+
+## What is available, limited and planned
+
+Available: card fetch and hash; human approval of the contract; repeated runs with deterministic run keys; credential isolation in the Runner with redaction of transcripts; budget and execution controls; Ed25519 signing and `suncly verify`; the "What was NOT tested" section; the report folder (result.json, transcripts, report.md, report.html); the CLI (attest, demo, verify, keys init, db migrate, db check, doctor).
+
+Available with limits: the drafter is deterministic (no model) and a skill without examples is not tested; the judge is deterministic only (no model-based judge), so semantic correctness is reported as not tested; customer criteria are structural and a model_checks criterion makes the run inconclusive; the sandbox is a declaration, not verified; the evidence store is append-only on files or Postgres with transcripts on local disk; the Policy engine only produces flag; CI integration is through the CLI's exit codes and --json; comparison between evaluations is computed in the browser workspace from two signed bundles.
+
+Planned (named roadmap stages, no dates): prompt-injection, undeclared-behaviour and failure-handling probes (stage 4); the model-based judge, Layer 2 (stage 4); recording human decisions in the evidence store (stage 5); the HTTP API (stage 5); a CI adapter (stage 5); registry adapters (stage 6); object storage for transcripts.
+
+## Supported workflows and integrations
+
+Protocol: A2A 1.0 over JSON-RPC (SendMessage, then GetTask polling). Agent Cards at /.well-known/agent-card.json. Direct Message replies are handled and count as completion only if the criteria allow it. Interrupted states (input or auth required) are recorded and judged; the Runner never invents input. gRPC and HTTP+JSON bindings, streaming, push notifications, extended cards and extensions are not exercised and are listed in reports as not tested. Authentication: one Authorization header value from an environment variable read only by the Runner.
+
+Model providers: Suncly is model-agnostic and calls no model provider. Agents built on Claude, OpenAI GPT and Codex, Grok, Gemini, Llama, Mistral, DeepSeek, Qwen, Cohere or open-source models are tested the same way through their A2A interface. Names are illustrative; no partnership or endorsement exists.
+
+Frameworks and tools: any framework that serves an A2A 1.0 Agent Card and JSON-RPC endpoint. Agents that only expose a chat or vendor API, and coding assistants, are not reachable until wrapped in an A2A server.
+
+Bundled sandbox agents (for the demo and tests): honest, honest-async, lying, flaky, slow, unreachable, direct-message, interrupted, leaky, card-changer, no-examples.
+
+## Security and data handling
+
+Suncly accesses the Agent Card URL, the agent endpoint named in the card, and one credential if the sandbox needs one. The Runner refuses any host other than the target. The credential is read only inside the Runner process; transcripts are redacted (credential, sensitive headers such as authorization and cookie, known token patterns, key=value secrets) before they leave it. Nothing goes to a model provider in this version. Evidence is written under the Suncly home folder (store, transcripts, keys) and the reports folder on the machine that runs Suncly, or to your Postgres. The store is append-only; Suncly defines no retention period and has no delete operation; evidence stays until you remove it. Tests run only against declared sandbox endpoints.
+
+Seven non-negotiable rules: idempotent runs; evidence is immutable; secrets never leave the Runner; the judge model is pinned; budget caps live in the Orchestrator; tests hit a sandbox or dry-run endpoint; reports state what was NOT tested.
+
+Limitations: a pass means every deterministic check passed on the sandbox during this evaluation, not a guarantee of future behaviour; a signature proves the evidence was not altered, not that the agent is correct; decisions are flag-only; the sandbox declaration is not verified; tests come from declared examples; probes are not implemented.
+
+## Sample evaluation
+
+Harbor Returns Agent is a fictional agent with four skills: order-status, start-return, refund-estimate, cancel-order (no examples, so not tested). Three evaluations produced by the real code path: (1) baseline, order-status and start-return pass every run, refund-estimate inconclusive because its criterion needs the model judge; (2) same card hash, start-return stops at TASK_STATE_INPUT_REQUIRED on every run and the second order-status example fails two runs in five; (3) a budget of 7 attempts for 20 planned runs ends the attestation failed with 13 runs never executed and no decision. A reviewer's decision note (block) is shown as a human decision outside the signed evidence.
+
+## Commands
+
+suncly attest <card-url> --sandbox [--runs N] [--budget N] [--approve-as ID] [--contract FILE] [--export-draft FILE] [--owner] [--risk-level low|medium|high] [--reports-dir DIR] [--json]
+suncly demo
+suncly verify <report-folder> [--public-key B64]
+suncly keys init [--new]
+suncly db migrate, suncly db check (with DATABASE_URL)
+suncly doctor [card-url]
+
+Exit codes: 0 completed and signed (never means approved); 1 internal error; 2 wrong arguments; 3 refused to start (no sandbox declaration, no approval, unusable card or contract); 4 attestation failed (budget or card re-fetch); 5 attestation invalidated (card changed); 6 verify or doctor found a problem.
+
+## Frequently asked questions
+
+Is Suncly available today? Yes, as a command-line tool in pilot. The HTTP API, model-based judging, probes and automatic approve or block decisions are planned stages, not current features.
+
+Which agents can it evaluate? Any agent that publishes an A2A 1.0 Agent Card and answers over JSON-RPC, whatever model or framework is behind it.
+
+Does Suncly call my production agent? No. Nothing runs unless the endpoint is declared a sandbox, and the report records that declaration.
+
+Where do my credentials go? Into one environment variable that only the Runner process reads; the Runner redacts it from every transcript.
+
+Does Suncly send anything to a model provider? Not in this version.
+
+What does a decision look like? One signed decision record per completed evaluation from the Policy engine; without a configured policy the outcome is always flag.
+
+Can I compare two evaluations? An unchanged card reuses its approved contract, so counts are comparable test case by test case; the workspace shows the comparison.
+
+Does it produce a score? No. Counts per test case, never combined.
+
+What does it cost? No price is published; access is arranged with the team by email at team@suncly.com.
+
+## Pages
+
+https://suncly.com/ · https://suncly.com/product · https://suncly.com/workflows · https://suncly.com/demo · https://suncly.com/security · https://suncly.com/glossary · https://suncly.com/docs · https://suncly.com/docs/getting-started · https://suncly.com/docs/cli · https://suncly.com/docs/evidence · https://suncly.com/company · https://suncly.com/access

@@ -2,6 +2,8 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { SiteLayout, PageHeader } from "./SiteLayout";
 import { FinalCta } from "./FinalCta";
+import { JsonLd } from "./JsonLd";
+import { breadcrumbLd, graph, techArticleLd, webPageLd } from "@/lib/seo";
 
 const guides = [
   { href: "/docs", label: "Documentation" },
@@ -17,6 +19,7 @@ export function DocLayout({
   current,
   toc,
   children,
+  extraLd,
 }: {
   eyebrow: string;
   headline: string;
@@ -24,9 +27,19 @@ export function DocLayout({
   current: string;
   toc: Array<{ id: string; title: string }>;
   children: ReactNode;
+  /** Extra JSON-LD nodes for this guide (for example a HowTo). */
+  extraLd?: Array<Record<string, unknown>>;
 }) {
   return (
     <SiteLayout>
+      <JsonLd
+        data={graph(
+          webPageLd({ path: current, name: eyebrow, description: intro }),
+          techArticleLd({ path: current, headline, description: intro }),
+          breadcrumbLd([{ name: "Suncly", path: "/" }, { name: "Docs", path: "/docs" }, { name: eyebrow, path: current }]),
+          ...(extraLd ?? []),
+        )}
+      />
       <PageHeader eyebrow={eyebrow} headline={headline} intro={intro} />
       <section className="py-12 md:py-16">
         <div className="container-site grid gap-12 lg:grid-cols-[minmax(0,3fr)_minmax(0,9fr)] lg:gap-16">

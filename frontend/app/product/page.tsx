@@ -7,18 +7,30 @@ import { AvailabilityBadge } from "@/components/ui/Badge";
 import { Table } from "@/components/ui/Table";
 import { Faq } from "@/components/Faq";
 import { byGroup, type Capability } from "@/lib/capabilities";
-import { productPage } from "@/lib/content";
+import { faq, productPage } from "@/lib/content";
+import { JsonLd } from "@/components/site/JsonLd";
+import { breadcrumbLd, faqLd, graph, KEYWORDS, pageMeta, webPageLd } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Product",
-  description:
-    "What Suncly does today, with its limits, and what is planned: tests from declared skills, human-approved test plans, repeated sandbox runs, deterministic verdicts, signed evidence and explicit coverage gaps.",
-  alternates: { canonical: "/product" },
-};
+const description =
+  "AI agent evaluation with Suncly: tests from declared A2A skills, human-approved plans, repeated sandbox runs, deterministic verdicts, signed evidence and explicit coverage gaps.";
+
+export const metadata: Metadata = pageMeta({
+  title: "AI agent evaluation: tests, evidence and approval",
+  description,
+  path: "/product",
+  keywords: [...KEYWORDS.core, ...KEYWORDS.evidence],
+});
 
 export default function ProductPage() {
   return (
     <SiteLayout>
+      <JsonLd
+        data={graph(
+          webPageLd({ path: "/product", name: "AI agent evaluation: tests, evidence and approval", description }),
+          breadcrumbLd([{ name: "Suncly", path: "/" }, { name: "Product", path: "/product" }]),
+          faqLd(faq.items),
+        )}
+      />
       <PageHeader eyebrow={productPage.title} headline={productPage.headline} intro={productPage.intro}>
         <dl className="grid gap-3 sm:grid-cols-3">
           {(["available", "limited", "planned"] as const).map((status) => (

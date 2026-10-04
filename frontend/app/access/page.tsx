@@ -4,17 +4,29 @@ import { SectionHeader, SectionLabel } from "@/components/SectionHeader";
 import { AccessForm } from "@/components/site/AccessForm";
 import { Notice } from "@/components/ui/Notice";
 import { accessPage } from "@/lib/content";
+import { JsonLd } from "@/components/site/JsonLd";
+import { breadcrumbLd, graph, pageMeta, webPageLd } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Access",
-  description: accessPage.intro,
-  alternates: { canonical: "/access" },
-};
+const description =
+  "Suncly is in pilot: no self-serve sign-up and no published price. Request access by email and evaluate your first A2A agent with the team.";
+
+export const metadata: Metadata = pageMeta({
+  title: "Pilot access: evaluate your first agent",
+  description,
+  path: "/access",
+  keywords: ["Suncly pilot", "Suncly access", "AI agent evaluation pilot", "request access Suncly"],
+});
 
 export default function AccessPage() {
   const a = accessPage;
   return (
     <SiteLayout>
+      <JsonLd
+        data={graph(
+          webPageLd({ path: "/access", name: "Pilot access", description, type: "ContactPage" }),
+          breadcrumbLd([{ name: "Suncly", path: "/" }, { name: "Access", path: "/access" }]),
+        )}
+      />
       <PageHeader eyebrow={a.title} headline={a.headline} intro={a.intro} />
       <Section>
         <div className="grid gap-6 lg:grid-cols-3">

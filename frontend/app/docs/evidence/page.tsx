@@ -2,12 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { DocLayout } from "@/components/site/DocLayout";
 import { CodeBlock } from "@/components/ui/CodeBlock";
+import { KEYWORDS, pageMeta } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Evidence and reports",
-  description: "What a Suncly report folder contains, what the signature covers, how to verify it, and how to load it into the review workspace.",
-  alternates: { canonical: "/docs/evidence" },
-};
+export const metadata: Metadata = pageMeta({
+  title: "Signed evidence and AI agent evaluation reports",
+  description:
+    "What a Suncly report folder contains, what the Ed25519 signature covers, how suncly verify checks it offline, and how to load a report into the review workspace.",
+  path: "/docs/evidence",
+  type: "article",
+  keywords: [...KEYWORDS.evidence, "result.json", "suncly verify", "Ed25519 signed attestation"],
+});
 
 const toc = [
   { id: "folder", title: "The report folder" },

@@ -7,18 +7,29 @@ import { Table } from "@/components/ui/Table";
 import { Notice } from "@/components/ui/Notice";
 import { byGroup, type Availability } from "@/lib/capabilities";
 import { workflowsPage } from "@/lib/content";
+import { JsonLd } from "@/components/site/JsonLd";
+import { breadcrumbLd, graph, KEYWORDS, pageMeta, webPageLd } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Supported workflows and integrations",
-  description:
-    "Exactly what Suncly can inspect and test: A2A 1.0 over JSON-RPC, any model or framework behind the agent, and the interfaces that exist today versus those on the roadmap.",
-  alternates: { canonical: "/workflows" },
-};
+const description =
+  "What Suncly can test: A2A 1.0 over JSON-RPC, Agent Card verification, agents built on any model or framework, and the integrations available today and planned.";
+
+export const metadata: Metadata = pageMeta({
+  title: "A2A protocol coverage and integrations",
+  description,
+  path: "/workflows",
+  keywords: [...KEYWORDS.protocol, ...KEYWORDS.audience, "model-agnostic agent testing", "A2A integrations"],
+});
 
 export default function WorkflowsPage() {
   const w = workflowsPage;
   return (
     <SiteLayout>
+      <JsonLd
+        data={graph(
+          webPageLd({ path: "/workflows", name: "A2A protocol coverage and integrations", description }),
+          breadcrumbLd([{ name: "Suncly", path: "/" }, { name: "Workflows", path: "/workflows" }]),
+        )}
+      />
       <PageHeader eyebrow={w.title} headline={w.headline} intro={w.intro} />
 
       <Section id="protocol">

@@ -1,4 +1,72 @@
+# Suncly — https://suncly.com
+# The public site may be crawled and quoted. The review workspace at /app holds
+# visitor-local data and is not meant for indexing.
+
 User-agent: *
 Allow: /
 Disallow: /app
+Disallow: /app/
+
+# AI assistants and answer engines: the same rules apply. Machine-readable
+# summaries are at /llms.txt and /llms-full.txt.
+User-agent: GPTBot
+Allow: /
+Disallow: /app
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /app
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /app
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /app
+
+User-agent: Claude-User
+Allow: /
+Disallow: /app
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /app
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /app
+
+User-agent: Perplexity-User
+Allow: /
+Disallow: /app
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /app
+
+User-agent: Bingbot
+Allow: /
+Disallow: /app
+
+User-agent: Applebot
+Allow: /
+Disallow: /app
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /app
+
+User-agent: CCBot
+Allow: /
+Disallow: /app
+
+User-agent: DuckAssistBot
+Allow: /
+Disallow: /app
+
+User-agent: meta-externalagent
+Allow: /
+Disallow: /app
+
 Sitemap: https://suncly.com/sitemap.xml

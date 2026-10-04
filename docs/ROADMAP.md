@@ -4,8 +4,18 @@ Suncly is built in the six stages of schema §9. "Stage 1 is enough to run a
 first pilot by hand" (schema §9). The CLI and the API call the same core
 library, which is built first (schema §6).
 
-**Status:** pre-prototype. No stage has started. This repository contains the
-architecture documentation and an empty package skeleton.
+**Status:** MVP implemented, beyond stage 1 and short of stages 2 to 6. Every
+stage 1 item below is ticked with the test that proves it. Of the later
+stages, the MVP implements: a deterministic Contract builder with the recorded
+human approval (stage 2, without a model); the Postgres store, the Evidence
+store behind one interface, transcript storage and Ed25519 signing (stage 3);
+and a flag-only Policy engine (stage 5, without policy configuration). Not
+implemented: model-based drafting and probes, Judge Layer 2, policy
+thresholds and `approve`/`block` decisions, human resolution of a flag, the
+HTTP API, the CI and registry adapters, the job table. The placeholder modules
+`api.py`, `adapters/ci.py` and `adapters/registry.py` name their stage.
+Choices the code made are recorded in
+[IMPLEMENTATION_NOTES.md](IMPLEMENTATION_NOTES.md).
 
 Conventions are as in [ARCHITECTURE.md](ARCHITECTURE.md): "schema §N" refers
 to [SCHEMA.md](../SCHEMA.md), **Proposed** marks what the schema does not
@@ -32,41 +42,74 @@ file report is the first version of the Report adapter
 
 **Definition of done**
 
-- [ ] `suncly attest <card-url> --runs <n>` fetches the Agent Card from
+- [x] `suncly attest <card-url> --runs <n>` fetches the Agent Card from
       `<card-url>`, canonicalizes it and computes `card_hash`.
-- [ ] The CLI holds no logic of its own. It calls the core library
+      Proof: `tests/unit/test_card.py::test_identical_cards_with_different_key_order_and_whitespace_hash_the_same`,
+      `tests/e2e/test_cli.py::test_attest_from_a_url_alone_completes_and_verifies`.
+- [x] The CLI holds no logic of its own. It calls the core library
       (schema §6).
-- [ ] The Runner runs in its own process or container, with network access
+      Proof: `tests/unit/test_architecture.py::test_imports_point_inward_only` (the core never imports the CLI; the CLI only calls `AttestationService`),
+      `tests/unit/test_non_negotiable_rules.py` (every rule is proven on the core alone, without the CLI).
+- [x] The Runner runs in its own process or container, with network access
       limited to the target (schema §2).
-- [ ] The Runner works as an A2A client. It sends each test case's input as a
+      Proof: `tests/unit/test_runner.py::test_the_transport_refuses_any_host_other_than_the_target`,
+      `tests/unit/test_adapters.py::test_subprocess_executor_treats_garbage_output_and_timeouts_as_crashes`,
+      every test in `tests/e2e/test_mock_agents.py` (a real Runner process per run).
+- [x] The Runner works as an A2A client. It sends each test case's input as a
       Message, follows the Task to a terminal state, and captures every
       message, including a direct Message reply when the agent sends one
       instead of a Task. Which protocol versions and bindings it supports is
       open ([OQ-A4](ARCHITECTURE.md#open-questions)).
-- [ ] The Runner calls only a sandbox or dry-run endpoint
+      Proof: `tests/unit/test_runner.py::test_send_message_builds_a_1_0_message_and_records_both_exchanges`,
+      `::test_a_non_terminal_task_is_polled_with_get_task_until_final`, `::test_direct_message_reply`,
+      `tests/e2e/test_mock_agents.py::test_honest_async_agent_is_followed_by_polling_get_task`,
+      `::test_direct_message_reply_is_handled_without_error_and_is_not_a_pass`.
+- [x] The Runner calls only a sandbox or dry-run endpoint
       ([DR-006](DECISIONS.md#dr-006-tests-hit-a-sandbox-or-dry-run-endpoint)).
-- [ ] Transcripts are redacted inside the Runner before they are returned
+      Proof: `tests/unit/test_non_negotiable_rules.py::test_dr_006_tests_hit_only_a_declared_sandbox`,
+      `tests/unit/test_runner.py::test_process_refuses_undeclared_sandboxes_and_bad_jobs`,
+      `tests/e2e/test_cli.py::test_attest_without_sandbox_declaration_is_refused`.
+- [x] Transcripts are redacted inside the Runner before they are returned
       ([DR-003](DECISIONS.md#dr-003-secrets-never-leave-the-runner)).
-- [ ] Every run has a deterministic run key. Re-running a crashed or retried
+      Proof: `tests/unit/test_non_negotiable_rules.py::test_dr_003_secrets_never_leave_the_runner`,
+      `tests/unit/test_runner.py::test_process_runs_a_job_against_a_local_sandbox_and_redacts_the_credential`,
+      `tests/e2e/test_mock_agents.py::test_leaky_agent_cannot_make_the_credential_appear_anywhere`.
+- [x] Every run has a deterministic run key. Re-running a crashed or retried
       run never produces a second counted result
       ([DR-001](DECISIONS.md#dr-001-idempotent-runs)).
-- [ ] Layer 1 of the Judge checks valid schema, final task state, required
+      Proof: `tests/unit/test_non_negotiable_rules.py::test_dr_001_idempotent_runs_retry_under_the_same_key_and_count_once`,
+      `tests/stores/test_store_contract.py::test_rejects_a_second_run_with_an_existing_run_key` (both stores),
+      `tests/db/test_migration_constraints.py::test_rejects_a_second_run_with_an_existing_run_key`.
+- [x] Layer 1 of the Judge checks valid schema, final task state, required
       fields and the latency limit. It assigns `pass`, `fail` or
       `inconclusive`, and `inconclusive` is never counted as a pass.
-- [ ] The file report shows the verdict counts for each test case and states
+      Proof: `tests/unit/test_judge.py` (one test per check),
+      `tests/unit/test_non_negotiable_rules.py::test_inconclusive_is_never_counted_as_a_pass`,
+      `tests/unit/test_signing_policy_verify.py::test_aggregate_keeps_inconclusive_apart_and_lists_every_test_case`.
+- [x] The file report shows the verdict counts for each test case and states
       what was NOT tested
       ([DR-007](DECISIONS.md#dr-007-reports-state-what-was-not-tested)).
-- [ ] A person can run a pilot attestation by hand, from start to finish
+      Proof: `tests/unit/test_non_negotiable_rules.py::test_dr_007_reports_state_what_was_not_tested`,
+      `tests/unit/test_adapters.py::test_report_folder_is_self_contained_and_offline`,
+      `tests/e2e/test_mock_agents.py::test_skill_without_examples_is_listed_as_not_tested`,
+      `::test_budget_stop_ends_failed_and_reports_runs_never_executed`.
+- [x] A person can run a pilot attestation by hand, from start to finish
       (schema §9).
+      Proof: `tests/e2e/test_cli.py::test_attest_from_a_url_alone_completes_and_verifies`,
+      `::test_demo_runs_both_agents_and_both_end_flagged`, and the walkthrough in
+      [QUICKSTART.md](QUICKSTART.md).
 
-**Not in this stage:** the Contract builder, Postgres, signing, Layer 2 and
-the Policy engine. Stage 1 results are not signed and get no decision.
+**Beyond stage 1 as planned:** the implemented MVP also includes the
+deterministic Contract builder with the recorded approval, the Postgres store
+and signing, and the flag-only Policy engine, so every attestation is signed
+and records a `flag` decision (decided 2026-10-04; see the status above).
+Layer 2 is not implemented.
 
 **Open:** [OQ-R1](#open-questions) (repetitions, and the non-negotiable budget
 cap of [DR-005](DECISIONS.md#dr-005-budget-caps-live-in-the-orchestrator),
-without an Orchestrator), [OQ-R2](#open-questions) (where test cases come from),
-[OQ-P4](API.md#open-questions) (credentials), and A2A-T7, whether the Python
-SDK supports protocol 1.0
+without an Orchestrator), [OQ-R2](#open-questions) (where test cases come from)
+and [OQ-P4](API.md#open-questions) (credentials). A2A-T7, whether the Python
+SDK supports protocol 1.0, is verified, and the own client is decided
 ([ARCHITECTURE.md](ARCHITECTURE.md#protocol-details-still-to-verify)).
 
 ## Stage 2: Contract builder with human approval

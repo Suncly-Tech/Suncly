@@ -92,7 +92,7 @@ Storage is **Postgres** (schema §7). Leave it consistent.
 Run:
 
 ```bash
-git grep -n -i -E "D1|Cloudflare|wrangler|R2 object storage"
+git grep -n -i -P "(?<!OQ-)\bD1\b|Cloudflare|wrangler|R2 object storage" -- SCHEMA.md docs
 ```
 
 For every hit in `SCHEMA.md` or `docs/`, restore the original Postgres wording.
@@ -148,7 +148,9 @@ Fix the clone URL only if `git remote get-url origin` shows a different one.
 ### 1.4 Phase 1 checks
 
 ```bash
-git grep -n -i -E "D1|Cloudflare|wrangler"     # must print nothing
+# Decided 2026-10-04: the check excludes the open-question ids OQ-D1, OQ-D10 and
+# OQ-D11 (lookbehind and word boundaries) and this brief, which quotes the names.
+git grep -n -i -P "(?<!OQ-)\bD[1]\b|Cloud[f]lare|wrang[l]er" -- . ':!CLAUDE_CODE_BRIEF.md'   # must print nothing
 git grep -n -i "postgres" | wc -l              # must be greater than 0
 ```
 
@@ -159,6 +161,11 @@ Commit: `Restore Postgres wording and document the db folder`.
 ## 2. Phase 2 — Project tooling
 
 ### 2.1 Package setup
+
+> **Decided (2026-10-04):** the pinned minimum is Python 3.12
+> (`requires-python = ">=3.12"`), what the founders' machines run; CI tests 3.12,
+> 3.13 and 3.14, the newest version every dependency ships wheels for. The two
+> requests below are met by that pair.
 
 - `pyproject.toml` with the package `suncly` under `src/`, a `suncly` console
   script pointing at `suncly.cli:main`, and a pinned minimum Python version.
@@ -234,7 +241,25 @@ Stage 1 has **no database, no signing, no Layer 2, no Policy engine and no
 Contract builder**. Results are written to files. Stage 1 results are not
 signed and get no decision.
 
+> **Decided (2026-10-04):** the implemented MVP goes beyond this scope. Every
+> attestation is signed, a completed one records a `flag` decision, evidence
+> lives in the file store or in Postgres, and a deterministic Contract builder
+> drafts the contract. The statements in 3.8 and 3.10 that stage 1 results are
+> unsigned and carry no decision are superseded: the report and the CLI say that
+> the decision is `flag` and that exit code 0 is not an approval. See
+> `docs/ROADMAP.md` for what is and is not implemented.
+
 ### 3.1 Verify the A2A Python SDK first (A2A-T7)
+
+> **Decided (2026-10-04):** the SDK does support protocol 1.0 (`a2a-sdk` 1.2.1,
+> see `docs/IMPLEMENTATION_NOTES.md`, Verified facts). Suncly nevertheless uses
+> its own minimal JSON-RPC client behind the `A2ATransport` port, limited to
+> `SendMessage` and `GetTask` polling. Reason: the Runner's isolation (one target
+> host) and its redaction are easier to audit in Suncly's own few hundred lines
+> than through the SDK and its dependencies inside the one process that holds
+> credentials. Revisit when streaming or push notifications are needed; the
+> switch is one new adapter for the port. The instruction below to use the SDK
+> is superseded by this decision.
 
 Before writing the Runner, check whether the Python A2A SDK supports protocol
 version 1.0 (the PascalCase method names, the `TASK_STATE_…` names and the
@@ -282,6 +307,15 @@ gives the same hash; invalid JSON, a non-https URL, an oversized body and a
 timeout each fail with a distinct, clear error.
 
 ### 3.4 Contract file (OQ-R2)
+
+> **Decided (2026-10-04):** the format is JSON, documented in `docs/API.md`
+> under "Contract file". A file carries no approval: approval is recorded by
+> `--approve-as` or the interactive prompt, never asserted by a file. A declared
+> skill without a test case must be listed under `skills_without_test_case`, or
+> the file is refused; the drafter lists skills without examples the same way
+> and never invents input. No `examples/` folder is shipped:
+> `suncly attest <card-url> --sandbox --export-draft FILE` writes the example
+> from any card. The bullets below that say otherwise are superseded.
 
 The Contract builder arrives in stage 2. For stage 1, test cases come from a
 contract file written by hand (the proposal in OQ-R2).

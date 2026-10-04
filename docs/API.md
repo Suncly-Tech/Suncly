@@ -65,10 +65,12 @@ suncly attest https://agent.example.com/.well-known/agent-card.json --runs 50
 
 What it does depends on the stage:
 
-- **Stage 1.** Fetches the card, runs each test case `--runs` times against a
-  sandbox or dry-run endpoint, judges each run with Layer 1, and writes a file
-  report that states what was NOT tested. Where stage 1 gets its test cases
-  from is open ([OQ-R2](ROADMAP.md#open-questions)).
+- **This MVP.** Fetches the card, gets a contract approved (drafted or from a
+  contract file), runs each test case `--runs` times against the declared
+  sandbox or dry-run endpoint, judges each run with Layer 1, records a `flag`
+  decision, signs the attestation, and writes a report that states what was
+  NOT tested. Where the test cases come from is the OQ-R2 proposal
+  ([ROADMAP.md](ROADMAP.md#open-questions)).
 - **From stage 2.** Runs only an approved contract. If the card's hash is new,
   a draft contract is created and must be approved first.
 - **Proposed:** an attestation started from the CLI has the trigger `manual`
@@ -76,6 +78,86 @@ What it does depends on the stage:
 
 The output is the file report. The console output format and the exit codes
 are not defined ([OQ-P5](#open-questions)).
+
+### CLI options (Proposed, OQ-P5)
+
+The schema defines only `suncly attest <card-url> --runs 50`. The MVP adds the
+options it cannot work without. All are proposals.
+
+| Option | Meaning |
+|---|---|
+| `--sandbox` | Declares the endpoint a sandbox or dry-run endpoint. Required: without it nothing runs (DR-006, OQ-A2). |
+| `--runs N` | Repetitions per test case. Default 5 (`SUNCLY_RUNS`). |
+| `--budget N` | `attestation.budget_limit`, in attempts. Default 2 x planned runs. One attempt costs 1 (OQ-D1). |
+| `--approve-as ID` | Approves the drafted contract as `ID` without a prompt; `ID` becomes `approved_by`. Without it, the CLI shows the draft and asks; with no terminal, it refuses. |
+| `--contract FILE` | Uses a contract file instead of the drafter (see below). The imported contract becomes a new version and still needs approval. |
+| `--export-draft FILE` | Writes the draft contract to `FILE` and stops. Nothing runs. |
+| `--owner`, `--risk-level` | `agent.owner` and `agent.risk_level`, recorded on first sight of the card URL. Defaults: `unspecified` and `high`. |
+| `--reports-dir DIR` | Where the report folder goes. Default `./suncly-reports`. |
+| `--json` | Prints a machine-readable result: `kind`, `attestation`, `decision`, `results`, `not_tested`, `report_dir`, `exit_code`. |
+| `--debug` | Shows tracebacks. |
+| `--home DIR` (before the command) | Moves the whole state folder (store, transcripts, keys). Default `~/.suncly`. |
+
+Other commands: `suncly demo`, `suncly verify <report-folder> [--public-key B64]`,
+`suncly keys init [--new]`, `suncly db migrate`, `suncly db check`,
+`suncly doctor [card-url]`.
+
+**Exit codes (Proposed).** 0: the attestation completed, that is, it was
+decided and signed; **0 never means the agent was approved**, and the output
+says so. 1: internal error. 2: wrong arguments. 3: refused to start (no
+sandbox declaration, no approval, unusable card or contract). 4: the
+attestation ended `failed`. 5: the attestation ended `invalidated`. 6:
+`suncly verify` or `suncly doctor` found a problem.
+
+**Trigger.** An attestation started from the CLI has `trigger` `manual`, also
+when CI calls the CLI.
+
+### Contract file (Proposed, OQ-R2 and OQ-D7)
+
+A hand-written or exported contract: one JSON document with the test cases of
+one contract for one card. Field names are the data model's. The file carries
+no approval fields: approval is recorded by `--approve-as` or the prompt.
+
+```json
+{
+  "suncly_contract_file": 1,
+  "card_hash": "sha256:…",
+  "agent_name": "Order Status Agent",
+  "skills_without_test_case": [],
+  "test_cases": [
+    {
+      "skill_id": "order-status",
+      "kind": "skill",
+      "input": {"text": "Where is order 1234?"},
+      "criteria": {
+        "final_state": "TASK_STATE_COMPLETED",
+        "latency_limit_ms": 10000,
+        "response_present": true,
+        "output_modes": ["text/plain"],
+        "required_fields": ["/artifacts/0/parts/0/text"],
+        "response_schema": {"type": "object", "required": ["artifacts"]},
+        "model_checks": [],
+        "accept_direct_message": false
+      }
+    }
+  ]
+}
+```
+
+- `card_hash` must equal the hash of the fetched card, or the file is refused.
+- Every declared skill needs a test case, or must be listed under
+  `skills_without_test_case` to acknowledge that it stays untested
+  (invariant 1 is then reported as not satisfied for it).
+- `input` is `{"text": …}` or `{"parts": [...]}` with A2A Part objects.
+- `criteria` keys: `final_state` (a terminal task state, default
+  `TASK_STATE_COMPLETED`); `latency_limit_ms` (required); `response_present`;
+  `output_modes` (media types every output part must use; `null` disables
+  the check); `required_fields` (JSON pointers that must exist and be
+  non-empty in the final response); `response_schema` (a JSON Schema the
+  final response must satisfy); `model_checks` (criteria for Layer 2, which
+  does not exist yet, so any entry makes the run `inconclusive`);
+  `accept_direct_message` (a direct Message reply counts as a completed task).
+  Unknown keys are refused.
 
 ## HTTP API
 
@@ -128,9 +210,10 @@ asynchronously.
 ```
 
 This example assumes the card's hash matches a card version that already has
-an approved contract. If the hash is new, a draft contract is created and the
-attestation waits for approval ([OQ-F1](FLOW.md#open-questions)). The response
-for that case is open ([OQ-P1](#open-questions)).
+an approved contract. If the hash is new, a draft contract is created and no
+attestation exists until a human approves it ([OQ-F1](FLOW.md#open-questions),
+decided 2026-10-04). The response for that case is open
+([OQ-P1](#open-questions)).
 
 ### GET /attestations/{id}
 

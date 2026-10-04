@@ -322,10 +322,10 @@ the schema does not name are **Proposed**.
 | Entity | Written by | After creation |
 |---|---|---|
 | `agent` | Not defined ([OQ-P2](API.md#open-questions)). | Not defined. |
-| `card_version` | **Proposed:** the Orchestrator ([OQ-A7](ARCHITECTURE.md#open-questions)). | **Proposed:** never changes ([OQ-D9](#open-questions)). |
+| `card_version` | The card service, on behalf of the attestation use case (decided 2026-10-04, [OQ-A7](ARCHITECTURE.md#open-questions)). | **Proposed:** never changes ([OQ-D9](#open-questions)). |
 | `contract` | The Contract builder. A human approval sets `status`, `approved_by` and `approved_at`. | Immutable once approved (schema §2). Whether a draft can be edited in place, and the move to `superseded`, are open ([OQ-D5](#open-questions)). |
 | `test_case` | The Contract builder. | Immutable once its contract is approved (schema §2). |
-| `attestation` | **Proposed:** the Orchestrator creates it and sets `queued`, `running`, `failed` and `invalidated`. The Policy engine adds `signature` and `signing_key_id` when it signs (schema §4, step 6), and **Proposed:** sets `completed`. | `status`, `cost_total`, `finished_at`, `signature` and `signing_key_id` change while the attestation runs. **Proposed:** nothing changes once it has reached a final status and been signed ([OQ-D6](#open-questions), [OQ-F7](FLOW.md#open-questions)). |
+| `attestation` | The attestation use case creates it once the contract is approved (decided 2026-10-04); the Orchestrator sets `running`, `failed` and `invalidated`. The Policy engine adds `signature` and `signing_key_id` when it signs (schema §4, step 6), and **Proposed:** sets `completed`. | `status`, `cost_total`, `finished_at`, `signature` and `signing_key_id` change while the attestation runs. **Proposed:** nothing changes once it has reached a final status and been signed ([OQ-D6](#open-questions), [OQ-F7](FLOW.md#open-questions)). |
 | `run` | The Judge (schema §4, step 5). | Never changes (schema §2, §8). |
 | `decision` | The Policy engine, or a human reviewer. | Never changes. A resolution is a new record (schema §11). |
 

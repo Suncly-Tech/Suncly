@@ -1,0 +1,143 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "suncly"
+version = "0.1.0"
+description = "Attestation for A2A agents: prove that an agent does what its Agent Card claims."
+readme = "README.md"
+requires-python = ">=3.12"
+# No license has been chosen yet (see README.md).
+dependencies = [
+    "httpx>=0.28,<0.29",
+    "pydantic>=2.11,<3",
+    "click>=8.2,<9",
+    "rfc8785>=0.1.4,<0.2",
+    "cryptography>=43,<51",
+    "psycopg[binary]>=3.2,<4",
+    "jsonschema>=4.23,<5",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9,<10",
+    "pytest-cov>=7,<8",
+    "pytest-timeout>=2.3,<3",
+    "ruff>=0.16,<0.17",
+    "mypy>=2.4,<2.5",
+    "types-jsonschema>=4.23",
+]
+
+[project.scripts]
+suncly = "suncly.cli.main:main"
+
+[project.urls]
+Repository = "https://github.com/Suncly-Tech/Suncly"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+suncly = ["py.typed", "adapters/postgres/migrations/*.sql", "adapters/report/templates/*.html"]
+
+# ---------------------------------------------------------------------------
+# ruff: lint and format
+# ---------------------------------------------------------------------------
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E", "W",    # pycodestyle
+    "F",         # pyflakes
+    "I",         # isort
+    "UP",        # pyupgrade
+    "B",         # bugbear
+    "C4",        # comprehensions
+    "SIM",       # simplify
+    "RUF",       # ruff-specific
+    "N",         # naming
+    "PTH",       # pathlib instead of os.path
+    "T20",       # no print() outside the CLI
+    "ERA",       # no commented-out code
+    "PIE",
+    "RET",
+    "ISC",
+    "TID",       # no relative imports
+    "S",         # bandit
+]
+ignore = [
+    "S101",      # asserts are fine (tests, invariants)
+    "S603", "S607",  # subprocess use is deliberate and reviewed in the Runner launcher
+]
+
+[tool.ruff.lint.per-file-ignores]
+"src/suncly/cli/*" = ["T20"]
+"src/suncly/mock_agents/*" = ["T20"]
+"tasks.py" = ["T20", "S"]
+"tests/*" = ["S", "T20", "PLR2004", "E501"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["suncly"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+# ---------------------------------------------------------------------------
+# mypy: strict
+# ---------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.12"
+files = ["src/suncly", "tests", "tasks.py"]
+strict = true
+warn_unreachable = true
+warn_unused_ignores = true
+show_error_codes = true
+pretty = true
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_decorators = false
+
+[[tool.mypy.overrides]]
+module = ["rfc8785", "rfc8785.*"]
+ignore_missing_imports = true
+
+# ---------------------------------------------------------------------------
+# pytest and coverage
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers --strict-config"
+timeout = 180
+markers = [
+    "db: needs a Postgres database (set DATABASE_URL); skipped otherwise",
+    "e2e: runs the whole attestation flow against local mock agents",
+]
+filterwarnings = [
+    "error",
+    # The domain's TestCase* classes are entities, not tests.
+    "ignore:cannot collect test class 'Test(Case(Kind|Result|Row)?|Input)':pytest.PytestCollectionWarning",
+]
+
+[tool.coverage.run]
+source = ["suncly"]
+branch = true
+# The Runner runs in a subprocess; these settings let coverage follow it.
+parallel = true
+concurrency = ["thread", "multiprocessing"]
+omit = ["*/adapters/registry.py", "*/adapters/ci.py", "*/api.py", "*/mock_agents/__main__.py"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+fail_under = 85
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "@overload",
+    "raise NotImplementedError",
+]

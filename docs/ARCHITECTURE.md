@@ -124,7 +124,7 @@ make Suncly approve less, never more.
 - Owns concurrency limits, retries, timeouts and the cost budget per
   attestation.
 - Runs stateless workers that pull from a queue and scale horizontally. The
-  queue starts as a D1-backed job table; a real queue is added only when
+  queue starts as a Postgres-backed job table; a real queue is added only when
   needed (schema §7).
 - Tracks `attestation.cost_total` against `attestation.budget_limit` and stops
   enqueuing runs when `cost_total` reaches `budget_limit`. The attestation then
@@ -133,9 +133,11 @@ make Suncly approve less, never more.
   differs from `card_version.card_hash`, the attestation becomes
   `invalidated`, no decision is made, and a new draft contract is created
   (schema §11).
-- **Proposed:** also performs the initial card fetch and hash, and creates the
-  `attestation` record. Schema §4, step 2 does not name a component for this
-  (OQ-A7).
+- Schema §4, step 2 does not name the component that performs the initial card
+  fetch. Decided 2026-10-04: the card service (`core/cards.py`), called by the
+  attestation use case, fetches and hashes the card and records the
+  `card_version`; the use case creates the `attestation` once the contract is
+  approved; the Orchestrator performs the end-of-run re-fetch ([OQ-A7](#open-questions)).
 
 **Inputs**
 
@@ -153,8 +155,6 @@ make Suncly approve less, never more.
 **Outputs**
 
 - Runs on the queue for the Runner.
-- **Proposed:** new `card_version` records and the `attestation` record
-  ([OQ-A7](#open-questions)).
 - Changes to `attestation.status` (`queued`, `running`, `failed`,
   `invalidated`) and to `cost_total`.
 - A request to the Contract builder for a new draft contract when the card has
@@ -340,8 +340,8 @@ make Suncly approve less, never more.
 
 - Run records from the Judge.
 - Decisions and signatures from the Policy engine.
-- **Proposed:** the `attestation` record from the Orchestrator
-  ([OQ-A7](#open-questions)).
+- The `attestation` record from the attestation use case, and its status
+  changes from the Orchestrator and the Policy engine.
 
 Card versions, contracts and test cases live in the same database but are not
 run evidence. [DATA_MODEL.md: Mutability](DATA_MODEL.md#mutability) shows which
@@ -502,9 +502,9 @@ From schema §7:
 
 | Concern | Choice |
 |---|---|
-| Language | Python. The schema's reason is that it has the most mature A2A SDK. Whether that SDK supports A2A protocol version 1.0 is unconfirmed (TODO: verify SDK support, A2A-T7). |
-| Storage | Cloudflare D1 for tables, R2 object storage for transcripts. |
-| Queue | A D1-backed job table first; a real queue only when needed ([OQ-D8](DATA_MODEL.md#open-questions)). |
+| Language | Python. The schema's reason is that it has the most mature A2A SDK. That SDK supports protocol version 1.0 (verified 2026-10-04, A2A-T7); Suncly nevertheless uses its own minimal client in the Runner (decided 2026-10-04, [IMPLEMENTATION_NOTES.md](IMPLEMENTATION_NOTES.md)). |
+| Storage | Postgres for tables, object storage for transcripts. |
+| Queue | A Postgres-backed job table first; a real queue only when needed ([OQ-D8](DATA_MODEL.md#open-questions)). |
 | Signing | Asymmetric signatures over the canonicalized attestation. |
 | Models | Customers bring their own keys. The judge model is pinned by version. |
 
@@ -546,9 +546,9 @@ main branch, so cite the versioned pages instead.
 
 ### Protocol details still to verify
 
-The specification is unclear or contradicts itself on these points, or the
-point is not a spec question at all (A2A-T7). Suncly does not take a side until
-each one is checked:
+The specification is unclear or contradicts itself on these points. Suncly does
+not take a side until each one is checked. A2A-T7 was never a spec question; it
+is verified and decided:
 
 - **A2A-T1** TODO: verify against spec. Requests appear to have no way to
   address a particular skill. No request message has a skill identifier, so
@@ -573,9 +573,12 @@ each one is checked:
   `SubscribeToTask` use? A2A §5.3 and §11.3.2 say `POST /tasks/{id}:subscribe`,
   while the proto declares `GET`. This matters only for the `HTTP+JSON`
   binding.
-- **A2A-T7** TODO: verify SDK support. Does the Python A2A SDK support
-  protocol version 1.0? Version 1.0 renamed methods, task states and card
-  fields.
+- **A2A-T7** Verified 2026-10-04: the Python SDK `a2a-sdk` 1.2.1 supports
+  protocol version 1.0, which renamed methods, task states and card fields
+  ([IMPLEMENTATION_NOTES.md](IMPLEMENTATION_NOTES.md), Verified facts). Decided
+  2026-10-04: Suncly still uses its own minimal JSON-RPC client in the Runner,
+  because the Runner's isolation and redaction are easier to audit that way.
+  Revisit when streaming or push notifications are needed.
 
 ## Out of scope
 
@@ -627,8 +630,9 @@ From schema §10. Suncly does not build any of these:
 - **OQ-A6 What Layer 1 validates "valid schema" against.** The A2A response
   structure, an output schema in the test case's `criteria`, or both?
 - **OQ-A7 Card fetching and hashing.**
-  - Which component performs the initial fetch? **Proposed:** the
-    Orchestrator, which already re-fetches the card under schema §11.
+  - Which component performs the initial fetch? Decided 2026-10-04: the card
+    service in `core/cards.py`, called by the attestation use case; the
+    Orchestrator re-fetches the card at the end under schema §11.
   - An authenticated extended card can only be fetched with credentials, which
     only the Runner may hold.
   - Which canonicalization scheme and hash algorithm produce `card_hash`?

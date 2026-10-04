@@ -1,1 +1,1 @@
-"""Registry adapter: writes approval status to the company's agent registry."""
+"""Registry adapter (stage 6): writes approval status to the agent registry (schema §2)."""

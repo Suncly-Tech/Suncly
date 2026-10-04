@@ -20,20 +20,27 @@ pytestmark = pytest.mark.db
 Conn = Any  # psycopg.Connection; kept loose so the module imports without psycopg stubs
 
 
+def _uuid(row: Any) -> uuid.UUID:
+    value: uuid.UUID = row[0]
+    return value
+
+
 def insert_agent(conn: Conn) -> uuid.UUID:
     row = conn.execute(
         "INSERT INTO agent (name, owner, risk_level) VALUES (%s, %s, %s::risk_level) RETURNING id",
         ("Agent", "team", "low"),
     ).fetchone()
-    return row[0]
+    return _uuid(row)
 
 
-def insert_card_version(conn: Conn, agent_id: uuid.UUID, raw_json: str = '{"name": "Agent"}') -> uuid.UUID:
+def insert_card_version(
+    conn: Conn, agent_id: uuid.UUID, raw_json: str = '{"name": "Agent"}'
+) -> uuid.UUID:
     row = conn.execute(
         "INSERT INTO card_version (agent_id, card_hash, raw_json) VALUES (%s, %s, %s) RETURNING id",
         (agent_id, "hash-" + uuid.uuid4().hex, raw_json),
     ).fetchone()
-    return row[0]
+    return _uuid(row)
 
 
 def insert_contract(conn: Conn, card_version_id: uuid.UUID, status: str = "approved") -> uuid.UUID:
@@ -46,7 +53,7 @@ def insert_contract(conn: Conn, card_version_id: uuid.UUID, status: str = "appro
         """,
         (card_version_id, status, "reviewer" if approved else None, approved),
     ).fetchone()
-    return row[0]
+    return _uuid(row)
 
 
 def insert_test_case(conn: Conn, contract_id: uuid.UUID) -> uuid.UUID:
@@ -57,7 +64,7 @@ def insert_test_case(conn: Conn, contract_id: uuid.UUID) -> uuid.UUID:
         """,
         (contract_id,),
     ).fetchone()
-    return row[0]
+    return _uuid(row)
 
 
 def insert_attestation(
@@ -70,7 +77,7 @@ def insert_attestation(
         """,
         (contract_id, card_version_id, status),
     ).fetchone()
-    return row[0]
+    return _uuid(row)
 
 
 def insert_run(
@@ -90,7 +97,7 @@ def insert_run(
         """,
         (attestation_id, test_case_id, attempt, judge_layer, rationale),
     ).fetchone()
-    return row[0]
+    return _uuid(row)
 
 
 def insert_decision(conn: Conn, attestation_id: uuid.UUID, decided_by: str = "policy") -> uuid.UUID:
@@ -101,7 +108,7 @@ def insert_decision(conn: Conn, attestation_id: uuid.UUID, decided_by: str = "po
         """,
         (attestation_id, decided_by),
     ).fetchone()
-    return row[0]
+    return _uuid(row)
 
 
 def approved_contract(conn: Conn) -> tuple[uuid.UUID, uuid.UUID, uuid.UUID]:
@@ -113,7 +120,9 @@ def approved_contract(conn: Conn) -> tuple[uuid.UUID, uuid.UUID, uuid.UUID]:
     return card_version_id, contract_id, test_case_id
 
 
-def rejects(conn: Conn, error: type[Exception], statement: str, params: tuple[Any, ...] = ()) -> None:
+def rejects(
+    conn: Conn, error: type[Exception], statement: str, params: tuple[Any, ...] = ()
+) -> None:
     """Assert the statement fails with ``error`` without poisoning the outer transaction."""
     with pytest.raises(error), conn.transaction():
         conn.execute(statement, params)
@@ -134,11 +143,23 @@ def test_rejects_attestation_for_a_contract_that_is_not_approved(db: Conn) -> No
 
 
 def test_rejects_changes_to_an_approved_contract_and_its_test_cases(db: Conn) -> None:
-    card_version_id, contract_id, test_case_id = approved_contract(db)
+    _, contract_id, test_case_id = approved_contract(db)
 
-    rejects(db, errors.RaiseException, "UPDATE contract SET version = 2 WHERE id = %s", (contract_id,))
-    rejects(db, errors.RaiseException, "UPDATE contract SET approved_by = 'x' WHERE id = %s", (contract_id,))
-    rejects(db, errors.RaiseException, "UPDATE contract SET status = 'draft' WHERE id = %s", (contract_id,))
+    rejects(
+        db, errors.RaiseException, "UPDATE contract SET version = 2 WHERE id = %s", (contract_id,)
+    )
+    rejects(
+        db,
+        errors.RaiseException,
+        "UPDATE contract SET approved_by = 'x' WHERE id = %s",
+        (contract_id,),
+    )
+    rejects(
+        db,
+        errors.RaiseException,
+        "UPDATE contract SET status = 'draft' WHERE id = %s",
+        (contract_id,),
+    )
     rejects(db, errors.RaiseException, "DELETE FROM contract WHERE id = %s", (contract_id,))
 
     rejects(
@@ -148,13 +169,26 @@ def test_rejects_changes_to_an_approved_contract_and_its_test_cases(db: Conn) ->
         " VALUES (%s, 's', '{}', '{}', 'skill'::test_case_kind)",
         (contract_id,),
     )
-    rejects(db, errors.RaiseException, "UPDATE test_case SET skill_id = 'other' WHERE id = %s", (test_case_id,))
+    rejects(
+        db,
+        errors.RaiseException,
+        "UPDATE test_case SET skill_id = 'other' WHERE id = %s",
+        (test_case_id,),
+    )
     rejects(db, errors.RaiseException, "DELETE FROM test_case WHERE id = %s", (test_case_id,))
 
     # The one permitted change: approved -> superseded with every other field untouched.
     db.execute("UPDATE contract SET status = 'superseded' WHERE id = %s", (contract_id,))
-    assert db.execute("SELECT status FROM contract WHERE id = %s", (contract_id,)).fetchone()[0] == "superseded"
-    rejects(db, errors.RaiseException, "UPDATE contract SET status = 'approved' WHERE id = %s", (contract_id,))
+    assert (
+        db.execute("SELECT status FROM contract WHERE id = %s", (contract_id,)).fetchone()[0]
+        == "superseded"
+    )
+    rejects(
+        db,
+        errors.RaiseException,
+        "UPDATE contract SET status = 'approved' WHERE id = %s",
+        (contract_id,),
+    )
 
 
 def test_rejects_attestation_whose_card_version_differs_from_its_contract(db: Conn) -> None:
@@ -205,7 +239,12 @@ def test_rejects_update_delete_and_truncate_on_run_and_decision(db: Conn) -> Non
     rejects(db, errors.RaiseException, "UPDATE run SET verdict = 'fail' WHERE id = %s", (run_id,))
     rejects(db, errors.RaiseException, "DELETE FROM run WHERE id = %s", (run_id,))
     rejects(db, errors.RaiseException, "TRUNCATE run")
-    rejects(db, errors.RaiseException, "UPDATE decision SET outcome = 'approve' WHERE id = %s", (decision_id,))
+    rejects(
+        db,
+        errors.RaiseException,
+        "UPDATE decision SET outcome = 'approve' WHERE id = %s",
+        (decision_id,),
+    )
     rejects(db, errors.RaiseException, "DELETE FROM decision WHERE id = %s", (decision_id,))
     rejects(db, errors.RaiseException, "TRUNCATE decision")
 
@@ -254,20 +293,38 @@ def test_rejects_a_completed_attestation_without_decision_or_signature(db: Conn)
         " signature = 'sig', signing_key_id = 'key' WHERE id = %s",
         (attestation_id,),
     )
-    assert db.execute("SELECT status FROM attestation WHERE id = %s", (attestation_id,)).fetchone()[0] == "completed"
+    assert (
+        db.execute("SELECT status FROM attestation WHERE id = %s", (attestation_id,)).fetchone()[0]
+        == "completed"
+    )
 
 
 def test_rejects_a_final_status_without_finished_at_and_the_reverse(db: Conn) -> None:
     card_version_id, contract_id, _ = approved_contract(db)
     attestation_id = insert_attestation(db, contract_id, card_version_id)
-    rejects(db, errors.CheckViolation, "UPDATE attestation SET status = 'failed' WHERE id = %s", (attestation_id,))
-    rejects(db, errors.CheckViolation, "UPDATE attestation SET finished_at = now() WHERE id = %s", (attestation_id,))
-    db.execute("UPDATE attestation SET status = 'failed', finished_at = now() WHERE id = %s", (attestation_id,))
+    rejects(
+        db,
+        errors.CheckViolation,
+        "UPDATE attestation SET status = 'failed' WHERE id = %s",
+        (attestation_id,),
+    )
+    rejects(
+        db,
+        errors.CheckViolation,
+        "UPDATE attestation SET finished_at = now() WHERE id = %s",
+        (attestation_id,),
+    )
+    db.execute(
+        "UPDATE attestation SET status = 'failed', finished_at = now() WHERE id = %s",
+        (attestation_id,),
+    )
 
 
 def test_raw_json_is_returned_byte_for_byte(db: Conn) -> None:
     raw = '{ "z":  1,\n\t"a": "two",  "a": "dup" }  '
     agent_id = insert_agent(db)
     card_version_id = insert_card_version(db, agent_id, raw_json=raw)
-    stored = db.execute("SELECT raw_json FROM card_version WHERE id = %s", (card_version_id,)).fetchone()[0]
+    stored = db.execute(
+        "SELECT raw_json FROM card_version WHERE id = %s", (card_version_id,)
+    ).fetchone()[0]
     assert stored == raw

@@ -127,6 +127,13 @@ class PostgresEvidenceStore:
         )
         return CardVersion.model_validate(row) if row else None
 
+    def list_card_versions(self, agent_id: UUID) -> list[CardVersion]:
+        rows = self._all(
+            "SELECT * FROM card_version WHERE agent_id = %s ORDER BY fetched_at, id::text",
+            (agent_id,),
+        )
+        return [CardVersion.model_validate(row) for row in rows]
+
     def add_card_version(self, card_version: CardVersion) -> None:
         with self._tx() as conn:
             conn.execute(

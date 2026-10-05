@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import json
 from collections.abc import Sequence
 from uuid import UUID
@@ -9,14 +10,35 @@ from uuid import UUID
 from suncly.core import signing
 from suncly.core.coverage import not_tested
 from suncly.core.policy_engine import aggregate
-from suncly.domain.canonical import sha256_hex
+from suncly.domain.canonical import canonical_json, sha256_hex
 from suncly.domain.card import parse_agent_card
-from suncly.domain.errors import StoreError
+from suncly.domain.errors import StoreError, TranscriptExistsError
 from suncly.domain.evidence import CardRecheck, EvidenceBundle, NotExecutedRun, RunEvidence
 from suncly.domain.models import JsonObject
 from suncly.ports.clock import Clock
 from suncly.ports.store import EvidenceStore
 from suncly.ports.transcripts import TranscriptStorage
+
+
+def payload_key(attestation_id: UUID) -> str:
+    """Where the exact signed payload of an attestation is kept (write-once)."""
+    return f"{attestation_id}/signature-payload.json"
+
+
+def store_payload(
+    transcripts: TranscriptStorage, attestation_id: UUID, payload: JsonObject
+) -> None:
+    """Keep the signed bytes; a second write under the key is refused like any evidence."""
+    with contextlib.suppress(TranscriptExistsError):
+        transcripts.put(payload_key(attestation_id), canonical_json(payload))
+
+
+def load_payload(transcripts: TranscriptStorage, attestation_id: UUID) -> JsonObject | None:
+    key = payload_key(attestation_id)
+    if not transcripts.exists(key):
+        return None
+    loaded = json.loads(transcripts.get(key))
+    return loaded if isinstance(loaded, dict) else None
 
 
 def evidence_document_hash(transcripts: TranscriptStorage, transcript_ref: str) -> str:
@@ -46,6 +68,9 @@ def assemble_bundle(
     drafter_name: str | None,
     signer_public_key: bytes | None,
     proposals: Sequence[str],
+    policy_evaluation: JsonObject | None = None,
+    decision_notes: Sequence[JsonObject] = (),
+    external_results: Sequence[JsonObject] = (),
 ) -> EvidenceBundle:
     """Load everything about an attestation and derive results and coverage."""
     attestation = store.get_attestation(attestation_id)
@@ -85,6 +110,8 @@ def assemble_bundle(
     policy_decision = decisions[0] if decisions else None
     payload: JsonObject | None = None
     if attestation.is_signed:
+        payload = load_payload(transcripts, attestation.id)
+    if attestation.is_signed and payload is None:
         payload = signing.build_payload(
             attestation=attestation,
             card_hash=card_version.card_hash,
@@ -114,4 +141,7 @@ def assemble_bundle(
         signer_public_key=signing.b64url(signer_public_key) if signer_public_key else None,
         signature_payload=payload,
         proposals=list(proposals),
+        policy_evaluation=policy_evaluation,
+        decision_notes=list(decision_notes),
+        external_results=list(external_results),
     )

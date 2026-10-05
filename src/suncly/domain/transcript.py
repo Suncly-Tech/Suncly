@@ -80,6 +80,10 @@ class Transcript(BaseModel):
     exchanges: list[Exchange] = Field(default_factory=list)
     failure: str | None = None
     redaction: RedactionSummary = Field(default_factory=RedactionSummary)
+    sandbox_verification: JsonObject | None = None
+    """Independent sandbox-state check performed by the Runner after the run (format 2 criteria):
+    ``{"url", "pointer", "expected", "observed", "ok", "error"}``. ``ok`` is ``None`` when the
+    check could not be performed; that is never a pass."""
 
     @property
     def responded(self) -> bool:

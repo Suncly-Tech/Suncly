@@ -63,6 +63,11 @@ class NotExecutedReason(StrEnum):
     """The Runner produced no result even after retries."""
     WITHHELD = "withheld"
     """Redaction failed inside the Runner; the transcript was withheld (OQ-A11)."""
+    UNKNOWN_OUTCOME = "unknown_outcome"
+    """The request may have reached the sandbox but no result was persisted (the Runner or the
+    worker died in between). The sandbox was not declared idempotent, so it was not repeated."""
+    CANCELLED = "cancelled"
+    """Cancellation was requested before this run started."""
 
 
 class NotExecutedRun(BaseModel):
@@ -132,6 +137,12 @@ class EvidenceBundle(BaseModel):
     signature_payload: JsonObject | None
     proposals: list[str]
     """Open-question proposals in effect for this attestation (docs/IMPLEMENTATION_NOTES.md)."""
+    policy_evaluation: JsonObject | None = None
+    """What the Policy engine concluded and why (``domain/policy.py``), when a policy applied."""
+    decision_notes: list[JsonObject] = Field(default_factory=list)
+    """Rationales of human decisions, in decision order."""
+    external_results: list[JsonObject] = Field(default_factory=list)
+    """Normalized results of external tools (the A2A TCK, Promptfoo), with their versions."""
 
     @property
     def transcript_hashes(self) -> dict[str, str]:

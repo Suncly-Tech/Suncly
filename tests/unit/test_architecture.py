@@ -33,7 +33,7 @@ ALLOWED = {
     "ports": {"domain"},
     "core": {"domain", "ports"},
     "runner": {"domain", "ports", "runner"},
-    "adapters": {"domain", "ports", "core", "runner", "adapters"},
+    "adapters": {"domain", "ports", "core", "runner", "adapters", "mock_agents"},
     "mock_agents": {"domain", "mock_agents"},
     "cli": {"domain", "ports", "core", "adapters", "cli", "mock_agents"},
 }
@@ -137,7 +137,7 @@ def test_only_the_policy_evaluation_constructs_an_approve_or_block_decision() ->
     ``tests/unit/test_policy.py`` proves.
     """
     pattern = re.compile(r"DecisionOutcome\.(APPROVE|BLOCK)\b")
-    allowed = {"domain.models", "domain.policy"}
+    allowed = {"domain.models", "domain.policy", "core.resolution"}
     for module, path in modules():
         if module in allowed:
             continue
@@ -224,11 +224,13 @@ def test_entity_fields_are_exactly_the_schemas() -> None:
 
 
 def test_placeholders_for_later_stages_hold_only_a_docstring() -> None:
-    for relative in ("api.py", "adapters/ci.py", "adapters/registry.py"):
+    """The registry adapter (stage 6) is still a placeholder; the API and CI adapters are real."""
+    for relative in ("adapters/registry.py",):
         tree = ast.parse((SRC / relative).read_text(encoding="utf-8"))
         assert len(tree.body) == 1 and isinstance(tree.body[0], ast.Expr), relative
         docstring = ast.get_docstring(tree) or ""
         assert re.search(r"stage [56]", docstring), relative
+    assert not (SRC / "api.py").exists(), "the API lives in adapters/api now"
 
 
 def test_packaged_migrations_match_the_db_folder() -> None:

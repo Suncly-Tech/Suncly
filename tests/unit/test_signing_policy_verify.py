@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 from uuid import UUID, uuid4
@@ -11,11 +11,12 @@ from uuid import UUID, uuid4
 import pytest
 
 from suncly.adapters.file_store import FileEvidenceStore
-from suncly.core import signing
+from suncly.core import integrity, signing
 from suncly.core.policy_engine import (
     FLAG_EXPLANATION,
     POLICY_VERSION_UNCONFIGURED,
     PolicyEngine,
+    SigningBinding,
     aggregate,
 )
 from suncly.core.verify import verify_result
@@ -200,39 +201,55 @@ def test_policy_engine_writes_flag_then_signs_then_completes(tmp_path: Path) -> 
     signer = MemorySigner()
     engine = PolicyEngine(store, FakeClock(), SeqIds(), signer)
 
-    decision, completed, results = engine.decide_and_sign(
-        running, approved, "sha256:c", [tc], [], {}
+    binding = SigningBinding(
+        issuer="suncly-test",
+        contract_content_hash="sha256:contract",
+        suite_version="contract/1",
+        judge_version="suncly-judge/2",
+        environment=integrity.EnvironmentBinding(
+            target_url="https://agent.example.com/rpc",
+            deployment_mode="local",
+            sandbox_declared=True,
+            protocol_binding="JSONRPC",
+            protocol_version="1.0",
+        ),
+        deployment_identity=None,
+        validity=timedelta(days=30),
     )
-    assert decision.outcome is DecisionOutcome.FLAG
+    decision, completed, results, evaluation, payload = engine.decide_and_sign(
+        running, approved, "sha256:c", [tc], [], {}, binding
+    )
+    assert decision.outcome is DecisionOutcome.FLAG and evaluation.requires_human
     assert (
         decision.policy_version == POLICY_VERSION_UNCONFIGURED and decision.decided_by == "policy"
     )
     assert completed.status is AttestationStatus.COMPLETED and completed.finished_at is not None
     assert completed.signing_key_id == signer.key_id
     assert store.list_decisions(running.id) == [decision]
-    payload = signing.build_payload(
-        attestation=running,
-        card_hash="sha256:c",
-        contract=approved,
-        results=results,
-        transcript_hashes={},
-        decision=decision,
-    )
+    assert payload["payload_version"] == 2 and payload["issuer"] == "suncly-test"
+    assert payload["decision"]["decided_by"] == "policy" and payload["policy"] is None
+    assert payload["contract"]["content_hash"] == "sha256:contract"
+    assert results and payload["results"][0]["test_case_id"] == str(tc.id)
     assert signing.verify_payload(signer.public_key, payload, completed.signature or "")
     assert "human must review" in FLAG_EXPLANATION
     with pytest.raises(ValueError, match="only a running attestation"):
-        engine.decide_and_sign(completed, approved, "sha256:c", [tc], [], {})
+        engine.decide_and_sign(completed, approved, "sha256:c", [tc], [], {}, binding)
 
 
 def test_policy_engine_has_no_numeric_thresholds() -> None:
+    """Every number the engine applies comes from the customer's policy (POLICY.md)."""
     import inspect
+    import re
 
     from suncly.core import policy_engine
+    from suncly.domain import policy
 
-    source = inspect.getsource(policy_engine)
-    body = source.split("def decide", 1)[1]
-    assert not any(token in body for token in ("0.9", "0.95", ">= 0", "< 0", "threshold ="))
-    assert "DecisionOutcome.FLAG" in body
+    for module in (policy_engine, policy):
+        source = inspect.getsource(module)
+        body = source.split("\ndef ", 1)[1]
+        assert not re.search(r"\b0\.[1-9]\d*\b", body), module.__name__
+        assert "threshold =" not in body, module.__name__
+    assert policy_engine.decide([result(p=100)]).outcome is DecisionOutcome.FLAG
 
 
 def make_result_document() -> tuple[dict[str, object], dict[str, bytes], MemorySigner]:

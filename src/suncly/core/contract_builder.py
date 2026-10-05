@@ -11,7 +11,7 @@ from collections import Counter
 from collections.abc import Sequence
 from uuid import UUID
 
-from suncly.domain.canonical import canonical_json
+from suncly.domain.canonical import canonical_json, canonical_sha256
 from suncly.domain.card import AgentCard, ParsedCard
 from suncly.domain.contract_file import ContractFile, ContractFileTestCase
 from suncly.domain.criteria import Criteria
@@ -92,6 +92,11 @@ def content_key(test_case: DraftTestCase | TestCase | ContractFileTestCase) -> b
             "criteria": test_case.criteria,
         }
     )
+
+
+def contract_content_hash(test_cases: Sequence[DraftTestCase | TestCase]) -> str:
+    """The content hash the signature binds: the sorted content keys of every test case."""
+    return canonical_sha256(sorted(content_key(tc).decode("utf-8") for tc in test_cases))
 
 
 def same_content(

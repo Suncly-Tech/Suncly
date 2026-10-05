@@ -138,8 +138,9 @@ def check_url(url: str, policy: NetworkPolicy, what: str = "URL") -> None:
     host = (parts.hostname or "").lower()
     if parts.scheme not in ("http", "https") or not host:
         raise TargetHostRefusedError(
-            f"The {what} must be an http(s) URL with a host.",
-            f"{url!r} has scheme {parts.scheme or 'none'}.",
+            f"The {what} must use https.",
+            f"{url!r} has scheme {parts.scheme or 'none'}" + ("" if host else " and no host") + ".",
+            "Use an https URL.",
         )
     if parts.username or parts.password:
         raise TargetHostRefusedError(

@@ -1,7 +1,9 @@
-"""Fetches an Agent Card over HTTPS with a timeout and a size limit (schema §4, step 2).
+"""Fetches an Agent Card with a timeout, a size limit and the network policy (schema §4).
 
-Plain http is accepted only for loopback addresses, where local sandboxes run.
-Redirects are followed only to https (or loopback) URLs, at most a few times.
+Every URL, including every redirect target, is checked against the policy
+before it is requested, and every resolved address is checked again at
+connection time (``runner/http_transport.py``). Redirects are followed by
+hand, at most a few times, never to a forbidden destination.
 """
 
 from __future__ import annotations
@@ -11,26 +13,43 @@ from datetime import UTC, datetime
 import httpx
 
 from suncly.domain.errors import CardFetchError, TargetHostRefusedError
+from suncly.domain.network import NetworkPolicy, check_url, is_loopback_host
 from suncly.ports.card_fetcher import FetchedCard
-from suncly.runner.http_transport import require_https_or_loopback
+from suncly.runner.http_transport import GuardedTransport, Resolver, default_policy, resolve_host
 
 MAX_REDIRECTS = 3
 WELL_KNOWN_HINT = "Check the URL; A2A cards are usually at /.well-known/agent-card.json."
 
 
 class HttpxCardFetcher:
-    def __init__(self, timeout_s: float, max_bytes: int) -> None:
+    def __init__(
+        self,
+        timeout_s: float,
+        max_bytes: int,
+        policy: NetworkPolicy | None = None,
+        resolver: Resolver = resolve_host,
+    ) -> None:
         self._timeout_s = timeout_s
         self._max_bytes = max_bytes
+        self._policy = policy or default_policy()
+        self._resolver = resolver
+
+    def _client(self, url: str) -> httpx.Client:
+        verify = not (self._policy.allows_loopback and is_loopback_host(httpx.URL(url).host))
+        return httpx.Client(
+            follow_redirects=False,
+            timeout=self._timeout_s,
+            transport=GuardedTransport(self._policy, self._resolver, verify=verify),
+        )
 
     def fetch(self, url: str) -> FetchedCard:
         current = url
         try:
-            require_https_or_loopback(current, "card URL")
+            check_url(current, self._policy, "card URL")
         except TargetHostRefusedError as exc:
             raise CardFetchError(exc.what, exc.why, exc.next_step) from exc
-        with httpx.Client(follow_redirects=False, timeout=self._timeout_s) as client:
-            for _ in range(MAX_REDIRECTS + 1):
+        with self._client(url) as client:
+            for _ in range(self._policy.max_redirects + 1):
                 try:
                     body, redirect = self._get(client, current)
                 except httpx.TimeoutException as exc:
@@ -39,6 +58,8 @@ class HttpxCardFetcher:
                         f"{current} did not answer within {self._timeout_s} seconds.",
                         "Check that the agent is running and reachable from this machine.",
                     ) from exc
+                except TargetHostRefusedError as exc:
+                    raise CardFetchError(exc.what, exc.why, exc.next_step) from exc
                 except httpx.HTTPError as exc:
                     raise CardFetchError(
                         "The card could not be fetched.",
@@ -59,7 +80,7 @@ class HttpxCardFetcher:
                 return FetchedCard(url=url, raw_json=text, fetched_at=datetime.now(UTC))
         raise CardFetchError(
             "The card URL redirected too many times.",
-            f"More than {MAX_REDIRECTS} redirects starting from {url}.",
+            f"More than {self._policy.max_redirects} redirects starting from {url}.",
             "Use the final URL of the card directly.",
         )
 
@@ -75,11 +96,12 @@ class HttpxCardFetcher:
                     )
                 target = str(httpx.URL(url).join(location))
                 try:
-                    require_https_or_loopback(target, "redirect target")
+                    check_url(target, self._policy, "redirect target")
                 except TargetHostRefusedError as exc:
                     raise CardFetchError(
-                        "The card URL redirects to a URL that is not https.",
-                        f"The redirect target is {target}.",
+                        "The card URL redirects to a URL that is not https or not allowed by "
+                        "the policy.",
+                        f"The redirect target is {target}: {exc.why}",
                         "Use the final https URL of the card directly.",
                     ) from exc
                 return b"", target

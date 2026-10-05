@@ -7,8 +7,9 @@ prompts and prints.
 
 from __future__ import annotations
 
-from collections.abc import Callable, Sequence
+from collections.abc import Callable
 from dataclasses import dataclass, field
+from datetime import timedelta
 from decimal import Decimal
 from pathlib import Path
 from typing import Literal
@@ -16,20 +17,21 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
 
-from suncly.core import signing
+from suncly.core import integrity
 from suncly.core.cards import CardService, select_interface
 from suncly.core.config import DEFAULT_BUDGET_FACTOR, Config
 from suncly.core.contract_builder import (
     ContractService,
+    contract_content_hash,
     contract_file_from_draft,
     draft_from_contract_file,
     same_content,
     uncovered_skills,
 )
-from suncly.core.evidence import assemble_bundle, evidence_document_hash
-from suncly.core.judge import JudgeService
+from suncly.core.evidence import assemble_bundle, evidence_document_hash, store_payload
+from suncly.core.judge import JUDGE_VERSION, JudgeService
 from suncly.core.orchestrator import Orchestrator, OrchestratorSettings
-from suncly.core.policy_engine import PolicyEngine, aggregate
+from suncly.core.policy_engine import PolicyEngine, SigningBinding
 from suncly.domain.card import ParsedCard
 from suncly.domain.contract_file import ContractFile, render_contract_file
 from suncly.domain.errors import ApprovalRequiredError, SandboxDeclarationMissingError
@@ -41,7 +43,6 @@ from suncly.domain.models import (
     Contract,
     Decision,
     RiskLevel,
-    Run,
     TestCase,
 )
 from suncly.ports.card_fetcher import CardFetcher
@@ -64,6 +65,20 @@ from suncly.ports.transcripts import TranscriptStorage
 #: (OQ-P2, OQ-P5: NEEDS DECISION). ``high`` is the most restrictive level.
 DEFAULT_OWNER = "unspecified"
 DEFAULT_RISK_LEVEL = RiskLevel.HIGH
+
+#: The issuer name a local CLI deployment binds into its signed payloads.
+LOCAL_ISSUER = "suncly-local"
+
+
+def deployment_identity_of(parsed: ParsedCard) -> integrity.DeploymentIdentity | None:
+    """The agent's self-declared version from its card, labelled as such; never invented."""
+    version = parsed.card.version.strip() if parsed.card.version else ""
+    if not version:
+        return None
+    return integrity.DeploymentIdentity(
+        agent_version=version, source="agent-card.version (self-declared by the agent)"
+    )
+
 
 #: The proposals in effect, listed in every report (docs/IMPLEMENTATION_NOTES.md).
 PROPOSALS_IN_EFFECT = (
@@ -280,11 +295,36 @@ class AttestationService:
 
         decision: Decision | None = None
         kind: OutcomeKind
+        engine = PolicyEngine(s.store, s.clock, s.ids, signer)
+        binding = SigningBinding(
+            issuer=LOCAL_ISSUER,
+            contract_content_hash=contract_content_hash(test_cases),
+            suite_version=source,
+            judge_version=JUDGE_VERSION,
+            environment=integrity.EnvironmentBinding(
+                target_url=interface.url,
+                deployment_mode="local",
+                sandbox_declared=request.sandbox_declared,
+                protocol_binding=interface.protocol_binding,
+                protocol_version=interface.protocol_version,
+            ),
+            deployment_identity=deployment_identity_of(parsed),
+            validity=timedelta(days=s.config.attestation_validity_days),
+            policy=None,
+            risk_level=agent.risk_level,
+        )
+        policy_evaluation: dict[str, object] | None = None
         if attestation.status is AttestationStatus.RUNNING:
-            engine = PolicyEngine(s.store, s.clock, s.ids, signer)
-            decision, attestation, _ = engine.decide_and_sign(
-                attestation, contract, parsed.card_hash, test_cases, runs, transcript_hashes
+            decision, attestation, _, evaluation, payload = engine.decide_and_sign(
+                attestation,
+                contract,
+                parsed.card_hash,
+                test_cases,
+                runs,
+                transcript_hashes,
+                binding,
             )
+            policy_evaluation = evaluation.model_dump(mode="json")
             kind = "completed"
             s.progress.on_event(
                 "decision",
@@ -293,10 +333,22 @@ class AttestationService:
                 signing_key_id=attestation.signing_key_id,
             )
         else:
-            attestation = self._sign_without_decision(
-                attestation, contract, parsed, test_cases, runs, transcript_hashes, signer
+            attestation, payload = engine.sign_without_decision(
+                attestation,
+                contract,
+                parsed.card_hash,
+                test_cases,
+                runs,
+                transcript_hashes,
+                binding,
+            )
+            s.progress.on_event(
+                "signed_without_decision",
+                status=attestation.status.value,
+                signing_key_id=attestation.signing_key_id,
             )
             kind = "failed" if attestation.status is AttestationStatus.FAILED else "invalidated"
+        store_payload(s.transcripts, attestation.id, payload)
 
         bundle = assemble_bundle(
             store=s.store,
@@ -312,6 +364,7 @@ class AttestationService:
             drafter_name=source,
             signer_public_key=signer.public_key,
             proposals=PROPOSALS_IN_EFFECT,
+            policy_evaluation=policy_evaluation,
         )
         report_dir = s.report_writer.write(bundle)
         s.progress.on_event("report_written", path=str(report_dir))
@@ -381,32 +434,3 @@ class AttestationService:
             "contract_approved", version=contract.version, approved_by=contract.approved_by
         )
         return contract, test_cases
-
-    # -- signing without a decision (OQ-F7, the documents' proposal) ---------
-
-    def _sign_without_decision(
-        self,
-        attestation: Attestation,
-        contract: Contract,
-        parsed: ParsedCard,
-        test_cases: Sequence[TestCase],
-        runs: Sequence[Run],
-        transcript_hashes: dict[str, str],
-        signer: Signer,
-    ) -> Attestation:
-        """Sign a failed or invalidated attestation; the payload's decision is ``null``."""
-        payload = signing.build_payload(
-            attestation=attestation,
-            card_hash=parsed.card_hash,
-            contract=contract,
-            results=aggregate(test_cases, runs),
-            transcript_hashes=transcript_hashes,
-            decision=None,
-        )
-        signature, key_id = signing.sign_payload(signer, payload)
-        signed = signing.with_signature(attestation, signature, key_id)
-        self._s.store.update_attestation(signed)
-        self._s.progress.on_event(
-            "signed_without_decision", status=signed.status.value, signing_key_id=key_id
-        )
-        return signed

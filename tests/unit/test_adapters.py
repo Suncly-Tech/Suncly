@@ -196,13 +196,22 @@ def test_report_folder_is_self_contained_and_offline(
     document = result_document(outcome.bundle)
     assert set(document["signature_payload"]) == {
         "payload_version",
+        "issuer",
         "attestation_id",
         "card_hash",
         "contract",
+        "policy",
+        "versions",
         "results",
         "transcript_hashes",
+        "artifact_hashes",
+        "environment",
+        "deployment_identity",
+        "issued_at",
+        "expires_at",
         "decision",
     }
+    assert document["signature_payload"]["payload_version"] == 2
     view = build_view(outcome.bundle)
     assert (view.pass_total, view.fail_total, view.inconclusive_total) == (2, 0, 0)
     assert all(row.transcript_file.startswith("transcripts/") for row in view.runs)

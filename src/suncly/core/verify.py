@@ -166,16 +166,25 @@ def verify_result(
 
     decisions = result.get("decisions") or []
     first = decisions[0] if decisions else None
-    recorded_decision = (
-        {"outcome": first.get("outcome"), "policy_version": first.get("policy_version")}
-        if isinstance(first, dict)
-        else None
-    )
+    signed_decision = payload.get("decision")
+    if isinstance(first, dict):
+        keys: tuple[str, ...] = ("outcome", "policy_version", "decided_by")
+        if payload.get("payload_version", 1) == 1:
+            keys = ("outcome", "policy_version")
+        recorded_decision: dict[str, Any] | None = {key: first.get(key) for key in keys}
+        signed_subset: Any = (
+            {key: signed_decision.get(key) for key in keys}
+            if isinstance(signed_decision, dict)
+            else signed_decision
+        )
+    else:
+        recorded_decision = None
+        signed_subset = signed_decision
     checks.append(
         VerificationCheck(
             "decision",
-            payload.get("decision") == recorded_decision,
-            f"signed {payload.get('decision')}; recorded {recorded_decision}",
+            signed_subset == recorded_decision,
+            f"signed {signed_decision}; recorded {recorded_decision}",
         )
     )
 

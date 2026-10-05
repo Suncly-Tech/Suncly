@@ -33,6 +33,9 @@ class RunJob(BaseModel):
     poll_interval_s: float = Field(gt=0)
     sandbox_declared: bool
     """DR-006: the Runner refuses to run unless the caller declared the target a sandbox."""
+    sandbox_verification: JsonObject | None = None
+    """Format 2 criteria: ``{"url", "pointer", "expected"}`` the Runner checks after the run,
+    on the target's origin, as independent evidence of sandbox state."""
 
 
 class RunResult(BaseModel):

@@ -106,6 +106,16 @@ class FileEvidenceStore:
         ]
         return min(matches, key=lambda cv: cv.fetched_at, default=None)
 
+    def list_card_versions(self, agent_id: UUID) -> list[CardVersion]:
+        return sorted(
+            (
+                cv
+                for cv in self._iter(self._root / "card_versions", CardVersion)
+                if cv.agent_id == agent_id
+            ),
+            key=lambda cv: (cv.fetched_at, str(cv.id)),
+        )
+
     def add_card_version(self, card_version: CardVersion) -> None:
         with self._lock:
             if self.get_agent(card_version.agent_id) is None:

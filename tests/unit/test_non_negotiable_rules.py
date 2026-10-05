@@ -235,8 +235,8 @@ def test_suncly_never_writes_an_approve_decision(
             inconclusive_count=inconclusives,
         )
     ]
-    assert decide(results) is DecisionOutcome.FLAG
-    assert decide([]) is DecisionOutcome.FLAG
+    assert decide(results).outcome is DecisionOutcome.FLAG
+    assert decide([]).outcome is DecisionOutcome.FLAG
 
 
 def test_only_the_runner_holds_credentials_and_the_job_carries_none() -> None:

@@ -18,7 +18,6 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from suncly.domain.a2a import TASK_STATE_COMPLETED, TERMINAL_TASK_STATES
 from suncly.domain.models import JsonObject
 
-
 #: Keys that exist only in criteria format 2.
 FORMAT_2_KEYS = (
     "suite_case_id",

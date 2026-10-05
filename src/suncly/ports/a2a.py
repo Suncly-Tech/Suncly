@@ -40,3 +40,7 @@ class A2ATransport(Protocol):
     def call(
         self, method: str, params: dict[str, Any], request_id: str, timeout_s: float
     ) -> RpcResponse: ...
+
+    def get_json(self, url: str, timeout_s: float) -> RpcResponse:
+        """``GET url`` on the target's origin, for independent sandbox-state verification."""
+        ...

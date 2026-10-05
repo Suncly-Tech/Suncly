@@ -55,6 +55,10 @@ class EvidenceStore(Protocol):
 
     def add_card_version(self, card_version: CardVersion) -> None: ...
 
+    def list_card_versions(self, agent_id: UUID) -> list[CardVersion]:
+        """Card versions of an agent, oldest fetch first."""
+        ...
+
     # contract and test_case ------------------------------------------------
     def get_contract(self, contract_id: UUID) -> Contract | None: ...
 

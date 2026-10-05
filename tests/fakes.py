@@ -259,6 +259,14 @@ class ScriptedTransport:
             raise AssertionError(f"unexpected call {method}") from exc
         return build(method, params)
 
+    def get_json(self, url: str, timeout_s: float) -> RpcResponse:
+        self.calls.append(("GET", {"url": url}))
+        try:
+            build = next(self._responses)
+        except StopIteration as exc:
+            raise AssertionError(f"unexpected GET {url}") from exc
+        return build("GET", {"url": url})
+
 
 def rpc_ok(
     result: JsonObject, clock: FakeClock | None = None

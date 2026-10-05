@@ -40,6 +40,8 @@ class Config:
     card_max_bytes: int = 1_000_000
     poll_interval_s: float = 0.5
     max_test_cases_per_skill: int = 3
+    attestation_validity_days: int = 90
+    """How long a signed attestation stays fresh (payload v2 ``expires_at``)."""
 
     @property
     def store_dir(self) -> Path:
@@ -153,6 +155,7 @@ PARSERS: dict[str, Callable[[str], Any]] = {
     "card_max_bytes": _positive_int("card_max_bytes"),
     "poll_interval_s": _positive_float("poll_interval_s"),
     "max_test_cases_per_skill": _positive_int("max_test_cases_per_skill"),
+    "attestation_validity_days": _positive_int("attestation_validity_days"),
 }
 
 #: Environment variables that do not follow the ``SUNCLY_<FIELD>`` pattern.

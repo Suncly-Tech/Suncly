@@ -70,6 +70,59 @@ def _rpc_result(response: RpcResponse) -> tuple[JsonObject | None, str | None]:
     return result, None
 
 
+def _resolve_pointer(document: Any, pointer: str) -> Any:
+    current = document
+    for raw_token in pointer.split("/")[1:]:
+        token = raw_token.replace("~1", "/").replace("~0", "~")
+        if isinstance(current, dict):
+            if token not in current:
+                raise KeyError(pointer)
+            current = current[token]
+        elif isinstance(current, list):
+            current = current[int(token)]
+        else:
+            raise KeyError(pointer)
+    return current
+
+
+def verify_sandbox_state(
+    spec: JsonObject, transport: A2ATransport, recorder: _Recorder, timeout_s: float
+) -> JsonObject:
+    """``GET`` the sandbox-state URL and compare the JSON at ``pointer`` with ``expected``.
+
+    The result is evidence, recorded with the transcript. ``ok`` is ``None``
+    when the check could not be performed, which the Judge never counts as a
+    pass. The transport applies the same host rule as every other request.
+    """
+    url = str(spec.get("url"))
+    pointer = str(spec.get("pointer", "/"))
+    expected = spec.get("expected")
+    result: JsonObject = {
+        "url": url,
+        "pointer": pointer,
+        "expected": expected,
+        "observed": None,
+        "ok": None,
+        "error": None,
+    }
+    response = transport.get_json(url, timeout_s)
+    recorder.add("GET sandbox-state", response)
+    if response.transport_error is not None:
+        result["error"] = response.transport_error
+        return result
+    if response.http_status != 200:
+        result["error"] = f"HTTP {response.http_status}"
+        return result
+    try:
+        observed = _resolve_pointer(response.response_body, pointer)
+    except (KeyError, IndexError, ValueError, TypeError):
+        result["error"] = f"{pointer} is missing from the sandbox state"
+        return result
+    result["observed"] = observed
+    result["ok"] = observed == expected
+    return result
+
+
 def execute_run(
     job: RunJob,
     transport: A2ATransport,
@@ -100,6 +153,13 @@ def execute_run(
         final_response: JsonObject | None = None,
         failure: str | None = None,
     ) -> Transcript:
+        verification = (
+            verify_sandbox_state(
+                job.sandbox_verification, transport, recorder, max(remaining(), 1.0)
+            )
+            if job.sandbox_verification is not None
+            else None
+        )
         return Transcript(
             attestation_id=job.attestation_id,
             test_case_id=job.test_case_id,
@@ -117,6 +177,7 @@ def execute_run(
             final_response=final_response,
             exchanges=recorder.exchanges,
             failure=failure,
+            sandbox_verification=verification,
         )
 
     first = transport.call(

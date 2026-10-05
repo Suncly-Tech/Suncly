@@ -17,9 +17,15 @@ dependencies = [
     "cryptography>=43,<51",
     "psycopg[binary]>=3.2,<4",
     "jsonschema>=4.23,<5",
+    "fastapi>=0.142,<0.143",
+    "uvicorn>=0.54,<0.55",
+    "PyJWT[crypto]>=2.15,<3",
+    "stripe>=16,<17",
 ]
 
 [project.optional-dependencies]
+anthropic = ["anthropic>=1.11,<2"]
+gcp = ["google-cloud-storage>=3,<4", "google-cloud-secret-manager>=2,<3"]
 dev = [
     "pytest>=9,<10",
     "pytest-cov>=7,<8",
@@ -27,6 +33,8 @@ dev = [
     "ruff>=0.16,<0.17",
     "mypy>=2.4,<2.5",
     "types-jsonschema>=4.23",
+    "httpx>=0.28,<0.29",
+    "anthropic>=1.11,<2",
 ]
 
 [project.scripts]
@@ -106,7 +114,7 @@ module = "tests.*"
 disallow_untyped_decorators = false
 
 [[tool.mypy.overrides]]
-module = ["rfc8785", "rfc8785.*"]
+module = ["rfc8785", "rfc8785.*", "google.*"]
 ignore_missing_imports = true
 
 # ---------------------------------------------------------------------------
@@ -119,6 +127,7 @@ timeout = 180
 markers = [
     "db: needs a Postgres database (set DATABASE_URL); skipped otherwise",
     "e2e: runs the whole attestation flow against local mock agents",
+    "api: runs the HTTP API in process against local mock agents",
 ]
 filterwarnings = [
     "error",
@@ -132,7 +141,14 @@ branch = true
 # The Runner runs in a subprocess; these settings let coverage follow it.
 parallel = true
 concurrency = ["thread", "multiprocessing"]
-omit = ["*/adapters/registry.py", "*/adapters/ci.py", "*/api.py", "*/mock_agents/__main__.py"]
+omit = [
+    "*/adapters/registry.py",
+    "*/mock_agents/__main__.py",
+    "*/adapters/anthropic_model.py",
+    "*/adapters/gcs_transcripts.py",
+    "*/adapters/secrets.py",
+    "*/cli/hosted.py",
+]
 
 [tool.coverage.report]
 show_missing = true

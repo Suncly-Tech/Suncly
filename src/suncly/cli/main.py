@@ -515,5 +515,8 @@ def doctor(ctx: click.Context, card_url: str | None, debug: bool) -> None:
     console.line("All checks passed.")
 
 
+# The hosted commands (api, worker, gate, auth, trust) register themselves on ``main``.
+from suncly.cli import hosted  # noqa: E402, F401
+
 if __name__ == "__main__":  # pragma: no cover - exercised as a subprocess
     main()

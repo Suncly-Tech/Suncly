@@ -44,6 +44,8 @@ class StartAttestationRequest:
     runs: int
     budget_limit: Decimal | None = None
     trigger: AttestationTrigger = AttestationTrigger.MANUAL
+    external_tools: tuple[str, ...] = ()
+    """Names of external tools (``a2a-tck``, ``promptfoo``) the worker runs after the runs."""
 
 
 @dataclass(frozen=True)
@@ -153,6 +155,7 @@ class AttestationWorkflow:
                 "runs": request.runs,
                 "reservation_id": str(reservation.id),
                 "created_by": ctx.reviewer_id,
+                "external_tools": list(request.external_tools),
             },
             status=JobStatus.QUEUED,
             created_at=s.clock.now(),

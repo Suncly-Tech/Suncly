@@ -61,6 +61,8 @@ class StartAttestation(Body):
     runs: int = Field(default=5, ge=1, le=200)
     budget_limit: Decimal | None = Field(default=None, ge=0)
     trigger: Literal["ci", "manual"] = "manual"
+    external_tools: list[Literal["a2a-tck", "promptfoo"]] = Field(default_factory=list)
+    """External evaluation tools to run after the contract's test cases (deduplicated)."""
 
     @property
     def trigger_value(self) -> AttestationTrigger:

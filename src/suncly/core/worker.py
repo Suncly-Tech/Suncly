@@ -11,6 +11,10 @@ without repeating a run whose outcome is unknown.
 
 from __future__ import annotations
 
+import contextlib
+import hashlib
+import shutil
+import tempfile
 from datetime import datetime, timedelta
 from typing import Any
 from uuid import UUID
@@ -31,13 +35,15 @@ from suncly.core.orchestrator import (
 )
 from suncly.core.policy_engine import PolicyEngine, SigningBinding, aggregate
 from suncly.domain.card import parse_agent_card
-from suncly.domain.errors import StoreError
+from suncly.domain.errors import StoreError, TranscriptExistsError
 from suncly.domain.evidence import NotExecutedReason, TestCaseResult
 from suncly.domain.jobs import JobKind, OutboxMessage
 from suncly.domain.ledger import UsageOperation, UsageOutcome
 from suncly.domain.models import AttestationStatus, JsonObject, TestCase
+from suncly.domain.policy import ExternalToolSummary
 from suncly.domain.tenancy import AgentRegistration
-from suncly.ports.app_store import AttestationMeta, SigningKeyRecord
+from suncly.ports.app_store import AttestationMeta, ExternalArtifact, SigningKeyRecord
+from suncly.ports.external_tools import ExternalToolResult
 from suncly.ports.model import StructuredResponse
 from suncly.ports.signer import Signer
 
@@ -178,6 +184,10 @@ class AttestationJobHandler:
         context.check()
         attestation = orchestration.attestation
         runs_recorded = [r.run for r in orchestration.recorded]
+        external_results, artifact_hashes, external_summaries = self._external_tools(
+            context, meta, attestation, registration, interface.url
+        )
+        context.check()
 
         # -- ledger lines: one per recorded run, whichever attempt recorded it ----------------
         # A run recorded by an attempt that died before writing its ledger line is billed
@@ -250,6 +260,8 @@ class AttestationJobHandler:
             risk_level=registration.risk_level,
             baseline=baseline,
             baseline_at=baseline_at,
+            artifact_hashes=artifact_hashes,
+            external=external_summaries,
         )
         context.check()
         engine = PolicyEngine(s.store, s.clock, s.ids, signer)
@@ -301,6 +313,7 @@ class AttestationJobHandler:
             card_recheck=orchestration.card_recheck.model_dump(mode="json"),
             policy_evaluation=policy_evaluation,
             unknown_outcomes=unknown,
+            external_results=external_results,
             in_flight=[],
         )
         s.app_store.add_outbox(
@@ -315,6 +328,104 @@ class AttestationJobHandler:
         )
         if orchestration.cancelled:
             raise JobCancelledError(f"attestation {attestation.id} was cancelled")
+
+    # -- external tools -----------------------------------------------------------------
+
+    def _external_tools(
+        self,
+        context: JobContext,
+        meta: AttestationMeta,
+        attestation: Any,
+        registration: AgentRegistration,
+        target_url: str,
+    ) -> tuple[list[JsonObject], dict[str, str], list[ExternalToolSummary]]:
+        """Run every requested tool once; a resumed execution reuses recorded results."""
+        s = self._s
+        requested = [str(name) for name in context.job.payload.get("external_tools") or []]
+        if not requested:
+            return [], {}, []
+        recorded: dict[str, JsonObject] = {
+            str(item.get("tool")): item
+            for item in context.progress().get("external_results") or []
+            if isinstance(item, dict)
+        }
+        results: list[JsonObject] = []
+        for name in dict.fromkeys(requested):
+            if name in recorded:
+                results.append(recorded[name])
+                continue
+            context.check()
+            context.update_progress(phase="external_tools", tool=name)
+            factory = s.external_tools.get(name)
+            if factory is None:
+                outcome = ExternalToolResult(
+                    tool=name,
+                    tool_version="unavailable",
+                    adapter_version="none",
+                    target_url=target_url,
+                    checks=[],
+                    failure="this deployment has no runner for the tool",
+                )
+            else:
+                work_dir = tempfile.mkdtemp(prefix=f"suncly-{name}-")
+                try:
+                    outcome = factory(registration).run(
+                        target_url, work_dir, s.app_config.worker.external_tool_timeout_s
+                    )
+                except Exception as exc:  # a crashing adapter is a failed tool, never a pass
+                    outcome = ExternalToolResult(
+                        tool=name,
+                        tool_version="unknown",
+                        adapter_version="unknown",
+                        target_url=target_url,
+                        checks=[],
+                        failure=f"{type(exc).__name__}: {exc}",
+                    )
+                finally:
+                    shutil.rmtree(work_dir, ignore_errors=True)
+            stored: list[JsonObject] = []
+            for artifact in outcome.artifacts:
+                key = f"{attestation.id}/external/{name}/{artifact.filename}"
+                digest = "sha256:" + hashlib.sha256(artifact.content).hexdigest()
+                with contextlib.suppress(TranscriptExistsError):
+                    s.transcripts.put(key, artifact.content)
+                s.app_store.add_external_artifact(
+                    ExternalArtifact(
+                        id=s.ids.new_id(),
+                        organization_id=meta.organization_id,
+                        attestation_id=attestation.id,
+                        tool=name,
+                        tool_version=outcome.tool_version,
+                        kind=artifact.kind,
+                        storage_ref=key,
+                        sha256=digest,
+                        created_at=s.clock.now(),
+                    )
+                )
+                stored.append({"kind": artifact.kind, "storage_ref": key, "sha256": digest})
+            item: JsonObject = {
+                **outcome.model_dump(mode="json", exclude={"artifacts"}),
+                "counts": outcome.counts(),
+                "artifacts": stored,
+            }
+            results.append(item)
+            context.update_progress(external_results=results)
+        hashes = {
+            str(a["storage_ref"]): str(a["sha256"]) for r in results for a in r.get("artifacts", [])
+        }
+        summaries = [
+            ExternalToolSummary(
+                tool=str(r["tool"]),
+                tool_version=str(r["tool_version"]),
+                passed=int(r["counts"]["passed"]),
+                failed=int(r["counts"]["failed"]),
+                undecided=int(r["counts"]["undecided"]),
+                failure=r.get("failure"),
+            )
+            for r in results
+        ]
+        context.update_progress(phase="running")
+        return results, hashes, summaries
 
     # -- helpers ------------------------------------------------------------------------
 

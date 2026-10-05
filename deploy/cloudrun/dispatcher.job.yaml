@@ -1,0 +1,62 @@
+# The dispatcher / recovery pass: recovers expired leases, enqueues due re-evaluations,
+# relays the outbox and reports usage to the meter. Cloud Scheduler runs it every minute
+# (deploy/terraform/scheduler.tf). Idempotent: overlapping runs are harmless.
+apiVersion: run.googleapis.com/v1
+kind: Job
+metadata:
+  name: suncly-dispatcher
+  labels:
+    app: suncly
+    component: dispatcher
+spec:
+  template:
+    metadata:
+      annotations:
+        run.googleapis.com/cloudsql-instances: "${PROJECT_ID}:${REGION}:suncly-db"
+        run.googleapis.com/execution-environment: gen2
+    spec:
+      parallelism: 1
+      taskCount: 1
+      template:
+        spec:
+          serviceAccountName: suncly-dispatcher@${PROJECT_ID}.iam.gserviceaccount.com
+          maxRetries: 1
+          timeoutSeconds: 300
+          containers:
+            - name: dispatcher
+              image: ${REGION}-docker.pkg.dev/${PROJECT_ID}/suncly/suncly@sha256:${IMAGE_DIGEST}
+              args: ["tick"]
+              resources:
+                limits:
+                  cpu: "1"
+                  memory: 512Mi
+              env:
+                - name: SUNCLY_ENVIRONMENT
+                  value: production
+                - name: SUNCLY_NETWORK_MODE
+                  value: public
+                - name: SUNCLY_OIDC_ISSUER
+                  value: https://accounts.google.com
+                - name: SUNCLY_OIDC_AUDIENCE
+                  value: ${OIDC_CLIENT_ID}
+                - name: SUNCLY_OIDC_JWKS_URL
+                  value: https://www.googleapis.com/oauth2/v3/certs
+                - name: SUNCLY_BILLING_PROVIDER
+                  value: stripe
+                - name: SUNCLY_EVIDENCE_BUCKET
+                  value: ${PROJECT_ID}-suncly-evidence
+                - name: DATABASE_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: suncly-database-url-api
+                      key: latest
+                - name: STRIPE_SECRET_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: suncly-stripe-secret-key
+                      key: latest
+                - name: STRIPE_WEBHOOK_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: suncly-stripe-webhook-secret
+                      key: latest

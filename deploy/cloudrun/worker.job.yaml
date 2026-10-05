@@ -1,0 +1,78 @@
+# The trusted Runner boundary: a Cloud Run Job that claims and runs attestation jobs
+# until its task deadline (the queue is in Postgres; a stopped task is recovered by the
+# lease reaper). Started by the dispatcher's scheduler trigger, several tasks in parallel.
+apiVersion: run.googleapis.com/v1
+kind: Job
+metadata:
+  name: suncly-worker
+  labels:
+    app: suncly
+    component: worker
+  annotations:
+    run.googleapis.com/description: "Attestation worker: Runner, Judge, Policy, signing, ledger."
+spec:
+  template:
+    metadata:
+      annotations:
+        run.googleapis.com/cloudsql-instances: "${PROJECT_ID}:${REGION}:suncly-db"
+        run.googleapis.com/execution-environment: gen2
+        run.googleapis.com/vpc-access-egress: all-traffic
+        run.googleapis.com/vpc-access-connector: suncly-egress
+    spec:
+      parallelism: 3
+      taskCount: 3
+      template:
+        spec:
+          serviceAccountName: suncly-runner@${PROJECT_ID}.iam.gserviceaccount.com
+          maxRetries: 0
+          timeoutSeconds: 3300
+          containers:
+            - name: worker
+              image: ${REGION}-docker.pkg.dev/${PROJECT_ID}/suncly/suncly@sha256:${IMAGE_DIGEST}
+              args: ["worker"]
+              resources:
+                limits:
+                  cpu: "2"
+                  memory: 2Gi
+              env:
+                - name: SUNCLY_ENVIRONMENT
+                  value: production
+                - name: SUNCLY_NETWORK_MODE
+                  value: public
+                - name: SUNCLY_ISSUER
+                  value: suncly.example
+                - name: SUNCLY_OIDC_ISSUER
+                  value: https://accounts.google.com
+                - name: SUNCLY_OIDC_AUDIENCE
+                  value: ${OIDC_CLIENT_ID}
+                - name: SUNCLY_OIDC_JWKS_URL
+                  value: https://www.googleapis.com/oauth2/v3/certs
+                - name: SUNCLY_EVIDENCE_BUCKET
+                  value: ${PROJECT_ID}-suncly-evidence
+                - name: SUNCLY_SECRET_MANAGER_PROJECT
+                  value: ${PROJECT_ID}
+                - name: SUNCLY_MODEL_PROVIDER
+                  value: anthropic
+                - name: SUNCLY_MODEL
+                  value: claude-opus-5-5
+                - name: SUNCLY_A2A_TCK_DIR
+                  value: /opt/a2a-tck
+                - name: SUNCLY_WORKER_LEASE_S
+                  value: "120"
+                - name: SUNCLY_WORKER_HEARTBEAT_S
+                  value: "20"
+                - name: DATABASE_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: suncly-database-url-worker
+                      key: latest
+                - name: ANTHROPIC_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: suncly-model-api-key
+                      key: latest
+                - name: SUNCLY_SIGNING_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: suncly-signing-key
+                      key: latest

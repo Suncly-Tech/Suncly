@@ -1,0 +1,51 @@
+{
+  "summary": {
+    "timestamp": "2026-10-05T09:12:44.102933+00:00",
+    "sut_url": "http://127.0.0.1:9999",
+    "spec_version": "",
+    "overall_compatibility": "66.7%",
+    "must_compatibility": "66.7%",
+    "should_compatibility": "100.0%",
+    "may_compatibility": "100.0%"
+  },
+  "per_requirement": {
+    "A2A-CARD-001": {
+      "level": "MUST",
+      "status": "PASS",
+      "transports": {"jsonrpc": "PASS"},
+      "errors": [],
+      "test_ids": ["tests/compatibility/test_agent_card.py::test_card_is_served[jsonrpc]"]
+    },
+    "A2A-MSG-001": {
+      "level": "MUST",
+      "status": "PASS",
+      "transports": {"jsonrpc": "PASS"},
+      "errors": [],
+      "test_ids": ["tests/compatibility/test_messages.py::test_send_message_returns_task[jsonrpc]"]
+    },
+    "A2A-TASK-003": {
+      "level": "MUST",
+      "status": "FAIL",
+      "transports": {"jsonrpc": "FAIL"},
+      "errors": ["AssertionError: GetTask for an unknown id must return TaskNotFoundError (-32001); got -32603"],
+      "test_ids": ["tests/compatibility/test_tasks.py::test_get_unknown_task[jsonrpc]"]
+    },
+    "A2A-STREAM-001": {
+      "level": "SHOULD",
+      "status": "SKIPPED",
+      "transports": {"jsonrpc": "SKIPPED"},
+      "errors": [],
+      "test_ids": ["tests/compatibility/test_streaming.py::test_stream_message[jsonrpc]"]
+    },
+    "A2A-PUSH-001": {
+      "level": "MAY",
+      "status": "NOT TESTED",
+      "transports": {},
+      "errors": [],
+      "test_ids": []
+    }
+  },
+  "per_transport": {
+    "jsonrpc": {"total": 4, "passed": 2, "failed": 1, "skipped": 1}
+  }
+}

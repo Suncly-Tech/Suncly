@@ -374,6 +374,7 @@ def create_app(services: AppServices) -> FastAPI:
                 runs=body.runs,
                 budget_limit=body.budget_limit,
                 trigger=body.trigger_value,
+                external_tools=tuple(dict.fromkeys(body.external_tools)),
             ),
         )
         return attestation_json(view)

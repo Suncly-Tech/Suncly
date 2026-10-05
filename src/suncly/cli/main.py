@@ -430,11 +430,13 @@ def _require_database_url(config: Config) -> str:
 @click.pass_context
 @handles_errors
 def db_migrate(ctx: click.Context, debug: bool) -> None:
-    """Apply db/migrations/0001_initial_schema.sql to an empty database."""
-    from suncly.adapters.postgres.migrate import apply_migration
+    """Apply every migration under db/migrations not yet applied, in order."""
+    from suncly.adapters.postgres.migrate import MIGRATIONS, apply_migrations
 
-    outcome = apply_migration(_require_database_url(_config(ctx)))
-    click.echo(f"Migration 0001_initial_schema.sql: {outcome}.")
+    applied = apply_migrations(_require_database_url(_config(ctx)))
+    for name in MIGRATIONS:
+        state = "applied" if name in applied else "already applied"
+        click.echo(f"Migration {name}.sql: {state}.")
 
 
 @db.command("check")

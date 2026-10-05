@@ -65,6 +65,8 @@ class WorkerConfig:
     retry_base_seconds: float = 5.0
     retry_cap_seconds: float = 300.0
     runner_timeout_s: float = 30.0
+    external_tool_timeout_s: float = 900.0
+    """Deadline for one external tool run (the TCK or a Promptfoo pack)."""
 
 
 @dataclass(frozen=True)
@@ -85,7 +87,15 @@ class AppConfig:
     currency: str = "EUR"
     evidence_bucket: str | None = None
     """When set, transcripts live in this object-storage bucket instead of the local disk."""
+    a2a_tck_dir: str | None = None
+    """A checkout of the pinned A2A TCK (worker only); unset means the tool is unavailable."""
+    promptfoo_pack: str | None = None
+    """The approved Promptfoo pack the worker runs (worker only); unset means unavailable."""
+    promptfoo_bin: str = "promptfoo"
+    """The promptfoo executable in the worker image."""
     secret_manager_project: str | None = None
+    signing_key_secret: str | None = None
+    """Secret Manager resource holding the signing key versions (worker and rotation)."""
     cors_origins: tuple[str, ...] = ("http://localhost:3100", "http://localhost:3000")
 
     def __post_init__(self) -> None:

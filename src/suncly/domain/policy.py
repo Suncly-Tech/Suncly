@@ -8,6 +8,7 @@ label, ``content_hash`` is what the signature binds.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from datetime import datetime, timedelta
 from enum import StrEnum
 from typing import Any
@@ -144,6 +145,20 @@ class TestCaseEvaluation(BaseModel):
     detail: str = ""
 
 
+class ExternalToolSummary(BaseModel):
+    """What one external tool (the A2A TCK, a Promptfoo pack) contributed to the evidence."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    tool: str
+    tool_version: str
+    passed: int = Field(ge=0)
+    failed: int = Field(ge=0)
+    undecided: int = Field(ge=0)
+    failure: str | None = None
+    """Set when the tool could not run; its checks are then all absent."""
+
+
 class PolicyEvaluation(BaseModel):
     """What the Policy engine concluded, and every reason it gives."""
 
@@ -155,6 +170,8 @@ class PolicyEvaluation(BaseModel):
     reasons: list[str]
     test_cases: list[TestCaseEvaluation] = Field(default_factory=list)
     requires_human: bool = False
+    external: list[ExternalToolSummary] = Field(default_factory=list)
+    """External tool results the decision took into account."""
 
 
 _PRECISION = 9
@@ -239,6 +256,7 @@ def evaluate_policy(
     baseline: dict[UUID, TestCaseResult] | None,
     baseline_at: datetime | None,
     now: datetime,
+    external: Sequence[ExternalToolSummary] = (),
 ) -> PolicyEvaluation:
     """The decision table of POLICY.md, with the customer's numbers. Pure.
 
@@ -296,6 +314,18 @@ def evaluate_policy(
                 f"the baseline evidence is {age.days} day(s) old; the policy accepts at most "
                 f"{policy.freshness.max_evidence_age_days}"
             )
+    external_problems = [
+        summary for summary in external if summary.failure is not None or summary.failed
+    ]
+    for summary in external_problems:
+        reasons.append(
+            f"external tool {summary.tool} {summary.tool_version}: "
+            + (
+                f"could not run ({summary.failure})"
+                if summary.failure is not None
+                else f"{summary.failed} failed check(s), {summary.undecided} undecided"
+            )
+        )
     failed = [e for e in evaluations if e.verdict is TestCaseVerdict.FAIL]
     borderline = [
         e for e in evaluations if e.verdict in (TestCaseVerdict.BORDERLINE, TestCaseVerdict.NO_RUNS)
@@ -313,11 +343,12 @@ def evaluate_policy(
         or bool(dropped)
         or bool(borderline)
         or bool(coverage_missing)
+        or bool(external_problems)
     )
     if not results:
         reasons.append("no test case results to decide on")
         requires_human = True
-    if dropped or borderline or coverage_missing or not results:
+    if dropped or borderline or coverage_missing or external_problems or not results:
         outcome = DecisionOutcome.FLAG
     elif failed:
         outcome = DecisionOutcome.BLOCK if thresholds.block_on_fail else DecisionOutcome.FLAG
@@ -340,4 +371,5 @@ def evaluate_policy(
         reasons=reasons,
         test_cases=evaluations,
         requires_human=requires_human and outcome is not DecisionOutcome.APPROVE,
+        external=list(external),
     )

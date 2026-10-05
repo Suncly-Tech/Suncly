@@ -1,0 +1,8 @@
+{
+  "name": "suncly-promptfoo-runner",
+  "private": true,
+  "description": "Pins the promptfoo version the Promptfoo adapter is written against (MIT).",
+  "dependencies": {
+    "promptfoo": "0.123.1"
+  }
+}

@@ -19,10 +19,15 @@ from suncly.adapters.httpx_card_fetcher import HttpxCardFetcher
 from suncly.adapters.local_transcripts import LocalTranscriptStorage
 from suncly.adapters.memory_app_store import MemoryApplicationStore
 from suncly.adapters.scoped_executor import ScopedSubprocessRunExecutor
+from suncly.adapters.secret_keys import (
+    SIGNING_KEY_ENV_VAR,
+    EnvSigningKeys,
+    SecretManagerSigningKeys,
+)
 from suncly.adapters.secrets import EnvironmentSecrets, NoSecrets, SecretManagerSecrets
 from suncly.adapters.stripe_billing import FakeBillingProvider, StripeBillingProvider
 from suncly.adapters.system import SystemClock, UuidIds
-from suncly.core.app import AppServices
+from suncly.core.app import AppServices, ExternalToolFactory
 from suncly.core.app_config import AppConfig
 from suncly.core.authz import Authorizer
 from suncly.core.billing import BillingService
@@ -35,10 +40,12 @@ from suncly.domain.network import NetworkPolicy
 from suncly.domain.tenancy import AgentRegistration
 from suncly.ports.app_store import ApplicationStore
 from suncly.ports.billing_provider import BillingProvider
+from suncly.ports.external_tools import ExternalToolRunner
 from suncly.ports.identity import TokenVerifier
 from suncly.ports.model import StructuredModelClient
 from suncly.ports.run_executor import RunExecutor
 from suncly.ports.secrets import SecretResolver
+from suncly.ports.signer import SigningKeys
 from suncly.ports.store import EvidenceStore
 from suncly.ports.transcripts import TranscriptStorage
 
@@ -130,6 +137,18 @@ def build_secret_resolver(app_config: AppConfig, env: Mapping[str, str]) -> Secr
     return EnvironmentSecrets(env)
 
 
+def build_signing_keys(
+    config: Config, app_config: AppConfig, env: Mapping[str, str]
+) -> SigningKeys:
+    """Secret Manager when configured (rotation-capable), else the platform-filled variable,
+    else the CLI's key files under ``SUNCLY_HOME``."""
+    if app_config.signing_key_secret:
+        return SecretManagerSigningKeys(app_config.signing_key_secret)
+    if env.get(SIGNING_KEY_ENV_VAR, "").strip():
+        return EnvSigningKeys(env)
+    return FileSigningKeys(config.keys_dir)
+
+
 def build_app_services(
     config: Config,
     app_config: AppConfig,
@@ -166,7 +185,7 @@ def build_app_services(
         transcripts=build_transcripts(config, app_config),
         fetcher=HttpxCardFetcher(config.card_timeout_s, config.card_max_bytes, policy=policy),
         drafter=DeterministicDrafter(),
-        keys=FileSigningKeys(config.keys_dir),
+        keys=build_signing_keys(config, app_config, env),
         clock=clock,
         ids=ids,
         usage=usage,
@@ -185,4 +204,51 @@ def build_app_services(
             )
 
         services.executor_factory = factory
+        services.external_tools = build_external_tools(app_config, resolver, base_env)
     return services
+
+
+def build_external_tools(
+    app_config: AppConfig, resolver: SecretResolver, base_env: Mapping[str, str]
+) -> dict[str, ExternalToolFactory]:
+    """The external tool runners this worker can provision, by tool name.
+
+    Each factory builds a ``ToolProcess`` scoped to one registration: the
+    Runner's minimal environment, the deployment's network mode and, only for
+    a tool that needs it to reach the sandbox, the agent credential in the one
+    variable that tool is documented to read.
+    """
+    from pathlib import Path
+
+    from suncly.adapters.external import A2ATckRunner, PromptfooRunner, ToolProcess
+    from suncly.adapters.external.process import credential_environment
+
+    def process_for(registration: AgentRegistration, with_credential: bool) -> ToolProcess:
+        extra = (
+            credential_environment(resolver.resolve(registration.credential))
+            if with_credential
+            else {}
+        )
+        return ToolProcess(base_env, registration.deployment_mode, extra)
+
+    tools: dict[str, ExternalToolFactory] = {}
+    if app_config.a2a_tck_dir:
+        checkout = Path(app_config.a2a_tck_dir)
+
+        def tck(registration: AgentRegistration) -> ExternalToolRunner:
+            # The TCK fetches the card and talks to the agent itself; it has no credential
+            # option, so it runs without one (a sandbox that requires auth fails its checks).
+            return A2ATckRunner(process_for(registration, with_credential=False), checkout)
+
+        tools["a2a-tck"] = tck
+    if app_config.promptfoo_pack:
+        pack = Path(app_config.promptfoo_pack)
+        binary = app_config.promptfoo_bin
+
+        def promptfoo(registration: AgentRegistration) -> ExternalToolRunner:
+            return PromptfooRunner(
+                process_for(registration, with_credential=True), pack, command=[binary]
+            )
+
+        tools["promptfoo"] = promptfoo
+    return tools

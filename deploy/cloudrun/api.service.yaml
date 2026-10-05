@@ -1,0 +1,101 @@
+# The Suncly API on Cloud Run (Knative serving manifest; `gcloud run services replace`).
+# Image references must be digest-pinned: deploy/validate.py refuses a tag or :latest.
+# Secrets reach the container only through Secret Manager references.
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: suncly-api
+  labels:
+    app: suncly
+    component: api
+  annotations:
+    run.googleapis.com/ingress: all
+    run.googleapis.com/description: "Suncly HTTP API: tenancy, contracts, attestations, evidence, billing."
+spec:
+  template:
+    metadata:
+      labels:
+        app: suncly
+        component: api
+      annotations:
+        autoscaling.knative.dev/minScale: "1"
+        autoscaling.knative.dev/maxScale: "10"
+        run.googleapis.com/cloudsql-instances: "${PROJECT_ID}:${REGION}:suncly-db"
+        run.googleapis.com/execution-environment: gen2
+        run.googleapis.com/startup-cpu-boost: "true"
+    spec:
+      serviceAccountName: suncly-api@${PROJECT_ID}.iam.gserviceaccount.com
+      containerConcurrency: 40
+      timeoutSeconds: 60
+      containers:
+        - name: api
+          image: ${REGION}-docker.pkg.dev/${PROJECT_ID}/suncly/suncly@sha256:${IMAGE_DIGEST}
+          args: ["api"]
+          ports:
+            - name: http1
+              containerPort: 8080
+          resources:
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          env:
+            - name: SUNCLY_ENVIRONMENT
+              value: production
+            - name: SUNCLY_NETWORK_MODE
+              value: public
+            - name: SUNCLY_PUBLIC_BASE_URL
+              value: https://api.suncly.example
+            - name: SUNCLY_ISSUER
+              value: suncly.example
+            - name: SUNCLY_OIDC_ISSUER
+              value: https://accounts.google.com
+            - name: SUNCLY_OIDC_AUDIENCE
+              value: ${OIDC_CLIENT_ID}
+            - name: SUNCLY_OIDC_JWKS_URL
+              value: https://www.googleapis.com/oauth2/v3/certs
+            - name: SUNCLY_BILLING_PROVIDER
+              value: stripe
+            - name: SUNCLY_EVIDENCE_BUCKET
+              value: ${PROJECT_ID}-suncly-evidence
+            - name: SUNCLY_CORS_ORIGINS
+              value: https://app.suncly.example
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: suncly-database-url-api
+                  key: latest
+            - name: STRIPE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: suncly-stripe-secret-key
+                  key: latest
+            - name: STRIPE_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: suncly-stripe-webhook-secret
+                  key: latest
+            - name: STRIPE_PRICE_PILOT
+              valueFrom:
+                secretKeyRef:
+                  name: suncly-stripe-price-pilot
+                  key: latest
+            - name: STRIPE_PRICE_TEAM
+              valueFrom:
+                secretKeyRef:
+                  name: suncly-stripe-price-team
+                  key: latest
+          startupProbe:
+            httpGet:
+              path: /v1/ready
+              port: 8080
+            initialDelaySeconds: 2
+            periodSeconds: 3
+            failureThreshold: 20
+          livenessProbe:
+            httpGet:
+              path: /v1/health
+              port: 8080
+            periodSeconds: 30
+  traffic:
+    - percent: 100
+      latestRevision: true

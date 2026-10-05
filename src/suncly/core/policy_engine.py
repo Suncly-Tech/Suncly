@@ -30,6 +30,7 @@ from suncly.domain.models import (
     TestCase,
 )
 from suncly.domain.policy import (
+    ExternalToolSummary,
     PolicyConfiguration,
     PolicyEvaluation,
     TestCategory,
@@ -102,6 +103,8 @@ class SigningBinding:
     baseline_at: datetime | None = None
     artifact_hashes: Mapping[str, str] = field(default_factory=dict)
     reviewer: str | None = None
+    external: Sequence[ExternalToolSummary] = ()
+    """External tool results that take part in the decision (never an approval)."""
 
 
 def decide(results: Sequence[TestCaseResult]) -> PolicyEvaluation:
@@ -138,6 +141,7 @@ class PolicyEngine:
             baseline=binding.baseline,
             baseline_at=binding.baseline_at,
             now=self._clock.now(),
+            external=binding.external,
         )
         return results, evaluation
 

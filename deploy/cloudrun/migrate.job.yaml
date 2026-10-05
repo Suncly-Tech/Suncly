@@ -1,0 +1,40 @@
+# Applies pending migrations (db/migrations, bookkept in suncly_app.schema_migration).
+# Run once per release before the new API and worker revisions receive traffic.
+apiVersion: run.googleapis.com/v1
+kind: Job
+metadata:
+  name: suncly-migrate
+  labels:
+    app: suncly
+    component: migrate
+spec:
+  template:
+    metadata:
+      annotations:
+        run.googleapis.com/cloudsql-instances: "${PROJECT_ID}:${REGION}:suncly-db"
+    spec:
+      parallelism: 1
+      taskCount: 1
+      template:
+        spec:
+          serviceAccountName: suncly-migrate@${PROJECT_ID}.iam.gserviceaccount.com
+          maxRetries: 0
+          timeoutSeconds: 600
+          containers:
+            - name: migrate
+              image: ${REGION}-docker.pkg.dev/${PROJECT_ID}/suncly/suncly@sha256:${IMAGE_DIGEST}
+              args: ["migrate"]
+              env:
+                - name: SUNCLY_ENVIRONMENT
+                  value: production
+                - name: SUNCLY_OIDC_ISSUER
+                  value: https://accounts.google.com
+                - name: SUNCLY_OIDC_AUDIENCE
+                  value: ${OIDC_CLIENT_ID}
+                - name: SUNCLY_OIDC_JWKS_URL
+                  value: https://www.googleapis.com/oauth2/v3/certs
+                - name: DATABASE_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: suncly-database-url-migrate
+                      key: latest

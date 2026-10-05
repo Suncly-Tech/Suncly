@@ -30,6 +30,7 @@ from suncly.ports.store import EvidenceStore
 from suncly.ports.transcripts import TranscriptStorage
 
 ExecutorFactory = Callable[[AgentRegistration], RunExecutor]
+ExternalToolFactory = Callable[[AgentRegistration], ExternalToolRunner]
 
 
 @dataclass
@@ -51,8 +52,9 @@ class AppServices:
     model_client: StructuredModelClient | None = None
     executor_factory: ExecutorFactory | None = None
     """Present only in the worker."""
-    external_tools: dict[str, ExternalToolRunner] = field(default_factory=dict)
-    """External evaluation adapters available to the worker, by tool name."""
+    external_tools: dict[str, ExternalToolFactory] = field(default_factory=dict)
+    """External evaluation adapters available to the worker, by tool name; each factory
+    provisions a runner scoped to one registration (its credential, its network mode)."""
 
     def close(self) -> None:
         self.store.close()

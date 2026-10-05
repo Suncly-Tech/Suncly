@@ -20,6 +20,7 @@ npm run functional       # links, navigation, install tabs, copy, specimen strip
 npm run inspect-storage  # cookies, storage keys and request hosts in the built site
 npm run lighthouse       # Lighthouse mobile and desktop on / and /docs
 npm run lcp-probe        # Lighthouse mobile on /, simulated and devtools throttling side by side
+npm run lcp-graph        # Lighthouse's own Lantern graph for the simulated LCP, with what-ifs
 python tasks.py check    # the repository's own ruff, mypy and pytest
 ```
 
@@ -31,7 +32,7 @@ python tasks.py check    # the repository's own ruff, mypy and pytest
 | `npm run build` | 32 routes, all static; the export builds with zero certification records (one `specimen` record page, noindex) |
 | `npm run words` | 779 visible words on the home page (budget 800), counted per section: hero 47, works with 38, how it works 96, install 64, evidence 63, use cases 90, offer and certified 82, data 54, research 49, lab 67, scope 110, questions 18, closing 7. Navigation, code, collapsed answers, tables, the footer and the legal line are excluded |
 | `npm run forbidden` | 39 files checked, 0 problems: no "trusted by", "A2A certified", "AI Act compliant", ®, "guarantee" outside a disclaimer, competitor name, placeholder, published price, "official" or "accredited" certification, or blue in the theme |
-| `npm run axe` | 23 pages at 1440 and 390 px: no violation of any impact |
+| `npm run axe` | 24 pages (the specimen record included since stage 5) at 1440 and 390 px: no violation of any impact |
 | `npm run keyboard` | 14 of 14 checks pass: skip link first, visible focus ring, primary action, install tabs (arrow keys move the selection), copy button announces "Copied", specimen strip, FAQ summaries, Find Suncly links, mobile menu opens from the keyboard, focus trapped, Escape closes |
 | `npm run functional` | 22 of 22 checks pass: 31 internal link targets return 200 and every anchor has a target on its page; the five primary links open their pages and the Install button jumps to `#install`; six install tabs, a tool tab shows Planned, the Terminal tab returns with its code block, the Windows toggle shows the PowerShell line, the copy button copies exactly the shown commands and announces success; the specimen strip reports the lying agent; on `/demo` the Signature tab controls a panel with the matching id and the in-browser verification runs with every check passing; the sample loads into the workspace, the overview shows it, the evaluation opens, the review form announces its validation errors, settings renders the clear action; no page errors |
 | `npm run inspect-storage` | cookies: none; sessionStorage: none; localStorage before any action: none; after loading the sample into the workspace: `suncly.workspace.v1`; request hosts: the site only; third-party hosts: none |
@@ -116,13 +117,48 @@ score 88 to 91):
   animation is transform-only so the picture paints at once, Newsreader's weight axis was
   pinned.
 
-**What remains and why it was not done.** Reaching 2.5 s by simulation would mean removing
-roughly 140 KB more from the before-paint set. The only candidates are the Next.js runtime
-and hydration scripts (needed by the install tabs, the specimen strip, the sticky stage,
-the navigation sheet and the workspace) and the self-hosted fonts (the brief's
-typography). Dropping either is a design decision, not a fix, so the shortfall is reported
-rather than engineered around. The CSS is already inlined, the scripts are deferred and
-unused-JavaScript savings are estimated at 52 KB inside the framework chunks.
+**Why it is still 2.9 s, from Lighthouse's own model** (`npm run lcp-graph`, final build,
+output kept in `lighthouse/lcp-graph.txt`). Lighthouse's LCP is the average of an
+optimistic and a pessimistic simulation of the page's dependency graph, floored at FCP;
+for this page both come to 2.89 s because both treat every request that starts before
+the observed paint as render-blocking. The simulated timeline is:
+
+| Simulated ms | Node | KB |
+| --- | --- | --- |
+| 0 to 903 | the document (half of it the React Server Components payload) | 58 |
+| 903 to 1206 | the hero picture, preloaded | 5 |
+| 903 to 2256 | the three fonts, sharing the 1.6 Mbps link | 79 |
+| 975 to 2710 | seven scripts, the two framework chunks last | 155 |
+| 2710 to 2892 | the first evaluation of the React runtime, which performs layout before the observed paint and so counts as render-blocking | |
+
+Re-simulating the same graph with resources removed, nothing else changed:
+
+| Graph | Simulated LCP |
+| --- | --- |
+| as built | 2.89 s |
+| without the three fonts | 2.63 s |
+| without every script | 2.74 s |
+| without the two framework chunks only | 2.89 s (the smaller scripts and the runtime evaluation remain) |
+| without every font and every script | 2.55 s |
+
+So the earlier estimate that "about 140 KB" had to go was wrong: even an empty-handed
+page (no fonts, no scripts) simulates at 2.55 s, because the document's 0.9 s and the
+layout work after it are most of the figure. The levers that remain are the document's
+size and the simulation's own constants.
+
+**The one small fix tested, and rejected.** Serving the stylesheet as an external file
+instead of inlining it (`experimental.inlineCss: false`) removes the stylesheet's second
+copy from the server-component payload: the document fell from 58 KB to 34 KB gzipped
+and the simulated LCP from 2.89 s to 2.80 s (three runs: 2.80, 2.84, 2.80; score 94 to
+95). But under devtools throttling the observed first paint and LCP went from 1.15 s and
+1.36 s to 1.88 s and 1.88 s, because the render-blocking stylesheet request now costs a
+round trip before anything paints, and a layout shift of 0.026 appeared. A tenth of a
+second in the simulation is not worth half a second on a real slow connection, so the
+inlined CSS stays. No other change inside the current stack (Next.js and the chosen fonts
+are fixed by the brief) was found that moves the simulated figure without a cost
+elsewhere, and optimising stopped there. **The simulated LCP target is recorded as
+failed.** The observed LCP passes under both devtools throttling (1.36 s) and no
+throttling (0.12 to 0.18 s).
 
 ## Screenshots
 
@@ -158,6 +194,40 @@ the FAQ; the closing sky's layers pause off screen and stay still under reduced 
 the footer banner's edge light runs once; the shared wordmark definition renders in the
 navigation, the footer lockup and the banner on every page.
 
+## Stage 5: inner pages and legal drafts
+
+- **Routes against section 6 of the brief.** Every page the brief lists exists and builds
+  (`HANDOFF.md` §8). Two are conditional in the brief and are deferred because their
+  condition is unmet: the research note pages (no note is published) and the coding-agents
+  guide under `/docs` (no tool is verified). Nothing is missing.
+- **Layouts inspected** from the final screenshots at 1440 and 390 px: `/offer`,
+  `/certified`, `/certified/policy`, `/certified/specimen`, `/data`, `/research`, `/lab`,
+  `/cookies`, `/legal`, `/privacy`, `/terms`, `/product`, `/workflows`, `/demo`,
+  `/security`, `/docs`, `/docs/getting-started`, `/docs/cli`, `/docs/evidence`,
+  `/company`, `/access`, `/glossary`, `/app`, `/app/new`, `/app/settings`. Fixes: the Lab
+  table's agent names no longer break mid-word on phones; `/docs/getting-started` clones
+  from the repository's current remote and no longer says repository access comes with the
+  pilot.
+- **Legal drafts read against the product, the data flows, the pricing state and the
+  certification state.** Consistent on: no hosted service, no accounts, no billing, no
+  price, flag-only decisions, the tool sends nothing to Suncly, one local-storage key, no
+  cookies, no criteria adopted, no record issued, badge free, repository public with no
+  licence. Four wording fixes: the Certification Policy's §11 summary promised an answer
+  within one month while its body leaves response times blank; the Terms' certification
+  section now says no criteria are published and no record exists; the legal notice now
+  presents the Estonian Acts as our reading for counsel to confirm; the security page and
+  `security.txt` say the contact is the general address, not yet confirmed for security
+  reports. Every drafted period or amount (notice periods, dispute answers, confidentiality
+  term, badge removal, liability cap) is listed in `legal/REVIEW.md` as a founder or counsel
+  decision. No legal verification is claimed: every primary source remains unreachable.
+- **Draft state.** `/privacy`, `/terms`, `/legal`, `/certified/policy` and
+  `/certified/specimen` carry the draft notice (where applicable) and
+  `<meta name="robots" content="noindex, nofollow">` in the export; none is in the sitemap.
+- **The security reporting address.** `team@suncly.com` was the previous site's general
+  contact (six files at the pre-redesign commit) and is `site.email` and
+  `company.contactEmail` now. `company.securityContactEmail` is blank. Whether the founders
+  want security reports at that address is unknown and is flagged in `HANDOFF.md` §4a.
+
 ## Acceptance against the stage-4 brief
 
 | Item | Status | Evidence |
@@ -171,13 +241,16 @@ navigation, the footer lockup and the banner on every page.
 | Social links accessible | pass | 44 px rings, accessible names, keyboard check; destinations themselves unverified (below) |
 | Interactions, reduced motion and URLs preserved | pass | functional and keyboard checks; every previous route builds |
 | Mobile Lighthouse performance ≥ 90 | pass, narrowly | 91 to 95 simulated across four runs; 90 devtools |
-| LCP < 2.5 s | **fail (simulated)**, pass (observed) | 2.87 to 2.91 s simulated; 1.36 s devtools; 0.18 s unthrottled |
+| LCP < 2.5 s | **fail (simulated)**, pass (observed) | 2.87 to 2.91 s simulated across seven runs; 1.36 s devtools; 0.12 to 0.18 s unthrottled; cause shown by `npm run lcp-graph` |
 | CLS < 0.1 | pass | 0 simulated and unthrottled; 0.0004 devtools |
 | Accessibility 100; desktop performance 100 | pass | Lighthouse on `/` and `/docs`; axe on 23 pages |
 | Unapproved certification criteria kept internal | pass | `REDESIGN_PLAN.md` §9 only; `/certified/policy` says none adopted |
 | Specimen record clearly fictional, no real agent implied | pass | `/certified/specimen`: "Specimen record (fictional)", "certifies nothing", noindex |
 | Legal pages visibly draft and noindex | pass | draft notice and robots meta on `/privacy`, `/terms`, `/legal`, `/certified/policy` |
-| No invented contacts or promises in `security.txt` and the disclosure policy | pass | contact is the site's existing address; no acknowledgement, fix-time, safe-harbour, credit or incident-notice promise |
+| No invented contacts or promises in `security.txt` and the disclosure policy | pass, with a flag | contact is the site's existing general address, stated as not yet confirmed for security reports; no acknowledgement, fix-time, safe-harbour, credit or incident-notice promise |
+| Security reporting address founder-authorised | unverified | `securityContactEmail` is blank; founder decision needed |
+| Legal drafts consistent with the product, data flows, pricing and certification state | pass | stage 5 read; four wording fixes above |
+| Legal applicability verified against primary sources | unverified | every source unreachable (`legal/APPLICABILITY.md`) |
 | `/demo` signature verification | pass | in-browser verification, every check passing (`npm run functional`) |
 | `/app` behaviour | pass | sample load, overview, evaluation, review form errors, settings |
 | Navigation, install tabs, copy buttons, links | pass | `npm run functional`: 31 targets, every anchor, six tabs, exact clipboard text |

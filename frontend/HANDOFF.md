@@ -29,8 +29,9 @@ checked and what was not), `REDESIGN_PLAN.md` (the plan and the audit) and
   legal notice, the security page's disclosure policy and `security.txt`; the research
   behind them in `legal/`. All four legal pages carry a visible draft notice and
   `noindex` until `launch.legalPublished` is set after sign-off.
-- Scripts: screenshots at four widths for every page, axe, keyboard, Lighthouse (full set
-  and the simulated-versus-observed LCP probe), the functional checks (every internal
+- Scripts: screenshots at four widths for every page, axe, keyboard, Lighthouse (full set,
+  the simulated-versus-observed LCP probe and the Lantern graph that explains the
+  simulated figure), the functional checks (every internal
   link, navigation, install tabs, copy buttons, the `/demo` signature verification, the
   workspace), the word budget, the forbidden-words scan, the storage inspection, the art
   and badge renderers.
@@ -80,6 +81,11 @@ checked and what was not), `REDESIGN_PLAN.md` (the plan and the audit) and
   repository's current practice. Those commitments are founder and counsel decisions
   (`legal/REVIEW.md`). The Terms draft keeps its thirty-day and fourteen-day notice
   clauses as questions for counsel, marked in `legal/REVIEW.md`.
+- **The security reporting address.** `security.txt` and the disclosure policy point to
+  `team@suncly.com`. That address is the team's general contact and was on the previous
+  site, but no founder has confirmed it as the destination for security reports and
+  `securityContactEmail` in `lib/launch.ts` is blank. Both places say so. Confirming or
+  replacing it is a founder decision (section 4a).
 - **Research notes.** The three note titles are listed as drafts in founder review; no
   note is published and none is in the sitemap.
 - **"Trusted by", "A2A certified", "AI Act compliant", ®, "official", "accredited".**
@@ -118,31 +124,47 @@ Without these the site can be deployed, but the pages named stay drafts or stay 
    them to install. The Terms bridge it with a limited licence; a real licence is the fix.
 4. **The canonical host** (`suncly.com` or `www.suncly.com`), which fixes the canonical
    URLs, the sitemap and `security.txt`'s absolute links.
+5. **The security reporting address**: confirm `team@suncly.com` as the destination for
+   security reports, or supply a dedicated address. Until then `security.txt` and the
+   disclosure policy carry the general address with a visible caveat.
+6. **The Estonian summary** on `/legal` (provisional blocker): our reading is that the
+   Language Act asks an Estonian company with a foreign-language site to summarise its
+   field of activity in Estonian. That reading is unverified (the Act could not be
+   fetched), so the summary is treated as required until counsel says otherwise; the
+   draft text needs founder review for accuracy and counsel's view on the obligation.
+
+This list is provisional wherever it rests on legal applicability: every primary source
+in `legal/APPLICABILITY.md` is marked unverified, and counsel may add to it or strike
+from it.
 
 ### 4b. Can remain planned, omitted or marked as such
 
 The site is truthful without them; each is visibly unresolved where it appears.
 
-5. **Pricing** (block 4): the billable unit, price and currency, billing period and
+7. **Pricing** (block 4): the billable unit, price and currency, billing period and
    payment method, pilot terms. `/offer` shows "not yet published"; the Terms' fee
    table has named blanks.
-6. **Certification** (block 6): accept or change the v0.1 profile; validity period;
+8. **Certification** (block 6): accept or change the v0.1 profile; validity period;
    re-test triggers; response times; who decides; the corrections and appeals address.
    Until then the programme reads "Opening with our pilots", no criteria are published
    and no record exists.
-7. **Response and support commitments** for the disclosure policy and `security.txt`:
-   acknowledgement time, fix window, safe harbour, credit, support period. None are
-   promised now.
-8. **Hacker News**: the exact `news.ycombinator.com` URL of the profile or submission.
-   The row shows four destinations until then.
-9. **Platform glyph permissions** and official SVGs for X, LinkedIn, GitHub and Reddit.
-   Text abbreviations ship until then.
-10. **Coding-agent runs** (block 3): one recorded run per tool turns its Planned label
-    into Available and fills its install tab.
-11. **The Estonian summary** on `/legal`, for review.
-12. **Whether to build the Agent Skill** (`REDESIGN_PLAN.md` §7).
-13. **Research notes**: founder review of the three drafts before any is published.
-14. **Commissioned stills**, if the vector renders are not enough (`art/README.md`).
+9. **Response and support commitments** for the disclosure policy, `security.txt`, the
+   Certification Policy (corrections and appeals) and the drafted periods in the Terms
+   (notice of charging, dispute answers, termination, export) and the Certification Policy
+   (correction of a prohibited use, badge removal, notice of licence changes). None is
+   promised in the security texts; the periods in the Terms and the Policy are drafts
+   listed in `legal/REVIEW.md` for the founders and counsel to set.
+10. **Hacker News**: the exact `news.ycombinator.com` URL of the profile or submission.
+    The row shows four destinations until then.
+11. **Platform glyph permissions** and official SVGs for X, LinkedIn, GitHub and Reddit.
+    Text abbreviations ship until then.
+12. **Coding-agent runs** (block 3): one recorded run per tool turns its Planned label
+    into Available, fills its install tab and unlocks the coding-agents guide under
+    `/docs` that the brief makes conditional on a verified tool.
+13. **Whether to build the Agent Skill** (`REDESIGN_PLAN.md` §7).
+14. **Research notes**: founder review of the three drafts before any is published; the
+    note pages under `/research` are built only then.
+15. **Commissioned stills**, if the vector renders are not enough (`art/README.md`).
 
 ## 5. Payment readiness
 
@@ -161,17 +183,34 @@ Privacy Policy §13 and `/data` say the question is open.
 
 ## 7. Known limitations of this delivery
 
-- Lighthouse mobile performance on `/` is 91 to 95 (simulated throttling, four runs on the
-  final build; 90 under devtools throttling). The simulated LCP is 2.9 s against the
-  brief's 2.5 s: the simulation charges every byte requested before the first paint
-  (the document, 80 KB of fonts, 158 KB of framework and hydration scripts) to the hero
-  picture, even though the picture itself is 5 KB, preloaded, and paints at 0.18 s
-  unthrottled and 1.4 s under devtools throttling. The fixes that were available were
-  made (fonts cut from 117 to 80 KB, the wordmark path written once, the hero preload,
-  the animation library removed); what remains is the Next.js runtime and the fonts
-  themselves. `VERIFICATION.md` has the figures and the reasoning.
+- Lighthouse mobile performance on `/` is 91 to 95 (simulated throttling, seven runs on
+  the final two builds; 90 to 94 under devtools throttling). The simulated LCP is 2.8 to
+  2.9 s against the brief's 2.5 s and is reported as a failure. `npm run lcp-graph`
+  shows why from Lighthouse's own model: the document (59 KB gzipped, half of it the
+  server-component payload) takes 0.9 s on the simulated link before anything else can
+  start; the fonts, the framework scripts and the hero picture then share the link; and
+  the first evaluation of the React runtime, which performs layout before the observed
+  paint, is the last node. Re-simulating that graph without every font and every script
+  still gives about 2.5 s, so no removal short of the document itself reaches the target.
+  One small fix inside the stack was tested and rejected: serving the CSS as an external
+  file instead of inlining it cut the document to 34 KB and the simulated LCP by 0.1 s,
+  but made the observed throttled paint 0.5 s slower and introduced a layout shift, so the
+  inlined CSS stays. The gap is retained and documented in `VERIFICATION.md`; optimising
+  stopped there.
 - The home page is long on phones (a tall page of sixteen sections); the four-frame
   story carries one stage on phones and the sticky stage on desktop.
 - Firefox and Safari rendering were not checked (no browser available beyond Chromium).
 - The workspace was restyled through tokens; every screen was screenshotted but its
   behaviour was exercised only as far as `VERIFICATION.md` says.
+
+## 8. Pages against the brief's section 6 (stage 5)
+
+| Page | State | Note |
+| --- | --- | --- |
+| `/offer`, `/certified`, `/certified/policy`, `/certified/specimen`, `/data`, `/research`, `/lab`, `/cookies`, `/legal` | built | the new pages; `/certified/<id>` has one generated page because `records.json` is empty, labelled a fictional specimen, noindex |
+| `/product`, `/workflows`, `/demo`, `/security`, `/docs`, `/docs/getting-started`, `/docs/cli`, `/docs/evidence`, `/company`, `/access`, `/glossary`, `/privacy`, `/terms` | built, restyled | every previous URL kept; `/docs/getting-started` now clones from the repository's current remote (the old owner's URL was stale) and no longer says repository access comes with the pilot |
+| `/app`, `/app/new`, `/app/import`, `/app/compare`, `/app/evaluation`, `/app/agent`, `/app/settings` | built, tokens only | behaviour unchanged; the functional script exercises the sample load, overview, evaluation, review form and settings |
+| Research note pages under `/research` | deferred by the brief's condition | the three notes are drafts in founder review; none is published, so no note page exists and none is in the sitemap |
+| Coding-agents guide under `/docs` | deferred by the brief's condition | built "once any tool is verified"; no tool is |
+| Search surfaces: `lib/seo.ts` DEFINITION, JSON-LD, `llms.txt`, `llms-full.txt`, sitemap, manifest, `og.png` | built | the social preview is in the new look; the sitemap lists the indexable pages only (the four legal drafts and the specimen are noindex and absent) |
+| Missing against section 6 | none | |

@@ -105,7 +105,7 @@ table moved from the home page to `/product`; statuses read Available / Pilot / 
 "the repository is private" became "the repository is public" (`RUN`); `/security` gained
 the disclosure policy, the support-period statement and the supplier-questionnaire table
 (`CODE`; no compliance claimed), and `public/.well-known/security.txt` (marked draft; `Contact` is the site's existing
-address `site.email`; no acknowledgement, fix-time, safe-harbour, credit or
+address `site.email`, which the founders have not confirmed as the destination for security reports; no acknowledgement, fix-time, safe-harbour, credit or
 incident-notice promise anywhere, because none has been decided — `INPUTS` block 5).
 
 ## Legal: Privacy (`/privacy`), Terms (`/terms`), Cookies (`/cookies`), Legal notice (`/legal`)
@@ -123,3 +123,19 @@ for founder review.
 Restyled through tokens only; behaviour unchanged. Reads `result.json` + `transcripts/*.json`
 (format `suncly-result/1`, `adapters/report/writer.py`); verification mirrors `core/verify.py`;
 comparison is computed in the browser and says so; no run can be started from the browser.
+
+## Stage 5 corrections
+
+- `/docs/getting-started`: the clone URL is the repository's current remote
+  (`git remote get-url origin`, `README.md`, `docs/QUICKSTART.md`: `Suncly-Tech/Suncly`);
+  the page had the previous owner's URL. "Repository access comes with the pilot" was
+  replaced by "The repository is public" (`RUN`, as on the home page).
+- `/legal`: the intro and the note under the Estonian summary now present the Information
+  Society Services Act, the Commercial Code and the Language Act as our reading, to be
+  confirmed by counsel, not as settled requirements (`legal/APPLICABILITY.md`: unverified).
+- `/certified/policy` §11: the summary line no longer promises an answer within one month;
+  response times are a named blank.
+- `/terms` §7: states that no criteria are published and no record exists while
+  `certification.criteriaAccepted` is false.
+- `/security` and `security.txt`: say that `team@suncly.com` is the general address and not
+  yet confirmed for security reports.

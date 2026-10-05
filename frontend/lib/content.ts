@@ -1200,7 +1200,7 @@ export const legalNoticePage = {
   title: "Legal notice",
   headline: "Who runs this site.",
   intro:
-    "The company details the Information Society Services Act and the Commercial Code ask for, and a summary in Estonian of what Suncly offers.",
+    "The company details Estonian law asks a company to publish on its website (our reading of the Information Society Services Act and the Commercial Code, to be confirmed by counsel), and a summary in Estonian of what Suncly offers.",
   estonianTitle: "Kokkuvõte eesti keeles",
   /** Draft for founder review (Language Act): a summary in Estonian of the field of activity. */
   estonian:

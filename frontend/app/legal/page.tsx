@@ -5,13 +5,24 @@ import { legalNoticePage, site } from "@/lib/content";
 import { company, launch } from "@/lib/launch";
 import { pageMeta } from "@/lib/seo";
 
-export const metadata: Metadata = pageMeta({ title: "Legal notice", description: "Company details for Suncly, and a summary in Estonian of what Suncly offers.", path: "/legal", noindex: !launch.legalPublished });
+export const metadata: Metadata = pageMeta({
+  title: "Legal notice",
+  description:
+    "Company details for Suncly, and a summary in Estonian of what Suncly offers.",
+  path: "/legal",
+  noindex: !launch.legalPublished,
+});
 
 export default function LegalNoticePage() {
   const l = legalNoticePage;
   const facts: Array<[string, string | null]> = [
     ["Business name", company.legalEntityName],
-    ["Registry code and register", company.registryCode ? `${company.registryCode}, Estonian Commercial Register` : null],
+    [
+      "Registry code and register",
+      company.registryCode
+        ? `${company.registryCode}, Estonian Commercial Register`
+        : null,
+    ],
     ["Registered office", company.registeredOffice],
     ["VAT number", company.vatNumber],
     ["E-mail", company.contactEmail],
@@ -21,7 +32,15 @@ export default function LegalNoticePage() {
     <SiteLayout>
       <PageHeader eyebrow="Legal" headline={l.headline} intro={l.intro} />
       <Section narrow>
-        <DraftNotice page="legal notice" needs={["legal entity name", "registry code", "registered office", "VAT number"]} />
+        <DraftNotice
+          page="legal notice"
+          needs={[
+            "legal entity name",
+            "registry code",
+            "registered office",
+            "VAT number",
+          ]}
+        />
         <article className="prose-site">
           <h2>Company details</h2>
           <table tabIndex={0}>
@@ -36,9 +55,23 @@ export default function LegalNoticePage() {
           </table>
           <h2>{l.estonianTitle}</h2>
           <p lang="et">{l.estonian}</p>
-          <p className="summary">The Estonian summary is a draft for founder review; the Language Act asks for a summary in Estonian of the field of activity on a foreign-language site of an Estonian company.</p>
+          <p className="summary">
+            The Estonian summary is a draft for founder review. Our reading is
+            that the Language Act asks an Estonian company whose site is in a
+            foreign language to summarise its field of activity in Estonian;
+            that reading has not been checked against the Act's text, and
+            counsel confirms whether and in what form it applies before this
+            page is published.
+          </p>
           <h2>Trade marks and attribution</h2>
-          <p>Suncly and the sun mark are trade marks of the company named above. No registration is claimed. Agent2Agent (A2A) is an open-source project of the Linux Foundation; Suncly is independent and is not affiliated with, endorsed by or certified by the Linux Foundation or the A2A project. Other names belong to their owners and are used only to say where Suncly runs or what it tests.</p>
+          <p>
+            Suncly and the sun mark are trade marks of the company named above.
+            No registration is claimed. Agent2Agent (A2A) is an open-source
+            project of the Linux Foundation; Suncly is independent and is not
+            affiliated with, endorsed by or certified by the Linux Foundation or
+            the A2A project. Other names belong to their owners and are used
+            only to say where Suncly runs or what it tests.
+          </p>
         </article>
       </Section>
     </SiteLayout>

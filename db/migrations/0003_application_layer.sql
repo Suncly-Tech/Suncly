@@ -1,6 +1,6 @@
 -- =============================================================================
 -- Suncly - the hosted application layer (SCHEMA.md §12)
--- Migration: 0002_application_layer.sql
+-- Migration: 0003_application_layer.sql
 -- Target:    PostgreSQL 13+ (Cloud SQL, plain Postgres)
 --
 -- The seven entities of SCHEMA.md §3 stay exactly as 0001 created them, in the
@@ -19,13 +19,9 @@
 
 BEGIN;
 
+-- Applied after 0002 (row level security on the core tables). Recognised in the catalog
+-- by the presence of its tables (adapters/postgres/migrate.py); no bookkeeping table.
 CREATE SCHEMA IF NOT EXISTS suncly_app;
-
-CREATE TABLE suncly_app.schema_migration (
-    version     text        PRIMARY KEY,
-    applied_at  timestamptz NOT NULL DEFAULT now()
-);
-INSERT INTO suncly_app.schema_migration (version) VALUES ('0001_initial_schema'), ('0002_application_layer');
 
 -- -----------------------------------------------------------------------------
 -- Tenancy

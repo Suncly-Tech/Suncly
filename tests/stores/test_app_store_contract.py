@@ -7,6 +7,7 @@ import threading
 from collections.abc import Iterator
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
+from pathlib import Path
 from uuid import UUID, uuid4
 
 import pytest
@@ -58,7 +59,19 @@ from suncly.ports.app_store import (
 from suncly.ports.store import EvidenceStore
 
 NOW = datetime(2026, 10, 5, 12, 0, tzinfo=UTC)
+REPO_ROOT = Path(__file__).resolve().parents[2]
 STORE_KINDS = ["memory"] + (["postgres"] if os.environ.get("DATABASE_URL") else [])
+
+
+def reset_application_schema(database_url: str) -> None:
+    """Drop and recreate ``suncly_app`` from the committed migration (its tables are
+    append-only, so TRUNCATE is refused by design)."""
+    import psycopg
+
+    migration = REPO_ROOT / "db" / "migrations" / "0003_application_layer.sql"
+    with psycopg.connect(database_url, autocommit=True) as conn:
+        conn.execute("DROP SCHEMA IF EXISTS suncly_app CASCADE")
+        conn.execute(migration.read_text(encoding="utf-8"))
 
 
 @pytest.fixture(params=STORE_KINDS)
@@ -70,6 +83,8 @@ def stores(
         return
     migrated = request.getfixturevalue("migrated_database")
     from suncly.adapters.postgres.app_store import PostgresApplicationStore
+
+    reset_application_schema(migrated)
     from suncly.adapters.postgres.store import PostgresEvidenceStore
 
     app = PostgresApplicationStore(migrated)

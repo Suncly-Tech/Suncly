@@ -224,8 +224,7 @@ application layer  schema "suncly_app": organization, membership,
                    decision_note, job, job_attempt, outbox, reservation,
                    usage_event, spending_limit, subscription,
                    provider_event, meter_report, signing_key,
-                   external_artifact, reevaluation_schedule,
-                   schema_migration.
+                   external_artifact, reevaluation_schedule.
 processes          API (FastAPI), worker (Runner boundary, Judge,
                    Policy, signer, ledger), dispatcher (recovery,
                    schedules, outbox, meter), migrate.

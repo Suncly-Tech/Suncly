@@ -42,6 +42,7 @@ RUN git clone --depth 1 --branch "${A2A_TCK_REF}" https://github.com/a2aproject/
     && test "$(git rev-parse HEAD)" = "${A2A_TCK_COMMIT}" \
     && python -m venv /opt/a2a-tck-venv \
     && /opt/a2a-tck-venv/bin/pip install -e . \
+    && git rev-parse HEAD > .suncly-pin \
     && rm -rf .git
 
 # ---- stage: runtime ---------------------------------------------------------------------------
@@ -50,6 +51,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 \
     PATH="/opt/venv/bin:/opt/promptfoo/node_modules/.bin:${PATH}" \
     SUNCLY_HOME=/var/suncly \
     SUNCLY_A2A_TCK_DIR=/opt/a2a-tck \
+    SUNCLY_A2A_TCK_PYTHON=/opt/a2a-tck-venv/bin/python \
     SUNCLY_PROMPTFOO_BIN=/opt/promptfoo/node_modules/.bin/promptfoo
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates tini \

@@ -173,7 +173,8 @@ defined in the documents that own them.
 ## DR-008 The application layer lives beside the core, in its own schema
 
 **Decision.** Tenancy, jobs, money, policy records and the key registry live
-in Postgres schema `suncly_app`, created by migration 0002. The seven
+in Postgres schema `suncly_app`, created by migration 0003 (0002 is the
+row level security migration). The seven
 entities of schema §3 stay in `public`, untouched. Application rows point
 at core rows by id; the core never points back.
 

@@ -61,8 +61,11 @@ every redirect, and bounds sizes, redirects and deadlines
    repository has immutable tags, and the manifests and Terraform refuse
    anything but `@sha256:` references.
 2. Run the migrate job (`suncly db migrate`): migrations are applied in
-   order and bookkept in `suncly_app.schema_migration`; an already applied
-   file is skipped. The two migrations in this repository are additive.
+   order and recognised from the catalog; an already applied file is
+   skipped. The three migrations in this repository are additive. Migration
+   0002 enables row level security on the core tables with no policies, so
+   every process connects as the table owner until policies exist; the
+   per-process database secrets all carry that role's URL for now.
 3. Deploy the API revision; the startup probe waits for `/v1/ready` (the
    database answers). Traffic moves to the new revision only when it is
    ready.

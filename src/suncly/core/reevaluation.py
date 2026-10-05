@@ -90,6 +90,9 @@ class ReevaluationJobHandler:
             return
         context.update_progress(phase="finished", attestation_id=str(view.attestation.id))
 
+    def exhausted(self, context: JobContext, job: Job) -> None:
+        context.update_progress(phase="finished", note=f"failed {job.attempts} time(s)")
+
     def _latest_approved_contract(self, agent_id: UUID) -> UUID | None:
         s = self._s
         best = None

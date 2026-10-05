@@ -16,6 +16,11 @@ from suncly.adapters.external import (
     normalize_promptfoo_results,
     normalize_tck_report,
 )
+from suncly.adapters.external.a2a_tck import (
+    A2A_TCK_COMMIT,
+    A2A_TCK_PYPROJECT_VERSION,
+    PIN_FILE,
+)
 from suncly.core.attestations_app import AttestationWorkflow
 from suncly.domain.jobs import JobKind
 from suncly.domain.models import DecisionOutcome
@@ -34,12 +39,16 @@ def process() -> ToolProcess:
     return ToolProcess(dict(os.environ), DeploymentMode.LOCAL)
 
 
-def tck_checkout(tmp_path: Path, version: str = A2A_TCK_VERSION) -> Path:
+def tck_checkout(
+    tmp_path: Path, version: str = A2A_TCK_PYPROJECT_VERSION, commit: str = A2A_TCK_COMMIT
+) -> Path:
+    """What the worker image leaves behind: the tag's files and a pin file in place of .git."""
     checkout = tmp_path / "a2a-tck"
     checkout.mkdir(parents=True)
     (checkout / "pyproject.toml").write_text(
         f'[project]\nname = "a2a-tck"\nversion = "{version}"\n'
     )
+    (checkout / PIN_FILE).write_text(commit + "\n")
     return checkout
 
 
@@ -103,9 +112,8 @@ def test_the_tool_process_gets_the_minimal_environment_and_a_deadline(tmp_path: 
     assert result.ran and result.returncode == 0
     env = json.loads(result.stdout)
     assert "ANTHROPIC_API_KEY" not in env and "DATABASE_URL" not in env
-    assert (
-        env["SUNCLY_NETWORK_MODE"] == "public" and env["SUNCLY_AGENT_AUTHORIZATION"] == "Bearer t"
-    )
+    assert env["SUNCLY_NETWORK_MODE"] == "public"
+    assert env["SUNCLY_AGENT_AUTHORIZATION"] == "[REDACTED]", "a tool's output never shows it"
     sleeper = tmp_path / "sleep.py"
     sleeper.write_text("import time; time.sleep(5)")
     slow = tool.run([sys.executable, str(sleeper)], tmp_path, 0.5)
@@ -132,8 +140,16 @@ def test_the_tck_runner_pins_its_version_and_keeps_the_report(tmp_path: Path) ->
         tck_checkout(tmp_path / "other", "0.3.0.beta5"),
         command=[sys.executable, str(FIXTURES / "fake_tck.py")],
     )
-    assert "pinned to" in (
+    assert "pinned to tag" in (
         wrong.run("http://127.0.0.1:9999/rpc", str(tmp_path / "w2"), 60.0).failure or ""
+    )
+    moved = A2ATckRunner(
+        process(),
+        tck_checkout(tmp_path / "moved", commit="0" * 40),
+        command=[sys.executable, str(FIXTURES / "fake_tck.py")],
+    )
+    assert "is at commit 0000" in (
+        moved.run("http://127.0.0.1:9999/rpc", str(tmp_path / "w4"), 60.0).failure or ""
     )
     assert "no TCK checkout" in (
         A2ATckRunner(process(), tmp_path / "missing")

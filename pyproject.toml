@@ -85,6 +85,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
+"deploy/validate.py" = ["T201"]
 "src/suncly/cli/*" = ["T20"]
 # Queries are built from module constants (schema and table names), never from input.
 "src/suncly/adapters/postgres/*" = ["S608"]
@@ -130,6 +131,7 @@ markers = [
     "db: needs a Postgres database (set DATABASE_URL); skipped otherwise",
     "e2e: runs the whole attestation flow against local mock agents",
     "api: runs the HTTP API in process against local mock agents",
+    "integration: runs the real pinned external tools; needs SUNCLY_TEST_* variables",
 ]
 filterwarnings = [
     "error",

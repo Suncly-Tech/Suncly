@@ -329,6 +329,41 @@ class AttestationJobHandler:
         if orchestration.cancelled:
             raise JobCancelledError(f"attestation {attestation.id} was cancelled")
 
+    # -- exhausted --------------------------------------------------------------------
+
+    def exhausted(self, context: JobContext, job: Any) -> None:
+        """Every attempt failed: the attestation ends ``failed`` with no decision; the
+        reservation stays held and is listed for reconciliation (ledger lines for runs the
+        dead attempts recorded were never written, so nothing is settled by guesswork)."""
+        s = self._s
+        attestation = s.store.get_attestation(job.logical_id)
+        if attestation is None or attestation.status.is_final:
+            return
+        failed = attestation.model_copy(
+            update={"status": AttestationStatus.FAILED, "finished_at": s.clock.now()}
+        )
+        s.store.update_attestation(failed)
+        meta = s.app_store.get_attestation_meta(attestation.id)
+        if meta is not None:
+            s.app_store.add_outbox(
+                OutboxMessage(
+                    id=s.ids.new_id(),
+                    organization_id=meta.organization_id,
+                    topic="attestation.failed",
+                    dedup_key=f"attestation.failed:{attestation.id}",
+                    payload={
+                        "attestation_id": str(attestation.id),
+                        "reason": job.last_error or "the job exhausted its attempts",
+                    },
+                    created_at=s.clock.now(),
+                )
+            )
+        context.update_progress(
+            phase="finished",
+            status=AttestationStatus.FAILED.value,
+            note=f"the job failed {job.attempts} time(s): {job.last_error or 'no error text'}",
+        )
+
     # -- external tools -----------------------------------------------------------------
 
     def _external_tools(

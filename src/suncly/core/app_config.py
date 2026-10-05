@@ -89,6 +89,8 @@ class AppConfig:
     """When set, transcripts live in this object-storage bucket instead of the local disk."""
     a2a_tck_dir: str | None = None
     """A checkout of the pinned A2A TCK (worker only); unset means the tool is unavailable."""
+    a2a_tck_python: str | None = None
+    """The interpreter of the TCK's own environment (the image's /opt/a2a-tck-venv)."""
     promptfoo_pack: str | None = None
     """The approved Promptfoo pack the worker runs (worker only); unset means unavailable."""
     promptfoo_bin: str = "promptfoo"
@@ -117,6 +119,12 @@ class AppConfig:
                     "Production cannot run in local network mode.",
                     "SUNCLY_NETWORK_MODE=local allows loopback targets, which is never public.",
                 )
+        if self.environment in ("production", "staging") and self.billing.provider == "fake":
+            raise ConfigError(
+                "The fake billing provider cannot run in a deployed environment.",
+                "Its webhook signing secret is public, so anyone could post an entitling event.",
+                "Set SUNCLY_BILLING_PROVIDER=stripe with test-mode keys.",
+            )
 
     @property
     def is_production(self) -> bool:

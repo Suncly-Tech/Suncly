@@ -1,5 +1,9 @@
+# One application role for now. Migration 0002 enables row level security on the core
+# tables with no policies, so only the table owner reads and writes them; separate API,
+# worker and migrate roles need policies first (db/README.md). The three secrets in
+# secrets.tf still exist so the split needs no manifest change later.
 resource "random_password" "db" {
-  for_each = toset(["api", "worker", "migrate"])
+  for_each = toset(["app"])
   length   = 32
   special  = false
 }

@@ -1,4 +1,4 @@
-# Applies pending migrations (db/migrations, bookkept in suncly_app.schema_migration).
+# Applies pending migrations (db/migrations, recognised from the catalog).
 # Run once per release before the new API and worker revisions receive traffic.
 apiVersion: run.googleapis.com/v1
 kind: Job

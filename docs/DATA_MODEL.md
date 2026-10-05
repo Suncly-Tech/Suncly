@@ -329,6 +329,17 @@ the schema does not name are **Proposed**.
 | `run` | The Judge (schema §4, step 5). | Never changes (schema §2, §8). |
 | `decision` | The Policy engine, or a human reviewer. | Never changes. A resolution is a new record (schema §11). |
 
+### In the database
+
+Migration `0002` in [db/](../db/README.md) adds two protections that change
+nothing above. Row level security is enabled on all seven tables, with no
+policies: every role sees no rows and writes nothing until a policy is added,
+except the table owner, as which Suncly's store connects, superusers and roles
+with `BYPASSRLS` (on Supabase: `postgres` and `service_role`). The six trigger
+functions that enforce the invariants run with a fixed, empty `search_path`
+and name every table and type they use as `public.…`, so the schema lives in
+`public`.
+
 ## Open questions
 
 - **OQ-D1 Types and cost.**
@@ -418,7 +429,7 @@ the schema does not name are **Proposed**.
 
 The hosted product adds these records beside the seven entities. None of
 them is evidence; every one points at a core row by id, never the reverse.
-Migration: `db/migrations/0002_application_layer.sql`. Models:
+Migration: `db/migrations/0003_application_layer.sql`. Models:
 `src/suncly/domain/{tenancy,jobs,ledger,billing,policy}.py` and
 `src/suncly/ports/app_store.py`.
 

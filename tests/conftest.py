@@ -9,6 +9,7 @@ from __future__ import annotations
 import os
 from collections.abc import Callable, Iterator
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -30,7 +31,13 @@ from tests.fakes import (
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 ServicesFactory = Callable[..., Services]
-MIGRATIONS = sorted((REPO_ROOT / "db" / "migrations").glob("*.sql"))
+MIGRATIONS_DIR = REPO_ROOT / "db" / "migrations"
+
+
+def apply_migrations(conn: Any) -> None:
+    """Apply every file in ``db/migrations``, in order, exactly as committed."""
+    for path in sorted(MIGRATIONS_DIR.glob("*.sql")):
+        conn.execute(path.read_text(encoding="utf-8"))
 
 
 @pytest.fixture(scope="session")
@@ -54,8 +61,7 @@ def migrated_database(database_url: str) -> str:
         conn.execute("DROP SCHEMA IF EXISTS suncly_app CASCADE")
         conn.execute("DROP SCHEMA public CASCADE")
         conn.execute("CREATE SCHEMA public")
-        for migration in MIGRATIONS:
-            conn.execute(migration.read_text(encoding="utf-8"))
+        apply_migrations(conn)
     return database_url
 
 

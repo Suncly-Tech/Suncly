@@ -235,10 +235,14 @@ def build_external_tools(
     if app_config.a2a_tck_dir:
         checkout = Path(app_config.a2a_tck_dir)
 
+        python = app_config.a2a_tck_python
+
         def tck(registration: AgentRegistration) -> ExternalToolRunner:
             # The TCK fetches the card and talks to the agent itself; it has no credential
             # option, so it runs without one (a sandbox that requires auth fails its checks).
-            return A2ATckRunner(process_for(registration, with_credential=False), checkout)
+            return A2ATckRunner(
+                process_for(registration, with_credential=False), checkout, python=python
+            )
 
         tools["a2a-tck"] = tck
     if app_config.promptfoo_pack:

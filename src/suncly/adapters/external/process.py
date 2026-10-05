@@ -51,13 +51,31 @@ class ToolProcess:
     ) -> None:
         self._env = minimal_environment(base_environment, network_mode)
         self._env.update(extra_environment or {})
+        #: Values handed to the tool that must never come back in its captured output.
+        self._secrets = [
+            value.encode("utf-8")
+            for value in (extra_environment or {}).values()
+            if value and len(value) >= 8
+        ]
 
-    def run(self, command: Sequence[str], cwd: Path, timeout_s: float) -> ToolProcessResult:
+    def _redact(self, data: bytes) -> bytes:
+        for secret in self._secrets:
+            data = data.replace(secret, b"[REDACTED]")
+        return data
+
+    def run(
+        self,
+        command: Sequence[str],
+        cwd: Path,
+        timeout_s: float,
+        extra_env: Mapping[str, str] | None = None,
+    ) -> ToolProcessResult:
+        env = {**self._env, **(extra_env or {})}
         try:
             completed = subprocess.run(
                 list(command),
                 cwd=str(cwd),
-                env=self._env,
+                env=env,
                 capture_output=True,
                 timeout=timeout_s,
                 check=False,
@@ -66,8 +84,8 @@ class ToolProcess:
         except subprocess.TimeoutExpired as exc:
             return ToolProcessResult(
                 returncode=None,
-                stdout=(exc.stdout or b"")[:MAX_CAPTURED_BYTES],
-                stderr=(exc.stderr or b"")[:MAX_CAPTURED_BYTES],
+                stdout=self._redact((exc.stdout or b"")[:MAX_CAPTURED_BYTES]),
+                stderr=self._redact((exc.stderr or b"")[:MAX_CAPTURED_BYTES]),
                 timed_out=True,
             )
         except OSError as exc:
@@ -76,7 +94,7 @@ class ToolProcess:
             )
         return ToolProcessResult(
             returncode=completed.returncode,
-            stdout=completed.stdout[:MAX_CAPTURED_BYTES],
-            stderr=completed.stderr[:MAX_CAPTURED_BYTES],
+            stdout=self._redact(completed.stdout[:MAX_CAPTURED_BYTES]),
+            stderr=self._redact(completed.stderr[:MAX_CAPTURED_BYTES]),
             timed_out=False,
         )

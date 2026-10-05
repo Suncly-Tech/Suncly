@@ -109,16 +109,13 @@ def check_manifest(path: Path, report: Report) -> None:
             if name.startswith("worker") and retries != 0:
                 report.fail(f"{name}: the worker job must not retry at the platform level")
     if name.startswith("api") and secrets_used & API_FORBIDDEN_SECRETS:
-        report.fail(
-            f"{name}: the API references worker-only secrets {secrets_used & API_FORBIDDEN_SECRETS}"
-        )
+        crossed = sorted(secrets_used & API_FORBIDDEN_SECRETS)
+        report.fail(f"{name}: the API references worker-only secrets {crossed}")
     if name.startswith("worker") and secrets_used & WORKER_FORBIDDEN_SECRETS:
-        report.fail(
-            f"{name}: the worker references API-only secrets {secrets_used & WORKER_FORBIDDEN_SECRETS}"
-        )
-    report.ok(
-        f"{name}: {account.split('@')[0]}, {len(secrets_used)} secret reference(s), digest-pinned image"
-    )
+        crossed = sorted(secrets_used & WORKER_FORBIDDEN_SECRETS)
+        report.fail(f"{name}: the worker references API-only secrets {crossed}")
+    who = account.split("@")[0]
+    report.ok(f"{name}: {who}, {len(secrets_used)} secret reference(s), digest-pinned image")
 
 
 def check_compose(report: Report) -> None:
@@ -217,9 +214,8 @@ def main() -> int:
         print(f"skipped {line}")
     for line in report.failures:
         print(f"FAIL    {line}")
-    print(
-        f"\n{len(report.passed)} passed, {len(report.skipped)} skipped, {len(report.failures)} failed"
-    )
+    summary = f"{len(report.passed)} passed, {len(report.skipped)} skipped"
+    print(f"\n{summary}, {len(report.failures)} failed")
     return 1 if report.failures else 0
 
 

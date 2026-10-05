@@ -17,14 +17,20 @@ import httpx
 import pytest
 
 from suncly.adapters.auth import issue_local_token
-from suncly.adapters.stripe_billing import FAKE_WEBHOOK_SECRET, sign_webhook_payload, webhook_event
+from suncly.adapters.stripe_billing import (
+    FAKE_WEBHOOK_SECRET,
+    sign_webhook_payload,
+    webhook_event,
+)
 from suncly.cli import exit_codes
 from suncly.mock_agents import behaviours
 from suncly.mock_agents.server import MockAgentServer
+from tests.stores.test_app_store_contract import reset_application_schema
 
 pytestmark = pytest.mark.e2e
 
 SECRET = "live-test-secret-with-enough-length"
+FINAL = ("completed", "failed", "cancelled", "invalidated")
 
 
 def free_port() -> int:
@@ -33,9 +39,14 @@ def free_port() -> int:
         return int(sock.getsockname()[1])
 
 
+def suncly(*args: str, home: Path) -> list[str]:
+    return [sys.executable, "-m", "suncly.cli.main", "--home", str(home), *args]
+
+
 @pytest.fixture
 def backend(migrated_database: str, tmp_path: Path) -> Iterator[tuple[str, Path]]:
-    """`suncly api serve` and `suncly worker run` as separate processes on the test database."""
+    """``suncly api serve`` and ``suncly worker run`` as separate processes on the test
+    database, which starts and ends this test with an empty application schema."""
     home = tmp_path / "home"
     port = free_port()
     env = {
@@ -54,33 +65,35 @@ def backend(migrated_database: str, tmp_path: Path) -> Iterator[tuple[str, Path]
         "NO_COLOR": "1",
     }
     env.pop("SUNCLY_MODEL_PROVIDER", None)
-    base = [sys.executable, "-m", "suncly.cli.main", "--home", str(home)]
+    reset_application_schema(migrated_database)
+    api_log = (tmp_path / "api.log").open("w", encoding="utf-8")
+    worker_log = (tmp_path / "worker.log").open("w", encoding="utf-8")
     api = subprocess.Popen(
-        [*base, "api", "serve", "--port", str(port)],
+        suncly("api", "serve", "--port", str(port), home=home),
         env=env,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.PIPE,
-        text=True,
+        stdout=api_log,
+        stderr=subprocess.STDOUT,
     )
     worker = subprocess.Popen(
-        [*base, "worker", "run", "--worker-id", "live-worker"],
+        suncly("worker", "run", "--worker-id", "live-worker", home=home),
         env=env,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.PIPE,
-        text=True,
+        stdout=worker_log,
+        stderr=subprocess.STDOUT,
     )
     url = f"http://127.0.0.1:{port}"
     try:
         deadline = time.monotonic() + 60
         while time.monotonic() < deadline:
             try:
-                if httpx.get(f"{url}/v1/health", timeout=2).status_code == 200:
-                    break
+                with httpx.Client(timeout=2) as probe:
+                    if probe.get(f"{url}/v1/health").status_code == 200:
+                        break
             except httpx.HTTPError:
                 pass
             if api.poll() is not None:
+                api_log.flush()
                 raise RuntimeError(
-                    f"the API exited early: {api.stderr.read() if api.stderr else ''}"
+                    f"the API exited early: {(tmp_path / 'api.log').read_text()[-2000:]}"
                 )
             time.sleep(0.2)
         else:
@@ -94,6 +107,11 @@ def backend(migrated_database: str, tmp_path: Path) -> Iterator[tuple[str, Path]
                 process.wait(timeout=15)
             except subprocess.TimeoutExpired:
                 process.kill()
+                process.wait(timeout=15)
+        api_log.close()
+        worker_log.close()
+        # Leave the shared database as the other tests expect it: application rows gone.
+        reset_application_schema(migrated_database)
 
 
 def test_the_full_hosted_workflow_against_a_local_backend(
@@ -101,8 +119,20 @@ def test_the_full_hosted_workflow_against_a_local_backend(
 ) -> None:
     url, home = backend
     token = issue_local_token(SECRET, "live-reviewer", "reviewer@example.test", "Live Reviewer")
-    client = httpx.Client(base_url=url, headers={"Authorization": f"Bearer {token}"}, timeout=30)
+    headers = {"Authorization": f"Bearer {token}"}
+    with httpx.Client(base_url=url, headers=headers, timeout=30) as client:
+        org, attestation, evidence = _run_the_workflow(client, url)
+        _gate_the_exported_evidence(client, home, tmp_path, evidence)
+    stranger_headers = {"Authorization": f"Bearer {issue_local_token(SECRET, 'stranger')}"}
+    with httpx.Client(base_url=url, headers=stranger_headers, timeout=30) as stranger:
+        assert (
+            stranger.get(f"/v1/organizations/{org}/attestations/{attestation}").status_code == 404
+        )
+        evidence_path = f"/v1/organizations/{org}/attestations/{attestation}/evidence"
+        assert stranger.get(evidence_path).status_code == 404
 
+
+def _run_the_workflow(client: httpx.Client, url: str) -> tuple[str, str, dict[str, object]]:
     # -- sign in, create the organization, entitle it through a verified test-mode webhook ---
     me = client.get("/v1/me").json()
     assert me["principal"]["subject"] == "live-reviewer" and me["organizations"] == []
@@ -121,12 +151,12 @@ def test_the_full_hosted_workflow_against_a_local_backend(
         },
     )
     signature = sign_webhook_payload(payload, FAKE_WEBHOOK_SECRET, int(time.time()))
-    hook = httpx.post(
-        f"{url}/v1/webhooks/stripe",
-        content=payload,
-        headers={"Content-Type": "application/json", "Stripe-Signature": signature},
-        timeout=30,
-    )
+    with httpx.Client(timeout=30) as anonymous:
+        hook = anonymous.post(
+            f"{url}/v1/webhooks/stripe",
+            content=payload,
+            headers={"Content-Type": "application/json", "Stripe-Signature": signature},
+        )
     assert hook.status_code == 200 and "checkout applied" in hook.json()["result"], hook.text
     entitlement = client.get(f"/v1/organizations/{org}/subscription").json()["entitlement"]
     assert entitlement["can_start_attestations"] and entitlement["plan_id"] == "pilot"
@@ -163,10 +193,8 @@ def test_the_full_hosted_workflow_against_a_local_backend(
         contract = drafted.json()["contract"]["id"]
         assert drafted.json()["test_cases"], "the honest agent's card declares examples"
         approved = client.post(f"/v1/organizations/{org}/contracts/{contract}/approve")
-        assert (
-            approved.status_code == 200
-            and approved.json()["contract"]["approved_by"] == "reviewer@example.test"
-        )
+        assert approved.status_code == 200
+        assert approved.json()["contract"]["approved_by"] == "reviewer@example.test"
         started = client.post(
             f"/v1/organizations/{org}/attestations",
             json={"registration_id": reg, "contract_id": contract, "runs": 2, "trigger": "ci"},
@@ -179,7 +207,7 @@ def test_the_full_hosted_workflow_against_a_local_backend(
         item = started.json()
         while time.monotonic() < deadline:
             item = client.get(f"/v1/organizations/{org}/attestations/{attestation}").json()
-            if item["attestation"]["status"] in ("completed", "failed", "cancelled", "invalidated"):
+            if item["attestation"]["status"] in FINAL:
                 break
             time.sleep(1)
         assert item["attestation"]["status"] == "completed", json.dumps(item, indent=2)[:3000]
@@ -190,10 +218,8 @@ def test_the_full_hosted_workflow_against_a_local_backend(
     # -- evidence, verification, the automatic decision ---------------------------------------
     evidence = client.get(f"/v1/organizations/{org}/attestations/{attestation}/evidence").json()
     result = evidence["result"]
-    assert (
-        result["decisions"][-1]["outcome"] == "approve"
-        and result["decisions"][-1]["decided_by"] == "policy"
-    )
+    assert result["decisions"][-1]["outcome"] == "approve"
+    assert result["decisions"][-1]["decided_by"] == "policy"
     assert len(result["runs"]) == len(evidence["transcripts"]) == 2 * len(result["test_cases"])
     for transcript in evidence["transcripts"].values():
         assert "Authorization" not in transcript or "REDACTED" in transcript
@@ -205,32 +231,34 @@ def test_the_full_hosted_workflow_against_a_local_backend(
     usage = client.get(f"/v1/organizations/{org}/usage").json()
     assert usage["reservations"][-1]["state"] == "settled"
     assert sum(e["billable_minor"] for e in usage["events"]) > 0
-    assert (
-        client.post(
-            f"/v1/organizations/{org}/attestations/{attestation}/decisions",
-            json={
-                "outcome": "block",
-                "rationale": "Only a flagged attestation is resolved by a person.",
-            },
-        ).status_code
-        == 409
+    resolve = client.post(
+        f"/v1/organizations/{org}/attestations/{attestation}/decisions",
+        json={
+            "outcome": "block",
+            "rationale": "Only a flagged attestation is resolved by a person.",
+        },
     )
+    assert resolve.status_code == 409
+    return org, attestation, evidence
 
-    # -- the CI gate on the exported report folder, with the deployment's trusted keys ---------
+
+def _gate_the_exported_evidence(
+    client: httpx.Client, home: Path, tmp_path: Path, evidence: dict[str, object]
+) -> None:
+    """The CI gate on the exported report folder, with the deployment's trusted keys."""
+    result = evidence["result"]
+    transcripts = evidence["transcripts"]
+    assert isinstance(transcripts, dict)
     folder = tmp_path / "report"
     (folder / "transcripts").mkdir(parents=True)
     (folder / "result.json").write_text(json.dumps(result), encoding="utf-8")
-    for run_id, text in evidence["transcripts"].items():
-        (folder / "transcripts" / f"{run_id}.json").write_text(text, encoding="utf-8")
+    for run_id, text in transcripts.items():
+        (folder / "transcripts" / f"{run_id}.json").write_text(str(text), encoding="utf-8")
     keys = tmp_path / "keys.json"
     keys.write_text(json.dumps(client.get("/v1/keys").json()), encoding="utf-8")
+    env = {**os.environ, "NO_COLOR": "1"}
     gate = subprocess.run(
-        [
-            sys.executable,
-            "-m",
-            "suncly.cli.main",
-            "--home",
-            str(home),
+        suncly(
             "gate",
             str(folder),
             "--trusted-keys",
@@ -238,51 +266,26 @@ def test_the_full_hosted_workflow_against_a_local_backend(
             "--issuer",
             "suncly-live-test",
             "--json",
-        ],
+            home=home,
+        ),
         capture_output=True,
         text=True,
         timeout=120,
-        env={**os.environ, "NO_COLOR": "1"},
+        env=env,
         check=False,
     )
     assert gate.returncode == exit_codes.OK, gate.stdout + gate.stderr
     verdict = json.loads(gate.stdout)
-    assert (
-        verdict["approved"]
-        and verdict["execution"]["ok"]
-        and verdict["verification"]["accepted"]
-        and verdict["policy"]["ok"]
-    )
+    assert verdict["approved"] and verdict["execution"]["ok"]
+    assert verdict["verification"]["accepted"] and verdict["policy"]["ok"]
     wrong_issuer = subprocess.run(
-        [
-            sys.executable,
-            "-m",
-            "suncly.cli.main",
-            "--home",
-            str(home),
-            "gate",
-            str(folder),
-            "--trusted-keys",
-            str(keys),
-            "--issuer",
-            "someone-else",
-        ],
+        suncly(
+            "gate", str(folder), "--trusted-keys", str(keys), "--issuer", "someone-else", home=home
+        ),
         capture_output=True,
         text=True,
         timeout=120,
-        env={**os.environ, "NO_COLOR": "1"},
+        env=env,
         check=False,
     )
     assert wrong_issuer.returncode == 11, wrong_issuer.stdout + wrong_issuer.stderr
-
-    # -- a stranger sees nothing ---------------------------------------------------------------
-    stranger = httpx.Client(
-        base_url=url,
-        headers={"Authorization": f"Bearer {issue_local_token(SECRET, 'stranger')}"},
-        timeout=30,
-    )
-    assert stranger.get(f"/v1/organizations/{org}/attestations/{attestation}").status_code == 404
-    assert (
-        stranger.get(f"/v1/organizations/{org}/attestations/{attestation}/evidence").status_code
-        == 404
-    )

@@ -239,21 +239,30 @@ def test_placeholders_for_later_stages_hold_only_a_docstring() -> None:
     assert not (SRC / "api.py").exists(), "the API lives in adapters/api now"
 
 
+MIGRATIONS = [
+    "0001_initial_schema.sql",
+    "0002_rls_and_search_path.sql",
+    "0003_application_layer.sql",
+]
+
+
 def test_packaged_migrations_match_the_db_folder() -> None:
+    from suncly.adapters.postgres import migrate
+
     source_dir = REPO / "db" / "migrations"
     packaged_dir = SRC / "adapters" / "postgres" / "migrations"
-    sources = sorted(p.name for p in source_dir.glob("*.sql"))
-    assert sources == sorted(p.name for p in packaged_dir.glob("*.sql"))
-    for name in sources:
+    assert sorted(p.name for p in source_dir.glob("*.sql")) == MIGRATIONS
+    assert sorted(p.name for p in packaged_dir.glob("*.sql")) == MIGRATIONS
+    assert list(migrate.MIGRATIONS) == MIGRATIONS
+    assert list(migrate.APPLIED) == MIGRATIONS
+    for name in MIGRATIONS:
         assert (packaged_dir / name).read_bytes() == (source_dir / name).read_bytes(), name
+    # The body check of migrate.py parses 0002: every guard must be found in it.
+    assert sorted(migrate.expected_function_bodies()) == sorted(migrate.FUNCTIONS)
 
 
-def test_db_folder_holds_exactly_the_migrations_and_its_readme() -> None:
+def test_db_folder_holds_exactly_the_migrations_and_the_readme() -> None:
     files = sorted(
         p.relative_to(REPO / "db").as_posix() for p in (REPO / "db").rglob("*") if p.is_file()
     )
-    assert files == [
-        "README.md",
-        "migrations/0001_initial_schema.sql",
-        "migrations/0002_application_layer.sql",
-    ]
+    assert files == ["README.md", *(f"migrations/{name}" for name in MIGRATIONS)]

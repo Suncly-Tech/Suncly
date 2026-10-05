@@ -19,7 +19,14 @@ from typing import Protocol
 
 from suncly.core.app_config import WorkerConfig
 from suncly.domain.errors import JobError
-from suncly.domain.jobs import AttemptOutcome, ExecutionAttempt, Job, JobKind, backoff_seconds
+from suncly.domain.jobs import (
+    AttemptOutcome,
+    ExecutionAttempt,
+    Job,
+    JobKind,
+    JobStatus,
+    backoff_seconds,
+)
 from suncly.domain.models import JsonObject
 from suncly.ports.app_store import ApplicationStore
 from suncly.ports.clock import Clock
@@ -91,6 +98,10 @@ class JobHandler(Protocol):
 
     def handle(self, context: JobContext) -> None:
         """Do the work. Return on success; raise ``JobCancelledError`` or any error otherwise."""
+        ...
+
+    def exhausted(self, context: JobContext, job: Job) -> None:
+        """The job failed for the last time: record that outcome on what the job was about."""
         ...
 
 
@@ -177,6 +188,11 @@ class WorkerLoop:
             f"job {job.id}: attempt {context.attempt.number} {outcome.value}; "
             f"job {job.status.value}"
         )
+        if job.status is JobStatus.FAILED:
+            try:
+                self._handlers[job.kind].exhausted(context, job)
+            except Exception as exc:  # the job is already failed; this only annotates it
+                self._log(f"job {job.id}: exhausted handler failed: {exc}")
 
     def _beat(self, context: JobContext, stop: threading.Event) -> None:
         while not stop.wait(self._config.heartbeat_seconds):

@@ -34,7 +34,13 @@ from suncly.ports.external_tools import (
 )
 
 A2A_TCK_VERSION = "1.0.0.alpha2"
+"""The git tag the adapter is written against."""
 A2A_TCK_COMMIT = "29063fe95e903cddac5d8ff811ab94df1ad6ef86"
+"""The commit that tag points at; the checkout must be exactly this."""
+A2A_TCK_PYPROJECT_VERSION = "1.0.0"
+"""What the tag's own pyproject.toml declares (the tag name is not in the file)."""
+PIN_FILE = ".suncly-pin"
+"""Written by the worker image next to the checkout after it removed ``.git``."""
 A2A_TCK_SOURCE = "https://github.com/a2aproject/a2a-tck"
 ADAPTER_VERSION = "suncly-a2a-tck-adapter/1"
 TOOL = "a2a-tck"
@@ -126,17 +132,37 @@ class A2ATckRunner:
         match = _VERSION_RE.search(pyproject.read_text(encoding="utf-8", errors="replace"))
         return match.group(1) if match else None
 
+    def _checkout_commit(self) -> str | None:
+        """The commit of the checkout: from ``.git`` when present, else the image's pin file."""
+        pin = self._checkout / PIN_FILE
+        if pin.is_file():
+            return pin.read_text(encoding="utf-8").strip() or None
+        if (self._checkout / ".git").exists():
+            result = self._process.run(
+                ["git", "-C", str(self._checkout), "rev-parse", "HEAD"], self._checkout, 30.0
+            )
+            if result.ran and result.returncode == 0:
+                return result.stdout.decode("utf-8", "replace").strip() or None
+        return None
+
     def run(self, target_url: str, work_dir: str, timeout_s: float) -> ExternalToolResult:
         folder = Path(work_dir)
         folder.mkdir(parents=True, exist_ok=True)
         version = self._checkout_version()
         if version is None:
             return self._failure(target_url, f"no TCK checkout at {self._checkout}")
-        if version != A2A_TCK_VERSION:
+        if version != A2A_TCK_PYPROJECT_VERSION:
             return self._failure(
                 target_url,
-                f"the TCK checkout is version {version}; the adapter is pinned to "
-                f"{A2A_TCK_VERSION} ({A2A_TCK_COMMIT[:12]})",
+                f"the TCK checkout declares version {version}; the adapter is pinned to tag "
+                f"{A2A_TCK_VERSION} ({A2A_TCK_PYPROJECT_VERSION} in its pyproject)",
+            )
+        commit = self._checkout_commit()
+        if commit != A2A_TCK_COMMIT:
+            return self._failure(
+                target_url,
+                f"the TCK checkout is at commit {commit or 'unknown'}; the adapter is pinned "
+                f"to {A2A_TCK_COMMIT} (tag {A2A_TCK_VERSION})",
             )
         command = [*self._command, "--sut-host", _base_url(target_url), "--level", "must"]
         result = self._process.run(command, self._checkout, timeout_s)

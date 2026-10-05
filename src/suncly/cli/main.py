@@ -430,13 +430,11 @@ def _require_database_url(config: Config) -> str:
 @click.pass_context
 @handles_errors
 def db_migrate(ctx: click.Context, debug: bool) -> None:
-    """Apply every migration under db/migrations not yet applied, in order."""
-    from suncly.adapters.postgres.migrate import MIGRATIONS, apply_migrations
+    """Apply the migrations in db/migrations that the database does not hold yet."""
+    from suncly.adapters.postgres.migrate import apply_migration
 
-    applied = apply_migrations(_require_database_url(_config(ctx)))
-    for name in MIGRATIONS:
-        state = "applied" if name in applied else "already applied"
-        click.echo(f"Migration {name}.sql: {state}.")
+    outcome = apply_migration(_require_database_url(_config(ctx)))
+    click.echo(f"Migrations: {outcome}.")
 
 
 @db.command("check")
@@ -444,7 +442,7 @@ def db_migrate(ctx: click.Context, debug: bool) -> None:
 @click.pass_context
 @handles_errors
 def db_check(ctx: click.Context, debug: bool) -> None:
-    """Check that the seven tables, eight enums and the triggers exist."""
+    """Check the tables, enums, triggers, row level security and function search paths."""
     from suncly.adapters.postgres.migrate import check_schema
 
     problems = check_schema(_require_database_url(_config(ctx)))
@@ -454,9 +452,12 @@ def db_check(ctx: click.Context, debug: bool) -> None:
         raise VerificationFailedError(
             "The database schema is incomplete.",
             f"{len(problems)} problem(s) found.",
-            "Run `suncly db migrate` on an empty database.",
+            "Run `suncly db migrate`; it applies what is missing.",
         )
-    click.echo("Schema check passed: 7 tables, 8 enums and all triggers are present.")
+    click.echo(
+        "Schema check passed: 7 tables, 8 enums and all triggers are present; row level"
+        " security is enabled on every table and every guard function has a fixed search_path."
+    )
 
 
 @main.command()

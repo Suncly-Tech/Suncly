@@ -91,20 +91,26 @@ def normalize_promptfoo_results(document: JsonObject, target_url: str) -> Extern
         test_case = _dict(row.get("testCase"))
         description = str(row.get("description") or test_case.get("description") or "")
         check_id = str(row.get("id") or f"row-{index}")
-        if row.get("error"):
+        grading = row.get("gradingResult")
+        # promptfoo 0.123: failureReason 0 none, 1 a failed assertion, 2 a provider/grader error.
+        # A failed assertion also fills ``error`` with the reason, so ``error`` alone never
+        # decides: a row with a grading result is judged by it; an error row without one, or
+        # one marked as an error, is undecided.
+        errored = row.get("failureReason") == 2 or (
+            bool(row.get("error")) and not isinstance(grading, dict)
+        )
+        if errored:
             passed: bool | None = None
-            detail = f"error: {str(row['error'])[:500]}"
+            detail = f"error: {str(row.get('error') or 'no grading result')[:500]}"
+        elif isinstance(grading, dict) and isinstance(grading.get("pass"), bool):
+            passed = bool(grading["pass"])
+            detail = str(grading.get("reason") or "")[:500]
+        elif isinstance(row.get("success"), bool):
+            passed = bool(row["success"])
+            detail = "success flag only; no grading result"
         else:
-            grading = row.get("gradingResult")
-            if isinstance(grading, dict) and isinstance(grading.get("pass"), bool):
-                passed = bool(grading["pass"])
-                detail = str(grading.get("reason") or "")[:500]
-            elif isinstance(row.get("success"), bool):
-                passed = bool(row["success"])
-                detail = "success flag only; no grading result"
-            else:
-                passed = None
-                detail = "no grading result and no success flag"
+            passed = None
+            detail = "no grading result and no success flag"
         metadata = _dict(test_case.get("metadata"))
         level = str(metadata.get("pluginId") or metadata.get("plugin") or _assertion_types(row))
         checks.append(
@@ -147,11 +153,22 @@ class PromptfooRunner:
         self._command = list(command) if command else ["promptfoo"]
         self._version_command = list(version_command) if version_command else None
 
+    @staticmethod
+    def _runtime(work_dir: Path) -> dict[str, str]:
+        """promptfoo's own knobs: no telemetry, no update check, its state inside the work dir."""
+        return {
+            "HOME": str(work_dir),
+            "PROMPTFOO_CONFIG_DIR": str(work_dir / ".promptfoo"),
+            "PROMPTFOO_DISABLE_TELEMETRY": "1",
+            "PROMPTFOO_DISABLE_UPDATE": "1",
+            "PROMPTFOO_DISABLE_SHARE_WARNING": "1",
+        }
+
     def _installed_version(self, work_dir: Path) -> str | None:
         command = self._version_command or [*self._command, "--version"]
         if shutil.which(command[0]) is None and not Path(command[0]).exists():
             return None
-        result = self._process.run(command, work_dir, 60.0)
+        result = self._process.run(command, work_dir, 60.0, self._runtime(work_dir))
         if not result.ran or result.returncode != 0:
             return None
         return result.stdout.decode("utf-8", "replace").strip().splitlines()[-1].strip()
@@ -182,7 +199,7 @@ class PromptfooRunner:
             "--var",
             f"target_url={target_url}",
         ]
-        result = self._process.run(command, folder, timeout_s)
+        result = self._process.run(command, folder, timeout_s, self._runtime(folder))
         artifacts: list[ExternalArtifactData] = []
         if result.stderr:
             artifacts.append(

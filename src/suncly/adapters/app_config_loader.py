@@ -112,6 +112,7 @@ def load_app_config(env: Mapping[str, str]) -> AppConfig:
         price_table_version=_text(env, "SUNCLY_PRICE_TABLE_VERSION", "2026-10-test"),
         evidence_bucket=env.get("SUNCLY_EVIDENCE_BUCKET") or None,
         a2a_tck_dir=_text(env, "SUNCLY_A2A_TCK_DIR", "") or None,
+        a2a_tck_python=_text(env, "SUNCLY_A2A_TCK_PYTHON", "") or None,
         promptfoo_pack=_text(env, "SUNCLY_PROMPTFOO_PACK", "") or None,
         promptfoo_bin=_text(env, "SUNCLY_PROMPTFOO_BIN", "promptfoo"),
         secret_manager_project=env.get("SUNCLY_SECRET_MANAGER_PROJECT") or None,

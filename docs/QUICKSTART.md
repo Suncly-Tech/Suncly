@@ -184,3 +184,49 @@ whole state folder, which is useful for isolated runs:
 ```powershell
 suncly --home .\tmp-home demo --reports-dir .\tmp-reports
 ```
+
+## 9. Run the hosted product locally
+
+The hosted product (API, worker, dispatcher, workspace) runs on the same
+core. Nothing in this section talks to a cloud project.
+
+```bash
+docker compose up --build            # Postgres, migrations, API on :8080, worker, dispatcher
+export SUNCLY_LOCAL_AUTH_SECRET=local-dev-secret-change-me-please
+suncly auth local-token --subject dev-1 --email dev@example.test
+```
+
+Then in the workspace (`npm --prefix frontend run dev`, http://localhost:3100):
+
+1. Settings → *Suncly API connection*: URL `http://localhost:8080`, the
+   token above, *Test and save*, create an organization.
+2. Hosted → *Agents and contracts*: register a sandbox agent. For a local
+   mock agent, run `suncly demo --serve` or `python -m suncly.mock_agents
+   honest` and use its card URL; tick the sandbox declaration.
+3. *Draft contract*, read the test cases, *Approve as me*.
+4. *Start attestation*; the worker container claims the job. The
+   attestation page shows the persisted progress, then the evidence, the
+   four verification layers and, for a flagged result, the resolution form.
+5. Hosted → *Usage and billing*: the ledger lines of the run, the
+   reservation that settled, the test plan catalog.
+
+Without a model provider configured (`SUNCLY_MODEL_PROVIDER`), model-judged
+criteria stay inconclusive and say so; the deterministic contract needs
+none. Without Stripe keys the billing provider is the in-memory fake.
+
+The same workflow without containers:
+
+```bash
+export DATABASE_URL=postgresql://suncly:...@localhost:5432/suncly
+suncly db migrate
+SUNCLY_ENVIRONMENT=development SUNCLY_NETWORK_MODE=local SUNCLY_LOCAL_AUTH_ENABLED=1 \
+  SUNCLY_LOCAL_AUTH_SECRET=... suncly api serve
+SUNCLY_ENVIRONMENT=development SUNCLY_NETWORK_MODE=local suncly worker run
+suncly worker tick    # once, or from cron
+```
+
+To consume a hosted result in CI, download the evidence
+(`GET .../attestations/{id}/evidence` writes the same `result.json` and
+transcripts `suncly attest` produces) and run `suncly gate <folder>
+--trusted-keys keys.json --issuer <issuer>` with `keys.json` from `GET
+/v1/keys`. Exit 0 is the only approval.

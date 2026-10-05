@@ -14,9 +14,10 @@ import { downloadText } from "@/lib/download";
 import { addReview, setReviewer, type ReviewDecision, type ReviewRecord } from "@/lib/workspace/store";
 
 /**
- * Record and route a reviewer's decision. The record is local: Suncly's evidence store has
- * no interface for a human decision yet (OQ-P2, stage 5), so the note is exported and
- * attached to the signed report by the reviewer.
+ * Record and route a reviewer's decision on a bundle loaded offline. The record is local: a
+ * report folder has no connection back to the store it came from, so the note is exported and
+ * attached to the signed report by the reviewer. On a hosted attestation the decision is
+ * recorded through the API instead (components/app/hosted/HostedAttestationView.tsx).
  */
 export function ReviewPanel({
   bundle,
@@ -107,7 +108,7 @@ export function ReviewPanel({
       "",
       ...result.not_tested.map((i) => `- **${i.category}:** ${i.detail}`),
       "",
-      "_This note is a human decision kept outside the signed attestation. Suncly's evidence store cannot record human decisions yet (stage 5)._",
+      "_This note is a human decision kept outside the signed attestation: it was recorded in the review workspace on an imported report folder, not through the hosted API._",
       "",
     ];
     downloadText(`${base}.md`, lines.join("\n"), "text/markdown");
@@ -136,7 +137,7 @@ export function ReviewPanel({
           description="Your decision and rationale, under your name. Kept in this browser and exported as a file to attach to the signed report or your ticket."
         />
         <Notice tone="info" className="mb-5">
-          Suncly's evidence store has no interface yet for recording a human decision (planned, stage 5). This note is not part of the signed attestation and does not change it; it carries the attestation id, signature and card hash so it can be matched to the evidence later.
+          This bundle was loaded from a report folder, so the note stays in this browser: it is not part of the signed attestation and does not change it. It carries the attestation id, signature and card hash so it can be matched to the evidence later. For an attestation run by a hosted deployment, resolve the flag on its hosted page instead; that records a second decision under your verified identity.
         </Notice>
         {!canDecide ? (
           <Notice tone="warn" className="mb-5" title="This attestation has no policy decision">

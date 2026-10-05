@@ -161,293 +161,101 @@ no approval fields: approval is recorded by `--approve-as` or the prompt.
 
 ## HTTP API
 
-### POST /attestations
+The hosted API is a thin FastAPI adapter (`src/suncly/adapters/api/app.py`)
+over the same services the worker runs. The OpenAPI document is served at
+`/openapi.json` and `/docs`, and can be written without a server with
+`suncly api openapi --out openapi.json`. Everything below is implemented and
+covered by `tests/unit/test_api_workflow.py`.
 
-Starts an attestation.
+### Conventions
 
-**Request** (Proposed)
-
-```http
-POST /attestations
-Content-Type: application/json
-```
+- **Authentication.** Every route except `/v1/health`, `/v1/ready`,
+  `/v1/keys`, `/v1/billing/plans` and the Stripe webhook needs
+  `Authorization: Bearer <token>`. Tokens are verified against the
+  configured OpenID Connect issuer (signature against its JWKS, issuer,
+  audience, expiry). Outside production a local HS256 verifier can be
+  enabled (`suncly auth local-token`).
+- **Tenancy.** The organization is the `{organization_id}` of the URL; the
+  caller's role comes from their membership. A body never names an
+  organization or a reviewer; an unknown field is a `422`. A non-member
+  gets `404` for every organization route, so other tenants' ids are
+  indistinguishable from unknown ones.
+- **Roles.** `viewer` reads; `reviewer` also registers agents, drafts,
+  approves and rejects contracts, starts and cancels attestations and
+  resolves flags; `administrator` also manages members, policies,
+  spending limits, billing, schedules and keys.
+- **Errors.** One envelope for every error, including validation:
 
 ```json
-{
-  "agent_id": "6f1c2d3e-4b5a-4c6d-8e7f-9a0b1c2d3e4f",
-  "card_url": "https://agent.example.com/.well-known/agent-card.json",
-  "runs": 50,
-  "trigger": "ci",
-  "budget_limit": 25.0
-}
+{"error": {"code": "quota_exceeded", "message": "The hard spending limit would be exceeded.",
+           "detail": "...", "next_step": "...", "request_id": "..."}}
 ```
 
-| Field | Meaning |
+  Codes and statuses: `unauthenticated` 401, `forbidden` 403, `not_found`
+  404, `conflict` 409, `quota_exceeded` 402, `validation_failed`,
+  `contract_invalid`, `card_unusable`, `refused` 422, `billing_provider` 502,
+  `internal_error` 500. The response carries `X-Request-Id`; a client may
+  send one.
+
+### Routes
+
+| Method and path | Role | What it does |
+|---|---|---|
+| `GET /v1/health`, `GET /v1/ready` | none | Liveness; readiness touches the database. |
+| `GET /v1/keys` | none | The trusted signing-key registry (issuer, key ids, public keys, revocations) for `suncly gate --trusted-keys`. |
+| `GET /v1/me` | any | The principal and its organizations with roles. |
+| `POST /v1/organizations` | any | Creates an organization; the caller becomes its administrator. |
+| `GET /v1/organizations/{id}` | viewer | The organization and the caller's role. |
+| `GET`/`POST /v1/organizations/{id}/members` | viewer / administrator | List members; add a member by subject and role. |
+| `POST /v1/organizations/{id}/agents` | reviewer | Registers a sandbox agent: name, card URL (checked against the network mode), risk level, sandbox declaration, idempotency declaration, credential reference (`secret-manager`, `env` outside production, or `none`), BYOK flag. |
+| `GET /v1/organizations/{id}/agents[/{registration_id}]` | viewer | List or read registrations. |
+| `DELETE /v1/organizations/{id}/agents/{registration_id}` | reviewer | Archives a registration; archived agents do not run. |
+| `POST .../agents/{registration_id}/contracts/draft` | reviewer | Drafts a contract from the card: `deterministic` (default), `model` (a model drafts a behavioural suite), `suite` (a suite the caller wrote) or `contract_file`. The same content yields the same draft. |
+| `GET .../agents/{registration_id}/contracts`, `GET /v1/organizations/{id}/contracts/{contract_id}` | viewer | Contracts of an agent; one contract with its test cases, coverage and suite. |
+| `POST /v1/organizations/{id}/contracts/{contract_id}/approve` or `/reject` | reviewer | Human approval or rejection; the approver is the verified caller. |
+| `POST /v1/organizations/{id}/attestations` | reviewer | Starts an attestation (`202`): reserves money under the hard limit, creates the record and a durable job. Body: `registration_id`, `contract_id`, `runs`, `budget_limit`, `trigger` (`ci` or `manual`), `external_tools` (`a2a-tck`, `promptfoo`). Refused for drafts, archived or undeclared sandboxes (`409`) and over the limit (`402`). |
+| `GET /v1/organizations/{id}/attestations[?registration_id=]`, `GET .../attestations/{attestation_id}` | viewer | Attestations with job state and live progress (planned and recorded runs, phase, unknown outcomes, external tool results). |
+| `POST .../attestations/{attestation_id}/cancel` | reviewer | Requests cancellation; a queued job is cancelled at once and its reservation released. |
+| `GET .../attestations/{attestation_id}/evidence` | viewer | The result document (`suncly-result/1`), the redacted transcripts and a summary. |
+| `GET .../attestations/{attestation_id}/verification` | viewer | The four verification layers for the evidence as stored. |
+| `POST .../attestations/{attestation_id}/decisions` | reviewer | Resolves a `flag` with `approve` or `block` and a rationale of at least 20 characters; the reviewer is the caller. A second decision is recorded; the first is never edited. |
+| `GET`/`POST /v1/organizations/{id}/policies`, `GET .../policies/{policy_id}` | viewer / administrator | Versioned policy configurations (`suncly-policy/1`). `high_risk_requires_human` cannot be false. |
+| `GET /v1/organizations/{id}/usage` | viewer | Entitlement, the period's ledger lines and reservations. |
+| `PUT /v1/organizations/{id}/spending-limit` | administrator | The hard limit in minor units. |
+| `GET /v1/billing/plans` | none | The test plan catalog and price table version. |
+| `GET /v1/organizations/{id}/subscription` | viewer | Subscription and entitlement. |
+| `POST .../billing/checkout`, `POST .../billing/portal`, `GET .../billing/reconciliation` | administrator | A checkout session for a plan; the customer portal; held reservations and stale provider events. |
+| `POST /v1/webhooks/stripe` | signature | Verified provider events, recorded once, applied in event order. |
+| `GET`/`POST /v1/organizations/{id}/schedules` | viewer / administrator | Scheduled re-evaluations of a registration. |
+
+### The CI gate
+
+`suncly gate <report-folder> [--trusted-keys keys.json] [--issuer NAME]
+[--policy-hash HASH] [--json]` answers three questions separately and exits
+0 only when all three are yes:
+
+| Exit code | Meaning |
 |---|---|
-| `agent_id` | `agent.id`. How an agent gets registered is not defined ([OQ-P2](#open-questions)). |
-| `card_url` | The API equivalent of the CLI's `<card-url>`. It is a request parameter only; the data model does not store it ([OQ-D2](DATA_MODEL.md#open-questions)). |
-| `runs` | The API equivalent of `--runs` ([OQ-P5](#open-questions)). |
-| `trigger` | `attestation.trigger`. **Proposed:** callers send `ci` or `manual`; `schedule` and `card_change` attestations start inside Suncly. |
-| `budget_limit` | `attestation.budget_limit` ([OQ-D1](DATA_MODEL.md#open-questions)). |
+| 0 | completed, verified, and the latest decision approves |
+| 10 | the attestation did not complete |
+| 11 | verification failed (signature, hashes, counts, issuer trust, freshness) |
+| 12 | not approved by policy (flag, block, or no decision) |
+| 13 | the report cannot be read |
 
-**Response** (Proposed): `202 Accepted`. The attestation is created and runs
-asynchronously.
+`suncly attest` keeps its exit codes: 0 there means completed and signed,
+never approved. `keys.json` is the body of `GET /v1/keys` or the output of
+`suncly trust list`.
 
-```json
-{
-  "id": "3c4d5e6f-7a8b-4c9d-8e0f-1a2b3c4d5e6f",
-  "contract_id": "7e8f9a0b-1c2d-4e3f-9a4b-5c6d7e8f9a0b",
-  "card_version_id": "0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d",
-  "trigger": "ci",
-  "status": "queued",
-  "started_at": "2026-10-01T09:00:00Z",
-  "finished_at": null,
-  "budget_limit": 25.0,
-  "cost_total": 0,
-  "signature": null,
-  "signing_key_id": null
-}
-```
+### Hosted commands
 
-This example assumes the card's hash matches a card version that already has
-an approved contract. If the hash is new, a draft contract is created and no
-attestation exists until a human approves it ([OQ-F1](FLOW.md#open-questions),
-decided 2026-10-04). The response for that case is open
-([OQ-P1](#open-questions)).
-
-### GET /attestations/{id}
-
-Returns an attestation's status and results.
-
-**Request**
-
-```http
-GET /attestations/3c4d5e6f-7a8b-4c9d-8e0f-1a2b3c4d5e6f
-```
-
-**Response** (Proposed): `200 OK`. This is a completed attestation, as
-returned before a human resolved its `flag`.
-
-```json
-{
-  "id": "3c4d5e6f-7a8b-4c9d-8e0f-1a2b3c4d5e6f",
-  "contract_id": "7e8f9a0b-1c2d-4e3f-9a4b-5c6d7e8f9a0b",
-  "card_version_id": "0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d",
-  "trigger": "ci",
-  "status": "completed",
-  "started_at": "2026-10-01T09:00:00Z",
-  "finished_at": "2026-10-01T09:42:10Z",
-  "budget_limit": 25.0,
-  "cost_total": 3.42,
-  "signature": "<signature>",
-  "signing_key_id": "<signing_key_id>",
-  "results": [
-    {
-      "test_case_id": "9b0c1d2e-3f4a-4b5c-9d6e-7f8a9b0c1d2e",
-      "skill_id": "order-status",
-      "kind": "skill",
-      "pass": 49,
-      "fail": 0,
-      "inconclusive": 1
-    },
-    {
-      "test_case_id": "2d3e4f5a-6b7c-4d8e-9f0a-1b2c3d4e5f6a",
-      "skill_id": "order-status",
-      "kind": "skill",
-      "pass": 50,
-      "fail": 0,
-      "inconclusive": 0
-    }
-  ],
-  "decisions": [
-    {
-      "id": "5a6b7c8d-9e0f-4a1b-8c2d-3e4f5a6b7c8d",
-      "attestation_id": "3c4d5e6f-7a8b-4c9d-8e0f-1a2b3c4d5e6f",
-      "outcome": "flag",
-      "policy_version": "<policy_version>",
-      "decided_by": "policy",
-      "decided_at": "2026-10-01T09:42:09Z"
-    }
-  ]
-}
-```
-
-- **`results`** are the per-test-case aggregated results named in schema §11:
-  how many runs of each test case got each `run.verdict`. Their exact shape is
-  open ([OQ-A8](ARCHITECTURE.md#open-questions)). `inconclusive` is reported
-  separately and never counted as `pass`.
-- **`decisions`** lists every `decision` record for the attestation, oldest
-  first. It is empty for a `failed`, `cancelled` or `invalidated` attestation.
-
-### POST /contracts/{id}/approve
-
-A human approves a draft contract.
-
-**Request** (Proposed): no body. The approver's identity comes from the
-authenticated caller ([OQ-P3](#open-questions)).
-
-```http
-POST /contracts/7e8f9a0b-1c2d-4e3f-9a4b-5c6d7e8f9a0b/approve
-```
-
-**Response** (Proposed): `200 OK`.
-
-```json
-{
-  "id": "7e8f9a0b-1c2d-4e3f-9a4b-5c6d7e8f9a0b",
-  "card_version_id": "0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d",
-  "version": 1,
-  "status": "approved",
-  "created_at": "2026-09-30T14:52:00Z",
-  "approved_by": "reviewer@example.com",
-  "approved_at": "2026-10-01T08:55:00Z"
-}
-```
-
-- Only a `draft` contract can be approved. Approving never modifies an already
-  approved contract, because approved contracts are immutable (schema §2). The
-  error format is open ([OQ-P1](#open-questions)).
-- Whether approving a new version supersedes earlier ones is open
-  ([OQ-D5](DATA_MODEL.md#open-questions)).
-
-### GET /agents/{id}/evidence
-
-Returns an agent's evidence history.
-
-**Request**
-
-```http
-GET /agents/6f1c2d3e-4b5a-4c6d-8e7f-9a0b1c2d3e4f/evidence
-```
-
-**Response** (Proposed): `200 OK`. The example shows two attestations, newest
-first:
-
-- the completed one above, after a reviewer resolved its `flag`;
-- an earlier scheduled attestation, invalidated because the card changed
-  during it.
-
-Each `runs` array is shortened to one item.
-
-```json
-{
-  "agent": {
-    "id": "6f1c2d3e-4b5a-4c6d-8e7f-9a0b1c2d3e4f",
-    "name": "Order Status Agent",
-    "owner": "example-team",
-    "risk_level": "low"
-  },
-  "attestations": [
-    {
-      "id": "3c4d5e6f-7a8b-4c9d-8e0f-1a2b3c4d5e6f",
-      "trigger": "ci",
-      "status": "completed",
-      "started_at": "2026-10-01T09:00:00Z",
-      "finished_at": "2026-10-01T09:42:10Z",
-      "budget_limit": 25.0,
-      "cost_total": 3.42,
-      "signature": "<signature>",
-      "signing_key_id": "<signing_key_id>",
-      "card_version": {
-        "id": "0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d",
-        "card_hash": "<card_hash>",
-        "fetched_at": "2026-09-30T14:50:30Z"
-      },
-      "contract": {
-        "id": "7e8f9a0b-1c2d-4e3f-9a4b-5c6d7e8f9a0b",
-        "version": 1
-      },
-      "decisions": [
-        {
-          "id": "5a6b7c8d-9e0f-4a1b-8c2d-3e4f5a6b7c8d",
-          "attestation_id": "3c4d5e6f-7a8b-4c9d-8e0f-1a2b3c4d5e6f",
-          "outcome": "flag",
-          "policy_version": "<policy_version>",
-          "decided_by": "policy",
-          "decided_at": "2026-10-01T09:42:09Z"
-        },
-        {
-          "id": "4e5f6a7b-8c9d-4e0f-a1b2-c3d4e5f6a7b8",
-          "attestation_id": "3c4d5e6f-7a8b-4c9d-8e0f-1a2b3c4d5e6f",
-          "outcome": "approve",
-          "policy_version": "<policy_version>",
-          "decided_by": "reviewer@example.com",
-          "decided_at": "2026-10-01T11:05:00Z"
-        }
-      ],
-      "runs": [
-        {
-          "id": "8c9d0e1f-2a3b-4c4d-9e5f-6a7b8c9d0e1f",
-          "test_case_id": "9b0c1d2e-3f4a-4b5c-9d6e-7f8a9b0c1d2e",
-          "attempt": 17,
-          "verdict": "inconclusive",
-          "judge_layer": "model",
-          "rationale": "<rationale>",
-          "latency_ms": 1840,
-          "cost": 0.0412,
-          "transcript_ref": "<transcript_ref>",
-          "started_at": "2026-10-01T09:11:02Z",
-          "finished_at": "2026-10-01T09:11:05Z"
-        }
-      ]
-    },
-    {
-      "id": "1f2e3d4c-5b6a-4978-8a9b-0c1d2e3f4a5b",
-      "trigger": "schedule",
-      "status": "invalidated",
-      "started_at": "2026-09-30T14:00:00Z",
-      "finished_at": "2026-09-30T14:50:30Z",
-      "budget_limit": 25.0,
-      "cost_total": 2.97,
-      "signature": "<signature>",
-      "signing_key_id": "<signing_key_id>",
-      "card_version": {
-        "id": "b1c2d3e4-f5a6-4b7c-8d9e-0f1a2b3c4d5e",
-        "card_hash": "<card_hash>",
-        "fetched_at": "2026-09-02T10:15:00Z"
-      },
-      "contract": {
-        "id": "c2d3e4f5-a6b7-4c8d-9e0f-1a2b3c4d5e6f",
-        "version": 2
-      },
-      "decisions": [],
-      "runs": [
-        {
-          "id": "d3e4f5a6-b7c8-4d9e-8f0a-1b2c3d4e5f6a",
-          "test_case_id": "e4f5a6b7-c8d9-4e0f-9a1b-2c3d4e5f6a7b",
-          "attempt": 1,
-          "verdict": "pass",
-          "judge_layer": "deterministic",
-          "rationale": null,
-          "latency_ms": 920,
-          "cost": 0.031,
-          "transcript_ref": "<transcript_ref>",
-          "started_at": "2026-09-30T14:00:04Z",
-          "finished_at": "2026-09-30T14:00:06Z"
-        }
-      ]
-    }
-  ]
-}
-```
-
-- **Card versions.** The invalidated attestation ran against card version
-  `b1c2d3e4-…`. Its final re-fetch found a new hash, so card version
-  `0a1b2c3d-…` and a new draft contract were created (schema §11). The
-  `fetched_at` of a card version is when that hash was first fetched.
-- **Contract versions.** The numbers here (2 for the old card version, 1 for
-  the new one) assume versions are numbered per card version. That is open
-  ([OQ-D5](DATA_MODEL.md#open-questions)).
-- **Signature.** The invalidated attestation has no decision (schema §11). It
-  is shown signed, because schema §2 says each attestation is signed. What its
-  signature covers without a decision is open
-  ([OQ-F7](FLOW.md#open-questions)).
-- **Budget.** Where a `schedule` attestation's `budget_limit` comes from is
-  open ([OQ-D2](DATA_MODEL.md#open-questions)).
-- **Second decision.** The reviewer's decision is a second record; the first
-  is unchanged (schema §11). No endpoint records that second decision yet
-  ([OQ-P2](#open-questions)).
-- **Pagination and filtering** are not defined ([OQ-P1](#open-questions)).
+| Command | What it does |
+|---|---|
+| `suncly api serve` / `suncly api openapi` | Serve the API; write the OpenAPI document. |
+| `suncly worker run [--once]` / `suncly worker tick` | Run jobs in the Runner boundary; one dispatcher pass (recover leases, enqueue due re-evaluations, relay the outbox, report usage). |
+| `suncly auth local-token --subject S` | A development token (never in production). |
+| `suncly trust list` / `revoke KEY --reason R` / `rotate` | The signing-key registry. |
+| `suncly judge calibrate DATASET [--provider fake\|configured]` | Judge calibration against the human-labelled dataset. |
+| `suncly db migrate` | Apply pending migrations in order. |
 
 ## Operations without an interface
 

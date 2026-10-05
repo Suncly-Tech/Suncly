@@ -144,3 +144,47 @@ documents now say what the code does.
    to "pick the newest Python version that all dependencies support"; the two
    cannot both be the minimum. Resolved 2026-10-04: the minimum is 3.12 and the
    newest tested is 3.14; the brief now carries the decision.
+
+## 6. Hosted product (2026-10-05): what is implemented, configured, deferred
+
+**Implemented and tested** (every row names the tests that prove it; all run
+offline on fakes, the Postgres rows also against a real database):
+
+| Area | Code | Tests |
+|---|---|---|
+| OIDC and local token verification, roles, authorization on every route, cross-tenant negatives, body fields that cannot carry an organization or reviewer | `adapters/auth.py`, `core/authz.py`, `adapters/api/` | `tests/unit/test_auth_and_authz.py`, `tests/unit/test_api_workflow.py` |
+| Durable jobs: atomic claim under the tenant limit, leases, heartbeats, recovery, backoff, cancellation, persisted progress, outbox dedup | `core/jobs.py`, `adapters/postgres/app_store.py`, `adapters/memory_app_store.py` | `tests/stores/test_app_store_contract.py` (both stores), `tests/unit/test_worker_and_jobs.py` |
+| Resume without duplicate evidence or billing; unknown outcomes; lease loss finalizes nothing; two workers under one tenant limit | `core/worker.py`, `core/orchestrator.py` | `tests/unit/test_worker_and_jobs.py` |
+| Scoped Runner executor, stdin credential, redaction, undeclared sandbox refused, public mode refuses loopback | `adapters/scoped_executor.py`, `runner/process.py` | `tests/unit/test_scoped_executor.py` |
+| SSRF: scheme, port, literal and resolved addresses, rebinding at connect time, every redirect, bounded sizes | `domain/network.py`, `runner/http_transport.py`, `adapters/httpx_card_fetcher.py` | `tests/unit/test_network_guard.py` |
+| Categories, format-2 criteria, behavioural suites, model drafter and judge with structured output, failures → inconclusive | `domain/behavioral.py`, `domain/criteria.py`, `core/judge.py`, `core/model_judge.py`, `core/model_drafter.py`, `adapters/anthropic_model.py`, `adapters/fake_model.py` | `tests/unit/test_judge_v2.py`, `test_behavioral_and_drafter.py` |
+| Human-labelled calibration dataset; false approvals and rejections and consistency measured | `core/model_calibration.py`, `tests/calibration/judge_calibration.json` | `tests/unit/test_judge_calibration.py` |
+| Versioned policy, no built-in thresholds, high risk never automatic, regression against the previous completed attestation, resolution as a second decision | `domain/policy.py`, `core/policy_engine.py`, `core/resolution.py` | `tests/unit/test_policy.py`, `test_worker_and_jobs.py`, `test_api_workflow.py` |
+| Payload version 2, tamper tests per bound field, version 1 still verifies, layered verification, revocation, gate exit codes | `core/integrity.py`, `core/ci_gate.py`, `cli/hosted.py` | `tests/unit/test_integrity.py` |
+| Ledger in minor units, reservations under a hard limit, settlement and release, BYOK, meter dedup, verified webhooks replayed and out of order, live keys refused | `core/usage.py`, `core/billing.py`, `adapters/stripe_billing.py` | `tests/unit/test_usage_and_billing.py`, `tests/stores/test_app_store_contract.py` |
+| A2A TCK and Promptfoo adapters: pinned versions, normalized checks, kept artifacts, failures never pass, artifact hashes in the payload | `adapters/external/` | `tests/unit/test_external_adapters.py` (stand-in binaries) |
+| Signing keys in Secret Manager or a platform variable | `adapters/secret_keys.py` | `tests/unit/test_secret_keys.py` |
+
+**Configured and validated, not deployed:** everything under `deploy/`
+(image, Cloud Run manifests, Terraform, scheduler, alerts, compose). The
+validator runs in CI; here, `terraform validate` and `docker build --check`
+were reported as skipped because the provider registry and a Docker daemon
+were not reachable.
+
+**Exercised by hand, not in CI:** the workspace's hosted pages against the
+local backend. CI builds and type-checks them.
+
+**Not run, by instruction:** the real model provider (the adapter is
+complete; calibration against it is a command, `suncly judge calibrate
+--provider configured`, that nobody ran), live Stripe objects (the test
+catalog carries no live price id), any customer agent.
+
+**Deferred:** Cloud KMS signing; organization deletion and a retention
+schedule beyond the bucket policy (db/README.md says what happens today);
+registry adapters (stage 6); gRPC and HTTP+JSON transports (the TCK tests
+them, the Runner speaks JSON-RPC); per-organization network modes (a
+private-network deployment is a separate deployment).
+
+**What a signed report means.** A valid signature proves the evidence is
+what the worker produced. It never implies approval: the gate reads the
+decision separately, and the workspace shows the four layers side by side.

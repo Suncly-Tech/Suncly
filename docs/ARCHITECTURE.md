@@ -675,3 +675,76 @@ From schema §10. Suncly does not build any of these:
   - If signing fails, the attestation is not marked `completed` and is not
     reported as approved.
   - The examples of what a report lists as NOT tested (see Report adapter).
+
+## Hosted product (2026-10-05)
+
+The hosted product wraps the core in an application layer (SCHEMA.md §12,
+[DECISIONS.md](DECISIONS.md) DR-008 to DR-013). The core is unchanged: the
+same `domain`, `ports`, `core`, `runner` and report adapters the CLI uses.
+
+### Processes
+
+| Process | Entry point | Holds | Never holds |
+|---|---|---|---|
+| API | `suncly api serve` → `adapters/api/app.py` | token verifiers, the application store, the evidence store, the public key registry, the billing provider | a Runner executor, an agent credential, a model key, a signing key |
+| Worker | `suncly worker run` → `core/jobs.py::WorkerLoop`, `core/worker.py::AttestationJobHandler` | the executor factory (one scoped Runner per registration), the secret resolver, the model client, the signing key | Stripe credentials |
+| Dispatcher | `suncly worker tick` → `core/reevaluation.py::housekeeping_tick` | the application store, the billing provider (meter reporting) | agent credentials, signing key |
+| CLI | `suncly attest`, `verify`, `gate`, … | the file store or Postgres, the local key files | tenancy; the CLI is single-user |
+
+`adapters/app_wiring.py::build_app_services` is the one place that decides
+what each process gets; `AppConfig` refuses production settings that would
+weaken a boundary (local auth, local network mode, missing OIDC).
+
+### Application services (`core/`)
+
+| Module | Responsibility |
+|---|---|
+| `authz.py` | permissions per role; `Authorizer.require(principal, organization_id, permission)`; non-members get "not found" |
+| `registry.py` | agent registrations: card URL checked against the network mode, credential reference, sandbox and idempotency declarations |
+| `contracts_app.py` | drafting (deterministic, model, suite, contract file), approval, rejection; the suite is stored next to the contract |
+| `attestations_app.py` | start (reserve money, create the record, enqueue the job with an outbox message), read, list, cancel, assemble evidence |
+| `jobs.py`, `worker.py` | the worker loop (claim, lease, heartbeat, finish, recover) and the attestation handler (resume, run, external tools, judge, policy, sign, bill, settle) |
+| `reevaluation.py` | scheduled re-evaluation jobs, outbox relay, the housekeeping tick |
+| `resolution.py` | human resolution of a flag: a second decision and an append-only note |
+| `policy_engine.py`, `domain/policy.py` | the customer's versioned policy applied to aggregated results, baselines and external summaries |
+| `integrity.py` | payload version 2, trust context, layered verification |
+| `usage.py`, `billing.py`, `pricing.py` | the ledger, reservations, entitlements, meter reporting, webhooks, reconciliation, the test price table and plan catalog |
+| `model_judge.py`, `model_drafter.py`, `model_calibration.py` | Judge Layer 2 and the suite drafter behind `ports/model.py`; calibration against the labelled dataset |
+| `ci_gate.py` | execution, verification and policy as three answers and one exit code |
+
+### Runner security in the hosted setting
+
+- **Executor.** `adapters/scoped_executor.py` starts the Runner with an
+  environment built from scratch (interpreter paths, the network mode) and
+  hands the credential over stdin inside a `RunEnvelope`. The worker's own
+  environment never reaches the child.
+- **Credentials.** `ports/secrets.py` resolves a `CredentialReference`
+  (Secret Manager, environment in development, or none). The resolver is
+  built in the worker only. The model key is a different variable read by
+  the model adapter only; the judge never sees an agent credential.
+- **Network policy.** `domain/network.py` defines the modes; the transport
+  resolves every host and checks every address before connecting, and the
+  card fetcher checks every redirect. Private-network mode is a separate
+  deployment, never a request parameter.
+- **External tools.** `adapters/external/process.py` runs the A2A TCK and
+  Promptfoo with the same minimal environment and a deadline; their output
+  is kept as artifacts and normalized; it can flag, never approve.
+
+### Durable jobs
+
+`ports/app_store.py` defines `claim_job`, `heartbeat`, `update_progress`,
+`finish_attempt`, `request_cancel` and `recover_expired_leases`; the
+Postgres adapter claims with `FOR UPDATE SKIP LOCKED` under the tenant's
+`max_concurrent_jobs`, the memory adapter mirrors the semantics for tests.
+`job.logical_id` is the attestation id; `job_attempt` numbers executions.
+A handler that loses its lease stops at its next check and finalizes
+nothing. Evidence is keyed by run, ledger lines by run id, so at-least-once
+delivery produces no duplicate.
+
+### Verification and trust
+
+`core/integrity.py::verify_layers` answers four questions separately;
+`core/verify.py` keeps answering the CLI's integrity question for both
+payload versions. The key registry (`signing_key` rows, `GET /v1/keys`,
+`suncly trust`) is what makes issuer trust a separate layer from
+cryptographic validity.

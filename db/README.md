@@ -140,3 +140,43 @@ Postgres superusers can disable triggers, so the append-only triggers protect
 against application bugs, not against someone with full database access. The
 application should connect with a role that is not a superuser and does not
 own the tables.
+
+## Migration 0002: the application layer
+
+`migrations/0002_application_layer.sql` creates schema `suncly_app` for the
+hosted product (SCHEMA.md §12, docs/DATA_MODEL.md "Application layer"). It
+touches nothing in `public`: the seven entities stay the complete list of
+evidence, and every application row points at them by id.
+
+| Group | Tables |
+|---|---|
+| Bookkeeping | `schema_migration` (which files were applied, when) |
+| Tenancy | `organization`, `membership` |
+| Agents and runs | `agent_registration`, `attestation_meta`, `external_artifact`, `reevaluation_schedule` |
+| Policy | `policy_record` (append-only), `decision_note` (append-only) |
+| Jobs | `job`, `job_attempt`, `outbox` |
+| Money | `reservation`, `usage_event` (append-only, one line per run and operation), `spending_limit`, `subscription`, `provider_event`, `meter_report` |
+| Keys | `signing_key` (revocation is a column, never a delete) |
+
+Apply both files in order; `suncly db migrate` does, and skips the ones
+already recorded in `schema_migration`:
+
+```bash
+psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/migrations/0001_initial_schema.sql
+psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/migrations/0002_application_layer.sql
+```
+
+Three database roles are intended in production (deploy/terraform/sql.tf):
+`suncly_migrate` owns both schemas, `suncly_api` reads and writes
+application rows and reads evidence, `suncly_worker` also writes evidence.
+The grants are applied by the operator after the migration; the files
+themselves grant nothing, so they run unchanged on a single-role local
+database.
+
+**Retention and deletion.** Evidence rows and transcripts are immutable and
+are not deleted by any code path. Deleting an organization is not
+implemented; the honest answer today is that an operator removes its rows
+by hand, in dependency order, after exporting what the customer is owed.
+The evidence bucket (deploy/terraform/storage.tf) keeps objects for the
+configured retention period and versions them; that period is the only
+deletion schedule that exists.

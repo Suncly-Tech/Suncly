@@ -32,9 +32,9 @@ const initial: AttestOptions = {
 };
 
 /**
- * Evaluation setup. The browser cannot start a run (no HTTP API yet; the Runner must hold
- * the credential in its own process), so this form validates the configuration and
- * produces the exact commands. Every option maps to a real CLI option.
+ * Evaluation setup for the CLI path: this form validates the configuration and produces the
+ * exact commands. Runs against a hosted deployment start from the hosted pages instead,
+ * where the worker holds the credential. Every option here maps to a real CLI option.
  */
 export function SetupForm() {
   const [o, setO] = useState<AttestOptions>(initial);
@@ -62,7 +62,7 @@ export function SetupForm() {
     <>
       <PageTitle
         title="New evaluation"
-        intro="Configure the evaluation, then run it with the CLI. The workspace cannot start runs in this version: there is no HTTP API, and the Runner must hold the agent credential in its own process on your machine."
+        intro="Configure the evaluation, then run it with the CLI on your machine or in your pipeline. To start runs from the browser, connect a hosted Suncly API under Settings and use the hosted pages; there a worker holds the agent credential, never this browser."
       />
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
@@ -219,9 +219,10 @@ export function SetupForm() {
               <Link href="/app/import" className="font-semibold text-ink underline underline-offset-4">Import the report folder</Link> to inspect results and evidence, verify the signature, record a review note and compare with the previous evaluation.
             </p>
             <div className="mt-4 flex flex-col gap-2 text-[13px]">
-              <div className="flex items-center justify-between gap-3"><span className="text-ink-soft">Start runs from this page</span><AvailabilityBadge status="planned" /></div>
-              <div className="flex items-center justify-between gap-3"><span className="text-ink-soft">Schedules and card-change triggers</span><AvailabilityBadge status="planned" /></div>
-              <div className="flex items-center justify-between gap-3"><span className="text-ink-soft">Run from CI with the CLI</span><AvailabilityBadge status="limited" /></div>
+              <div className="flex items-center justify-between gap-3"><span className="text-ink-soft">Start runs from the browser (hosted pages, connected API)</span><AvailabilityBadge status="limited" /></div>
+              <div className="flex items-center justify-between gap-3"><span className="text-ink-soft">Scheduled re-evaluations (hosted)</span><AvailabilityBadge status="available" /></div>
+              <div className="flex items-center justify-between gap-3"><span className="text-ink-soft">Card-change triggers</span><AvailabilityBadge status="planned" /></div>
+              <div className="flex items-center justify-between gap-3"><span className="text-ink-soft">Run from CI with the CLI and gate on suncly gate</span><AvailabilityBadge status="available" /></div>
             </div>
           </Card>
         </div>

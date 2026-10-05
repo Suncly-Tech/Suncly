@@ -113,7 +113,9 @@ export default function SecurityPage() {
               <li><strong>A CI runner.</strong> The CLI with <code>--approve-as</code>, <code>--json</code> and documented exit codes; the report folder archived as a build artefact.</li>
               <li><strong>A server inside your network.</strong> The same CLI with <code>DATABASE_URL</code> pointing at your Postgres (any PostgreSQL 13 or newer; the schema is applied with <code>suncly db migrate</code>). Transcripts stay on that machine's disk until an object-storage adapter exists.</li>
             </ul>
-            <p>There is no hosted Suncly service, no account system and no data sent to Suncly in this version.</p>
+            <p>
+              <strong>A hosted deployment.</strong> The API, a worker in the trusted Runner boundary and a dispatcher, configured for Google Cloud Run under <code>deploy/</code>: separate identities per process, secrets by reference only, the Runner's egress restricted to public https hosts, evidence in a versioned bucket. This configuration is validated in CI and has not been deployed; this website sends no data to Suncly and creates no account.
+            </p>
 
             <h2 id="sandbox">Sandbox requirements</h2>
             <p>

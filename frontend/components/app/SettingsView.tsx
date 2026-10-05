@@ -10,6 +10,7 @@ import { Notice } from "@/components/ui/Notice";
 import { KeyValue } from "@/components/ui/Stat";
 import { AvailabilityBadge } from "@/components/ui/Badge";
 import { PageTitle, Loading } from "./PageTitle";
+import { ConnectionCard } from "./hosted/ConnectionCard";
 import { sampleBundles } from "@/lib/sample";
 import {
   addBundle,
@@ -37,7 +38,10 @@ export function SettingsView() {
 
   return (
     <>
-      <PageTitle title="Settings" intro="Workspace storage, sample data, your reviewer identity, and where accounts and billing stand." />
+      <PageTitle title="Settings" intro="The API connection for the hosted pages, workspace storage, sample data, your reviewer identity, and where accounts and billing stand." />
+      <div className="mb-6">
+        <ConnectionCard />
+      </div>
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader title="Workspace storage" description="Everything the workspace knows lives in this browser's local storage." />
@@ -83,7 +87,7 @@ export function SettingsView() {
         </Card>
 
         <Card>
-          <CardHeader title="Reviewer identity" description="Pre-fills the reviewer field on review notes. Stored locally; there is no account system in this version." />
+          <CardHeader title="Reviewer identity" description="Pre-fills the reviewer field on offline review notes. Stored locally. Hosted decisions use the identity of the connected API token instead." />
           <form
             className="flex flex-col gap-4"
             onSubmit={(e) => {
@@ -114,21 +118,21 @@ export function SettingsView() {
           <ul className="flex flex-col gap-3 text-small">
             <li className="flex items-start justify-between gap-4">
               <span className="text-ink">
-                <span className="font-semibold">Accounts and sign-in.</span> None. Reviewer identity is an identifier you type; identity systems are out of scope for Suncly, and an external source will supply identities later (OQ-P3).
+                <span className="font-semibold">Accounts and sign-in.</span> The hosted API verifies OpenID Connect tokens from your identity provider and keeps organizations with administrator, reviewer and viewer roles. Suncly runs no identity system of its own; local tokens exist for development only.
               </span>
-              <AvailabilityBadge status="planned" />
+              <AvailabilityBadge status="available" />
             </li>
             <li className="flex items-start justify-between gap-4">
               <span className="text-ink">
-                <span className="font-semibold">Usage.</span> Every attestation records its cost in attempts against its budget; that is the unit the code counts today. There is no aggregate usage view across a team yet.
+                <span className="font-semibold">Usage.</span> The hosted ledger records every Runner and judge call in whole minor units against a reservation held under your hard limit; the Usage page shows it. Offline, the CLI still counts attempts against a budget.
+              </span>
+              <AvailabilityBadge status="available" />
+            </li>
+            <li className="flex items-start justify-between gap-4">
+              <span className="text-ink">
+                <span className="font-semibold">Billing.</span> Subscriptions with an included allowance and explicit overage run through the billing provider in test mode: checkout, portal and verified webhooks work against test prices. No live product or price exists yet; access to a hosted deployment is arranged with the team.
               </span>
               <AvailabilityBadge status="limited" />
-            </li>
-            <li className="flex items-start justify-between gap-4">
-              <span className="text-ink">
-                <span className="font-semibold">Billing.</span> A payment layer is planned. Nothing here collects payment details, and no price is published. Access is arranged with the team.
-              </span>
-              <AvailabilityBadge status="planned" />
             </li>
           </ul>
           <Notice tone="info" className="mt-5">

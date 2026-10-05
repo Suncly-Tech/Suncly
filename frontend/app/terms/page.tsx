@@ -45,7 +45,7 @@ export default function TermsPage() {
           <p><em>{legal.pending}</em>.</p>
 
           <h2>Changes</h2>
-          <p>These terms will be replaced when the commercial offering and payment layer are introduced. Effective date: <em>{legal.pending}</em>.</p>
+          <p>These terms will be replaced before the commercial offering goes live; the software's billing runs in test mode and no price is published. Effective date: <em>{legal.pending}</em>.</p>
         </article>
       </Section>
     </SiteLayout>

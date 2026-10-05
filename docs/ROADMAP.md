@@ -190,26 +190,50 @@ stage 3 cannot make yet), [OQ-D6](DATA_MODEL.md#open-questions),
 
 ## Stage 5: API, Policy engine, CI adapter
 
-**Scope:** the four HTTP endpoints, the Policy engine and the CI adapter.
+**Scope:** the HTTP API, the Policy engine and the CI adapter.
+**Status (2026-10-05): implemented and tested** as part of the hosted
+product (SCHEMA.md §12), with a wider API than the four endpoints first
+listed.
 
 **Definition of done**
 
-- [ ] The four endpoints in [API.md](API.md) work and call the same core
-      library as the CLI (schema §6).
-- [ ] The Policy engine applies the customer's per-risk-level thresholds to
+- [x] The endpoints in [API.md](API.md) work and call the same core
+      library as the CLI (schema §6). `tests/unit/test_api_workflow.py`.
+- [x] The Policy engine applies the customer's per-risk-level thresholds to
       aggregated results. It writes a `decision` with `outcome` `approve`,
       `flag` or `block`, plus `policy_version`, `decided_by` `"policy"` and
-      `decided_at`.
-- [ ] It follows [POLICY.md](POLICY.md): it never approves a `high` risk agent
+      `decided_at`. `domain/policy.py`, `tests/unit/test_policy.py`.
+- [x] It follows [POLICY.md](POLICY.md): it never approves a `high` risk agent
       automatically, it flags borderline and dropping results, and it never
       counts `inconclusive` as a pass.
-- [ ] No decision is made for an attestation that is `failed` or
+- [x] No decision is made for an attestation that is `failed` or
       `invalidated` (schema §11).
-- [ ] A human resolution of a `flag` is stored as a second `decision`, and the
-      first is never edited (schema §11).
-- [ ] No numeric threshold is built into the code. Thresholds come from the
-      customer's configuration (schema §5).
-- [ ] The CI adapter returns pass or fail to the pipeline.
+- [x] A human resolution of a `flag` is stored as a second `decision`, and the
+      first is never edited (schema §11). `core/resolution.py`.
+- [x] No numeric threshold is built into the code. Thresholds come from the
+      customer's configuration (schema §5); without one the outcome is `flag`.
+- [x] The CI adapter returns three separate answers (execution,
+      verification, policy) and one exit code: `suncly gate`.
+
+## Stage 5b: Hosted product (2026-10-05)
+
+**Scope:** tenancy and identity, durable jobs, Runner security, the
+behavioural test format and the model judge, external tools, signed payload
+version 2, the usage ledger and billing, deployment configuration.
+
+| Area | Status |
+|---|---|
+| Organizations, memberships, roles, OIDC and local auth, authorization on every route, negative cross-tenant tests | implemented and tested |
+| Postgres job system: atomic claiming, leases, heartbeats, recovery, retries with backoff, cancellation, persisted progress, tenant concurrency, outbox | implemented and tested (memory and Postgres stores) |
+| Scoped Runner executor, credential on stdin, redaction, SSRF defences at URL, address and redirect level, network modes | implemented and tested |
+| Categories, behavioural suite format 2, model drafter and judge (Anthropic adapter, offline fakes), calibration dataset | implemented and tested; the real provider is configured, never called in CI |
+| A2A TCK and Promptfoo adapters, pinned, normalized, artifacts bound into the payload | implemented and tested with stand-in binaries; the tools themselves are installed by the worker image only |
+| Versioned policy, human resolution, CI gate | implemented and tested |
+| Payload version 2, layered verification, key registry with revocation, scheduled re-evaluation | implemented and tested |
+| Ledger, reservations, hard limits, BYOK, Stripe test mode with verified idempotent webhooks, reconciliation | implemented and tested against the fake provider and the Stripe SDK's signature verification |
+| Cloud Run deployment (image, manifests, Terraform, scheduler, alerts), local compose | configured and validated, not deployed |
+| Hosted workspace pages in the frontend | implemented; built in CI, exercised by hand against the local backend |
+| Cloud KMS signing, organization deletion, registry adapters | deferred |
 
 **Open:** [OQ-P1](API.md#open-questions), [OQ-P2](API.md#open-questions),
 [OQ-P3](API.md#open-questions), [OQ-PO1](POLICY.md#open-questions) to

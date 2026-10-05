@@ -413,3 +413,37 @@ the schema does not name are **Proposed**.
   - What `policy_version` does a human decision carry?
   - What format does a reviewer's identifier have?
   - Which outcomes may a human choose? **Proposed:** `approve` or `block`.
+
+## Application layer (schema `suncly_app`, 2026-10-05)
+
+The hosted product adds these records beside the seven entities. None of
+them is evidence; every one points at a core row by id, never the reverse.
+Migration: `db/migrations/0002_application_layer.sql`. Models:
+`src/suncly/domain/{tenancy,jobs,ledger,billing,policy}.py` and
+`src/suncly/ports/app_store.py`.
+
+| Record | Key fields | Mutability |
+|---|---|---|
+| `organization` | `slug`, `name`, `max_concurrent_jobs` | editable |
+| `membership` | `organization_id`, `subject` (the identity provider's stable id), `email`, `role` (administrator, reviewer, viewer) | editable |
+| `agent_registration` | `agent_id` → `agent`, `card_url`, `risk_level`, `sandbox_declared`, `sandbox_idempotent`, `credential` (provider, ref), `deployment_mode`, `bring_your_own_model_key`, `archived_at` | archive only |
+| `attestation_meta` | `attestation_id` → `attestation`, `registration_id`, `created_by`, `runs_planned`, `suite_version`, `contract_content_hash`, `judge_version`, `rubric_versions`, `policy_version`, `policy_content_hash`, `environment`, `deployment_identity`, `issued_at`, `expires_at`, `payload_version`, `decided_by_reviewer` | written by the worker and the resolution |
+| `policy_record` | `policy_version`, `content_hash`, `configuration` (`suncly-policy/1`) | append-only |
+| `decision_note` | `decision_id` → `decision`, `reviewer_subject`, `rationale` | append-only |
+| `job` | `kind`, `logical_id` (the attestation id), `payload`, `status`, `run_after`, `attempts`, `max_attempts`, `lease_owner`, `lease_expires_at`, `cancel_requested`, `progress`, `last_error` | state machine: queued → running → succeeded, failed or cancelled; a lost lease returns it to queued |
+| `job_attempt` | `job_id`, `number`, `worker_id`, `started_at`, `last_heartbeat_at`, `outcome` (running, succeeded, failed, lost, cancelled), `error` | closed once |
+| `outbox` | `topic`, `dedup_key` (unique), `payload`, `delivered_at`, `attempts`, `last_error` | at least once |
+| `reservation` | `attestation_id`, `amount_minor`, `currency`, `state` (held, settled, released), `settled_minor` | closed once |
+| `usage_event` | `attestation_id`, `logical_run_id` (unique with `operation` for Runner calls), `execution_attempt_id`, `reservation_id`, `provider`, `model`, `operation`, `outcome` (settled, unknown, failed), `measured`, `provider_cost_minor`, `billable_minor`, `allowance_minor`, `settlement` | append-only |
+| `spending_limit` | `period_limit_minor`, `set_by`, `set_at` | append-only (the latest applies) |
+| `subscription` | `plan_id`, `status`, provider ids, period, `provider_updated_at` | upsert, guarded against out-of-order events |
+| `provider_event` | `provider`, `event_id` (unique), `result` | recorded once |
+| `meter_report` | `usage_event_id` (unique), `provider_identifier`, `reported_at` | recorded once |
+| `signing_key` | `key_id`, `issuer`, `public_key`, `created_at`, `revoked_at`, `revocation_reason` | revoke only |
+| `external_artifact` | `attestation_id`, `tool`, `tool_version`, `kind`, `storage_ref`, `sha256` | immutable |
+| `reevaluation_schedule` | `registration_id`, `interval_hours`, `runs_per_test_case`, `budget_limit`, `next_run_at`, `enabled` | editable |
+
+Invariants enforced by the migration: append-only triggers on the ledger,
+policy, note and provider-event tables; one ledger line per run and
+operation; unique outbox keys; the organization's concurrency limit between
+1 and 64; roles and states as enums.

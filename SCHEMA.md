@@ -207,3 +207,108 @@ decision.decided_by: "policy" for automatic decisions,
   results, the hash of every run transcript, the decision outcome
   and policy_version. Signed with the key of the Suncly deployment
   that ran it, identified by signing_key_id.
+
+## 12. ADDENDUM — HOSTED PRODUCT (2026-10-05)
+
+This section adds the commercial application layer around the seven
+entities. It changes nothing in sections 1 to 11: the attestation core
+stays the same library the CLI runs, and the application layer calls it.
+
+### LAYERS
+```text
+attestation core   domain, ports, core, runner, report adapters.
+                   Seven entities in Postgres schema "public".
+                   No tenant, no money, no identity.
+application layer  schema "suncly_app": organization, membership,
+                   agent_registration, attestation_meta, policy_record,
+                   decision_note, job, job_attempt, outbox, reservation,
+                   usage_event, spending_limit, subscription,
+                   provider_event, meter_report, signing_key,
+                   external_artifact, reevaluation_schedule,
+                   schema_migration.
+processes          API (FastAPI), worker (Runner boundary, Judge,
+                   Policy, signer, ledger), dispatcher (recovery,
+                   schedules, outbox, meter), migrate.
+```
+
+### IDENTITY AND TENANCY
+- Every request carries a bearer token verified against the configured
+  OpenID Connect issuer (signature, issuer, audience, expiry). A local
+  HS256 verifier exists for development and tests and refuses to start in
+  production.
+- The organization comes from the URL, the principal from the token; a
+  request body never names either. A non-member sees "not found", never
+  "forbidden".
+- Roles: administrator ⊃ reviewer ⊃ viewer. Reviewers register agents,
+  draft and approve contracts, start and cancel attestations and resolve
+  flags. Administrators also manage members, policies, limits, billing,
+  schedules and keys.
+
+### JOBS
+- An attestation is a job with a stable logical id (the attestation id)
+  and numbered execution attempts. Workers claim atomically under the
+  tenant's concurrency limit, hold a lease, heartbeat, persist progress
+  after every run, and finish or fail the attempt. An expired lease is
+  recovered: the attempt is marked lost and the job requeued with
+  backoff, up to max_attempts.
+- Delivery is at least once. Evidence and ledger lines are keyed by run,
+  so a resumed execution records nothing twice. A run whose outcome is
+  unknown (the Runner died after sending) is repeated only when the
+  registration declares the sandbox idempotent; otherwise it is reported
+  as unknown and the reservation stays held for a person to reconcile.
+- Cancellation is a request on the job that the worker sees at its next
+  heartbeat; runs not started are reported as cancelled; no decision is
+  made.
+
+### TESTS, JUDGE, POLICY
+- Result categories: protocol, semantic, security, operational.
+- Behavioural suite format "suncly-behavioral-suite/2": reference
+  examples, deterministic assertions, rubrics (versioned statements),
+  negative cases, acknowledged coverage gaps, optional sandbox-state
+  verification. Compiled into format-2 criteria. A model may draft a
+  suite; a human approves it before anything runs.
+- Judge Layer 2 is a model behind a port with pinned configuration and
+  structured output. Model identity, parameters, usage and rationale are
+  recorded on the run. A model failure is "inconclusive". The judge holds
+  no tool and no agent credential.
+- Policy: a versioned customer configuration per risk level (thresholds,
+  required categories, inconclusive handling, regression and freshness
+  rules). Without a policy the only outcome is flag. High-risk agents are
+  never approved automatically; that setting cannot be turned off. A
+  human resolution is a second decision plus an append-only note.
+- External tools (A2A TCK, Promptfoo pack) contribute normalized checks
+  and kept artifacts; a failed or undecided external check can only flag.
+
+### SIGNED PAYLOAD VERSION 2
+```text
+payload_version, issuer, attestation_id, card_hash,
+contract {id, version, content_hash}, policy {version, content_hash},
+versions {suite, judge, rubrics}, results, transcript_hashes,
+artifact_hashes, environment, deployment_identity, issued_at,
+expires_at, decision {outcome, policy_version, decided_by, reviewer}
+```
+- Verification is layered and each layer is reported separately:
+  cryptographic validity, issuer trust (a registry of keys with
+  revocation), freshness (expiry), policy acceptability. A valid
+  signature never implies approval. Version 1 payloads still verify.
+- The CI gate answers three questions separately: did the attestation
+  complete, does it verify, does its latest decision approve.
+
+### MONEY
+- The ledger is append-only, in integer minor units of one currency.
+  Reservations are taken under a hard spending limit before a job starts,
+  settled from the ledger lines when it ends, released when it is
+  cancelled before running, and held for reconciliation when an outcome
+  is unknown.
+- Plans carry an included allowance; usage beyond it is overage reported
+  once per ledger line to the billing provider's meter. The provider
+  adapter runs in test mode; it refuses live keys unless told otherwise.
+  Webhooks are verified, recorded once, and applied in event order.
+
+### RULES (ADDED)
+- The API process holds no Runner, no agent credential, no signing key.
+- Only the worker resolves agent credentials, and only into the Runner
+  child process (stdin) or an external tool's process (one variable).
+- A worker whose lease is gone finalizes nothing.
+- Nothing in this addendum counts an inconclusive run or an undecided
+  check as a pass.

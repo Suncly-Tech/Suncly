@@ -112,8 +112,8 @@ export default function EvidencePage() {
         <li><strong>inconclusive runs</strong>: how many runs ended inconclusive; they count neither as pass nor as fail.</li>
         <li><strong>declared capability not exercised</strong>: streaming, push notifications, extended card, extensions.</li>
         <li><strong>interface not used</strong>: other bindings or URLs the card lists.</li>
-        <li><strong>probes</strong>: no probe test cases exist yet (stage 4).</li>
-        <li><strong>semantic correctness</strong>: Layer 1 checks structure, state, output modes and latency; meaning needs Layer 2 (stage 4).</li>
+        <li><strong>probes</strong>: no probe test cases of the data model's probe kinds exist; a behavioural suite's negative security cases are the current form.</li>
+        <li><strong>semantic correctness</strong>: Layer 1 checks structure, state, output modes and latency; meaning is judged by Layer 2 (a pinned model) only where a rubric exists and a provider is configured, otherwise it is inconclusive.</li>
         <li><strong>production endpoint</strong>: tests ran against the declared sandbox only.</li>
         <li><strong>card observation</strong>: fields the A2A specification marks REQUIRED that the card omits.</li>
       </ul>

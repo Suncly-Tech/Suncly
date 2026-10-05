@@ -53,7 +53,7 @@ export default function PrivacyPage() {
           </p>
 
           <h2>Changes</h2>
-          <p>This notice will be updated when the hosted service, account system or payment layer is introduced. Effective date: <em>{legal.pending}</em>.</p>
+          <p>This notice will be updated before a hosted deployment accepts customer data; its account model (OpenID Connect identities, organizations) and billing in test mode exist in the software but no hosted service is operated today. Effective date: <em>{legal.pending}</em>.</p>
         </article>
       </Section>
     </SiteLayout>

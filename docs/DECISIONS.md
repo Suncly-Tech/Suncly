@@ -169,3 +169,110 @@ where they apply:
 This document has no open questions of its own. The open questions that
 affect each decision are listed under "Still open" in its record and are
 defined in the documents that own them.
+
+## DR-008 The application layer lives beside the core, in its own schema
+
+**Decision.** Tenancy, jobs, money, policy records and the key registry live
+in Postgres schema `suncly_app`, created by migration 0002. The seven
+entities of schema §3 stay in `public`, untouched. Application rows point
+at core rows by id; the core never points back.
+
+**Why.** The attestation core is the product's evidence and must stay the
+same library the CLI runs offline. A tenant, a reservation or a job attempt
+is not evidence and must not change how evidence is produced or verified.
+
+**Consequences.** Every API route resolves the organization from the URL
+and the caller from the token, then checks ownership against `suncly_app`
+before touching a core row. The CLI keeps working with the file store and
+with a database that only carries migration 0001.
+
+## DR-009 Jobs are at least once; evidence and money are keyed by run
+
+**Decision.** Attestation jobs are claimed atomically under a lease and
+retried with backoff after a crash or a lost lease. Suncly does not claim
+exactly-once execution. Instead, every run has one key (attestation, test
+case, attempt) in the evidence store and one ledger line keyed by the run's
+id, so a resumed execution records nothing twice. A run whose outcome is
+unknown is repeated only when the registration declares the sandbox
+idempotent; otherwise it is reported as unknown and the money stays held
+until a person reconciles it.
+
+**Why.** A worker can die between sending a request and persisting its
+result. Pretending that cannot happen would either double-charge or hide a
+call the sandbox received. Saying "unknown" is the honest third outcome.
+
+**Consequences.** `job.progress` carries the in-flight keys; the reaper
+requeues expired leases; `usage_event.logical_run_id` is unique per run and
+operation; the reservation of an attestation with unknown outcomes stays
+held and is listed for reconciliation.
+
+## DR-010 Signed payload version 2 and layered verification
+
+**Decision.** Payload version 2 binds the card hash, the contract content
+hash and version, the policy version and content hash, the suite, judge and
+rubric versions, the evidence and artifact hashes, the target environment,
+the deployment identity when the card signs it, the issuer, the issue and
+expiry times, the decision and the reviewer. Verification reports four
+layers separately: cryptographic validity, issuer trust (a key registry
+with revocation), freshness and policy acceptability. Version 1 payloads
+keep verifying.
+
+**Why.** A valid signature proves integrity, not approval. A key may be
+revoked, an attestation may be stale, a policy may have changed: each is a
+different question with a different owner, and a CI gate must be able to
+ask them separately.
+
+**Consequences.** `suncly verify` keeps answering integrity; `suncly gate`
+answers execution, verification and policy with distinct exit codes; the API
+serves the key registry at `GET /v1/keys`.
+
+## DR-011 Money is integers, the ledger is append-only, limits are hard
+
+**Decision.** Every amount is an integer in minor units of one currency.
+Usage is recorded as append-only lines; corrections are new lines. A
+reservation is taken under the organization's hard limit before a job is
+queued, atomically with the limit check, and settled or released when the
+job ends. Included allowances and overage are computed per line; overage is
+reported to the billing provider at most once per line. The Stripe adapter
+runs in test mode and refuses live keys unless explicitly allowed.
+
+**Why.** Floating point and mutable balances are how billing disputes
+start. A hard limit that can be raced is not a limit.
+
+**Consequences.** `reservation`, `usage_event`, `meter_report` and
+`provider_event` are append-only tables with triggers; the entitlement check
+and the reservation happen in one statement; the reconciliation view lists
+every held reservation and every stale provider event.
+
+## DR-012 Network modes are a deployment's choice, never a request's
+
+**Decision.** The Runner runs in one of three modes set by the deployment:
+`public` (https to public addresses on 443 or 8443, every resolved address
+and every redirect checked, loopback, private, link-local and metadata
+ranges refused), `private_network` (a separately authorized deployment that
+may reach private ranges) and `local` (development only; refused in
+production). A registration records the mode it ran under; a request body
+cannot choose one.
+
+**Why.** Server-side request forgery is the obvious attack on a service
+that connects to customer-named hosts. The defence must hold at the moment
+of connection, not only when a URL is validated.
+
+**Consequences.** `domain/network.py` decides, `runner/http_transport.py`
+enforces at connect time, the card fetcher enforces on every redirect, the
+Cloud Run worker also sits behind an egress firewall (deploy/terraform).
+
+## DR-013 External tools run inside the Runner boundary and only flag
+
+**Decision.** The A2A TCK and a Promptfoo pack run as child processes with
+the Runner's minimal environment, pinned to one version each, with their
+output files kept as artifacts whose hashes the payload binds. Their checks
+are normalized into Suncly's categories; a failed or undecided check can
+make a decision `flag`, never `approve` or `block`.
+
+**Why.** A third-party tool is evidence, not a verdict: it is not reviewed
+by the customer the way a contract is, and its own pass can hide a skipped
+or errored check.
+
+**Consequences.** `ports/external_tools.py`, `adapters/external/`; the
+policy evaluation records every tool's summary and reasons.

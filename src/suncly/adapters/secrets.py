@@ -59,7 +59,7 @@ class SecretManagerSecrets:
     @staticmethod
     def _default_accessor(name: str) -> str:
         try:
-            from google.cloud import secretmanager  # type: ignore[import-not-found]
+            from google.cloud import secretmanager
         except ImportError as exc:  # pragma: no cover - needs the optional extra
             raise RunnerError(
                 "Secret Manager support is not installed.",

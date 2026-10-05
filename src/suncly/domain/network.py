@@ -116,6 +116,8 @@ def address_block_reason(address: str) -> str | None:
         return "not an IP address"
     if parsed.version == 6 and parsed.ipv4_mapped is not None:
         parsed = parsed.ipv4_mapped
+    if parsed.is_unspecified:
+        return "reserved"
     if parsed.is_loopback:
         return "loopback"
     if parsed.is_link_local:

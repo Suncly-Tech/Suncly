@@ -157,8 +157,12 @@ class PolicyEvaluation(BaseModel):
     requires_human: bool = False
 
 
+_PRECISION = 9
+"""Ratios are compared at nine decimals so 19/20 is not "below" 0.9 + 0.05."""
+
+
 def _ratio(numerator: int, denominator: int) -> float | None:
-    return None if denominator == 0 else numerator / denominator
+    return None if denominator == 0 else round(numerator / denominator, _PRECISION)
 
 
 def evaluate_test_case(
@@ -186,7 +190,7 @@ def evaluate_test_case(
         )
         base_ratio = _ratio(baseline.pass_count, base_denominator)
         if base_ratio is not None and pass_ratio is not None:
-            dropped = (base_ratio - pass_ratio) > regression.max_pass_ratio_drop
+            dropped = round(base_ratio - pass_ratio, _PRECISION) > regression.max_pass_ratio_drop
     if pass_ratio is None:
         return TestCaseEvaluation(
             test_case_id=result.test_case_id,
@@ -197,10 +201,11 @@ def evaluate_test_case(
             dropped=dropped,
             detail="no decidable run",
         )
+    borderline_ceiling = round(thresholds.min_pass_ratio + thresholds.borderline_margin, _PRECISION)
     if pass_ratio < thresholds.min_pass_ratio:
         verdict = TestCaseVerdict.FAIL
         detail = f"pass ratio {pass_ratio:.3f} below min_pass_ratio {thresholds.min_pass_ratio}"
-    elif pass_ratio < thresholds.min_pass_ratio + thresholds.borderline_margin:
+    elif pass_ratio < borderline_ceiling:
         verdict = TestCaseVerdict.BORDERLINE
         detail = f"pass ratio {pass_ratio:.3f} within the borderline margin"
     elif inconclusive_ratio > thresholds.max_inconclusive_ratio:

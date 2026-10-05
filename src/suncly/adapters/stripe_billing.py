@@ -26,16 +26,18 @@ from suncly.ports.billing_provider import (
 )
 
 TEST_KEY_PREFIXES = ("sk_test_", "rk_test_")
+FAKE_WEBHOOK_SECRET = "whsec_test_fake_secret"  # noqa: S105 - the in-memory fake's key, not a secret
 
 
 def _webhook_from(event: Any) -> ProviderWebhook:
     data = event["data"] if isinstance(event, dict) else event.data
-    data_dict = dict(data) if not isinstance(data, dict) else data
+    if hasattr(data, "to_dict_recursive"):
+        data_dict: dict[str, Any] = data.to_dict_recursive()
+    elif hasattr(data, "to_dict"):
+        data_dict = data.to_dict()
+    else:
+        data_dict = dict(data)
     obj: Any = data_dict.get("object")
-    if obj is not None and hasattr(obj, "to_dict_recursive"):
-        obj = obj.to_dict_recursive()
-    elif obj is not None and hasattr(obj, "to_dict"):
-        obj = obj.to_dict()
     return ProviderWebhook(
         event_id=str(event["id"] if isinstance(event, dict) else event.id),
         event_type=str(event["type"] if isinstance(event, dict) else event.type),
@@ -150,7 +152,7 @@ class FakeBillingProvider:
 
     name = "stripe"
 
-    def __init__(self, webhook_secret: str = "whsec_test_fake_secret") -> None:
+    def __init__(self, webhook_secret: str = FAKE_WEBHOOK_SECRET) -> None:
         self.webhook_secret = webhook_secret
         self.checkouts: list[CheckoutRequest] = []
         self.portals: list[tuple[str, str]] = []

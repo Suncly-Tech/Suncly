@@ -121,7 +121,13 @@ def test_only_the_runner_reads_the_credential() -> None:
 
 def test_no_module_outside_the_runner_reads_the_environment_for_the_agent() -> None:
     """The parent processes never touch os.environ except the config loader and the CLI."""
-    allowed = {"adapters.config_loader", "cli.main", "cli.output", "runner.process"}
+    allowed = {
+        "adapters.config_loader",
+        "cli.hosted",
+        "cli.main",
+        "cli.output",
+        "runner.process",
+    }
     for module, path in modules():
         text = path.read_text(encoding="utf-8")
         if "os.environ" in text or "getenv(" in text:

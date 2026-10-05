@@ -36,7 +36,7 @@ class GcsTranscriptStorage:
     @classmethod
     def for_bucket(cls, bucket_name: str, prefix: str = "evidence/") -> GcsTranscriptStorage:
         try:
-            from google.cloud import storage  # type: ignore[import-not-found]
+            from google.cloud import storage
         except ImportError as exc:  # pragma: no cover - needs the optional extra
             raise StoreError(
                 "Cloud Storage support is not installed.", "Install suncly[gcp]."
@@ -84,7 +84,7 @@ def _is_precondition_failure(exc: Exception) -> bool:
 class MemoryBucket:
     """An in-memory bucket honouring ``if_generation_match=0``, for tests."""
 
-    class _Exists(Exception):
+    class _ExistsError(Exception):
         code = 412
 
     def __init__(self) -> None:
@@ -98,7 +98,7 @@ class MemoryBucket:
                 self, data: bytes, content_type: str, if_generation_match: int
             ) -> None:
                 if if_generation_match == 0 and name in bucket.objects:
-                    raise MemoryBucket._Exists(name)
+                    raise MemoryBucket._ExistsError(name)
                 bucket.objects[name] = data
 
             def download_as_bytes(self) -> bytes:

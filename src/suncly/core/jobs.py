@@ -25,11 +25,11 @@ from suncly.ports.app_store import ApplicationStore
 from suncly.ports.clock import Clock
 
 
-class CancelledJob(Exception):
+class JobCancelledError(Exception):
     """Raised by a handler when it stopped because cancellation was requested."""
 
 
-class LeaseLost(Exception):
+class LeaseLostError(Exception):
     """Raised when the worker's lease on the job is gone; the attempt is not finished by us."""
 
 
@@ -70,7 +70,7 @@ class JobContext:
     def check(self) -> None:
         """Raise when the handler must stop."""
         if self.lease_lost:
-            raise LeaseLost(f"lease on job {self.job.id} was lost")
+            raise LeaseLostError(f"lease on job {self.job.id} was lost")
 
     def update_progress(self, **changes: object) -> JsonObject:
         with self._lock:
@@ -88,7 +88,7 @@ class JobHandler(Protocol):
     kind: JobKind
 
     def handle(self, context: JobContext) -> None:
-        """Do the work. Return on success; raise ``CancelledJob`` or any error otherwise."""
+        """Do the work. Return on success; raise ``JobCancelledError`` or any error otherwise."""
         ...
 
 
@@ -138,9 +138,9 @@ class WorkerLoop:
         beater.start()
         try:
             self._handlers[job.kind].handle(context)
-        except CancelledJob:
+        except JobCancelledError:
             self._finish(context, AttemptOutcome.CANCELLED, None)
-        except LeaseLost as exc:
+        except LeaseLostError as exc:
             self._log(f"job {job.id}: {exc}; leaving it to the reaper")
         except Exception as exc:
             error = f"{type(exc).__name__}: {exc}"
@@ -172,7 +172,8 @@ class WorkerLoop:
             self._log(f"job {context.job.id}: could not finish attempt: {exc}")
             return
         self._log(
-            f"job {job.id}: attempt {context.attempt.number} {outcome.value}; job {job.status.value}"
+            f"job {job.id}: attempt {context.attempt.number} {outcome.value}; "
+            f"job {job.status.value}"
         )
 
     def _beat(self, context: JobContext, stop: threading.Event) -> None:

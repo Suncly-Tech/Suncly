@@ -89,10 +89,10 @@ def create_app(services: AppServices) -> FastAPI:
                 last = exc
         raise last or AuthenticationError("The token could not be verified.")
 
-    PrincipalDep = Annotated[Principal, Depends(principal)]
+    AuthenticatedPrincipal = Annotated[Principal, Depends(principal)]  # noqa: N806 - a type alias
 
     def context_for(permission: str) -> Callable[..., AuthorizedContext]:
-        def dependency(organization_id: UUID, who: PrincipalDep) -> AuthorizedContext:
+        def dependency(organization_id: UUID, who: AuthenticatedPrincipal) -> AuthorizedContext:
             return services.authorizer.require(who, organization_id, permission)
 
         return dependency
@@ -179,7 +179,7 @@ def create_app(services: AppServices) -> FastAPI:
     # -- identity and organizations ---------------------------------------------
 
     @app.get("/v1/me", tags=["identity"])
-    def me(who: PrincipalDep) -> JsonObject:
+    def me(who: AuthenticatedPrincipal) -> JsonObject:
         organizations = services.app_store.list_organizations_for_subject(who.subject)
         return {
             "principal": who.model_dump(mode="json"),
@@ -190,7 +190,9 @@ def create_app(services: AppServices) -> FastAPI:
         }
 
     @app.post("/v1/organizations", status_code=201, tags=["organizations"])
-    def create_organization(body: schemas.CreateOrganization, who: PrincipalDep) -> JsonObject:
+    def create_organization(
+        body: schemas.CreateOrganization, who: AuthenticatedPrincipal
+    ) -> JsonObject:
         if services.app_store.get_organization_by_slug(body.slug) is not None:
             raise ConflictError("An organization with this slug exists.", f"Slug {body.slug!r}.")
         organization = Organization(

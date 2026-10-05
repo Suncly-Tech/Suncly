@@ -20,7 +20,7 @@ from suncly.core.app import AppServices
 from suncly.core.attestation import deployment_identity_of
 from suncly.core.cards import select_interface
 from suncly.core.evidence import evidence_document_hash, store_payload
-from suncly.core.jobs import CancelledJob, JobContext, LeaseLost
+from suncly.core.jobs import JobCancelledError, JobContext, LeaseLostError
 from suncly.core.judge import JUDGE_VERSION, JudgeService
 from suncly.core.model_judge import ModelJudge
 from suncly.core.orchestrator import (
@@ -172,7 +172,7 @@ class AttestationJobHandler:
                     retry_unknown=registration.sandbox_idempotent,
                 ),
             )
-        except LeaseLost:
+        except LeaseLostError:
             raise
         attestation = orchestration.attestation
         runs_recorded = [r.run for r in orchestration.recorded]
@@ -198,7 +198,10 @@ class AttestationJobHandler:
                     execution_attempt_id=context.attempt.id,
                     reservation_id=reservation_id,
                     outcome=UsageOutcome.UNKNOWN,
-                    note=f"unknown outcome: {item.reason.value} for {item.test_case_id}#{item.attempt}",
+                    note=(
+                        f"unknown outcome: {item.reason.value} "
+                        f"for {item.test_case_id}#{item.attempt}"
+                    ),
                 )
             elif item.reason is NotExecutedReason.WITHHELD:
                 s.usage.record_agent_call(
@@ -238,7 +241,7 @@ class AttestationJobHandler:
         engine = PolicyEngine(s.store, s.clock, s.ids, signer)
         policy_evaluation: JsonObject | None = None
         if attestation.status is AttestationStatus.RUNNING:
-            decision, attestation, _, evaluation, payload = engine.decide_and_sign(
+            _, attestation, _, evaluation, payload = engine.decide_and_sign(
                 attestation,
                 contract,
                 parsed.card_hash,
@@ -297,7 +300,7 @@ class AttestationJobHandler:
             )
         )
         if orchestration.cancelled:
-            raise CancelledJob(f"attestation {attestation.id} was cancelled")
+            raise JobCancelledError(f"attestation {attestation.id} was cancelled")
 
     # -- helpers ------------------------------------------------------------------------
 

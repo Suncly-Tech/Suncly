@@ -157,7 +157,7 @@ def decide_from_statements(
     passes = verdicts.count("pass")
     undecided = verdicts.count("cannot_decide")
     overall = str(answer.get("overall_rationale", ""))
-    if pass_requires == "majority":
+    if pass_requires == "majority":  # noqa: S105 - a rubric rule, not a credential
         if fails > len(verdicts) / 2:
             return RunVerdict.FAIL, overall, statements
         if passes > len(verdicts) / 2:

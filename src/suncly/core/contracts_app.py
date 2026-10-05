@@ -10,6 +10,7 @@ nothing in a request body can name the approver.
 
 from __future__ import annotations
 
+import contextlib
 from dataclasses import dataclass
 from uuid import UUID
 
@@ -98,13 +99,11 @@ class ContractWorkflow:
         existing = contracts.latest_draft_with_content(card_version.id, draft)
         contract, test_cases = existing or contracts.create_draft(card_version.id, draft)
         if suite is not None and existing is None:
-            try:
+            with contextlib.suppress(TranscriptExistsError):
                 s.transcripts.put(
                     f"contracts/{contract.id}/suite.json",
                     render_behavioral_suite(suite).encode("utf-8"),
                 )
-            except TranscriptExistsError:
-                pass
         return ContractDetail(
             contract=contract,
             test_cases=test_cases,

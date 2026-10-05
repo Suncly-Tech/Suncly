@@ -11,7 +11,6 @@ command line, never in the job. Nothing from the child's stderr is surfaced.
 
 from __future__ import annotations
 
-import os
 import subprocess
 import sys
 from collections.abc import Mapping
@@ -78,7 +77,7 @@ class ScopedSubprocessRunExecutor:
                 timeout=job.timeout_s + GRACE_S,
                 check=False,
                 env=self._env,
-                cwd=str(Path(os.getcwd())),
+                cwd=str(Path.cwd()),
             )
         except subprocess.TimeoutExpired:
             return RunResult(

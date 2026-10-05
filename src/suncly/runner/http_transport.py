@@ -34,6 +34,15 @@ import httpx
 from suncly.domain.a2a import VERSION_HEADER
 from suncly.domain.errors import TargetHostRefusedError
 from suncly.domain.network import NetworkPolicy, check_addresses, check_url, is_loopback_host
+
+__all__ = [
+    "GuardedBackend",
+    "GuardedTransport",
+    "HttpxJsonRpcTransport",
+    "is_loopback_host",
+    "require_https_or_loopback",
+    "resolve_host",
+]
 from suncly.domain.tenancy import DeploymentMode
 from suncly.ports.a2a import RpcResponse
 

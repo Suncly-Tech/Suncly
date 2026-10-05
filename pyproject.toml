@@ -132,7 +132,7 @@ markers = [
 filterwarnings = [
     "error",
     # The domain's TestCase* classes are entities, not tests.
-    "ignore:cannot collect test class 'Test(Case(Kind|Result|Row)?|Input)':pytest.PytestCollectionWarning",
+    "ignore:cannot collect test class 'Test(Case(Kind|Result|Row|Verdict|Evaluation)?|Input|Category)':pytest.PytestCollectionWarning",
 ]
 
 [tool.coverage.run]

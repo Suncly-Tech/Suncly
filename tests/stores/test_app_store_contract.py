@@ -278,11 +278,9 @@ def test_attestation_meta_policies_and_notes(
     if core is not None:
         from suncly.domain.models import Decision, DecisionOutcome
 
-        core.update_attestation(
-            core.get_attestation(attestation_id).model_copy(
-                update={"status": AttestationStatus.RUNNING}
-            )
-        )  # type: ignore[union-attr]
+        current = core.get_attestation(attestation_id)
+        assert current is not None
+        core.update_attestation(current.model_copy(update={"status": AttestationStatus.RUNNING}))
         decision = Decision(
             id=uuid4(),
             attestation_id=attestation_id,

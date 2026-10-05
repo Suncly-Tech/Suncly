@@ -214,3 +214,127 @@ Privacy Policy §13 and `/data` say the question is open.
 | Coding-agents guide under `/docs` | deferred by the brief's condition | built "once any tool is verified"; no tool is |
 | Search surfaces: `lib/seo.ts` DEFINITION, JSON-LD, `llms.txt`, `llms-full.txt`, sitemap, manifest, `og.png` | built | the social preview is in the new look; the sitemap lists the indexable pages only (the four legal drafts and the specimen are noindex and absent) |
 | Missing against section 6 | none | |
+
+## 9. Final acceptance and handover (stage 6)
+
+### Where the work is
+
+- Branch `claude/sweet-ride-ku6uau` on `github.com/Suncly-Tech/Suncly`, final commit
+  recorded in `REDESIGN_PROGRESS.md`; the branch is six commits ahead of `main` and one
+  behind it (a database migration on `main` that touches nothing in `frontend/`; a dry-run
+  merge is clean). Nothing was merged, deployed or published.
+- Comparison: `https://github.com/Suncly-Tech/Suncly/compare/main...claude/sweet-ride-ku6uau`.
+- No preview deployment exists. Local preview, with Node 22:
+
+  ```bash
+  git clone https://github.com/Suncly-Tech/Suncly.git && cd Suncly
+  git checkout claude/sweet-ride-ku6uau
+  cd frontend && npm ci && npm run build && npm run serve   # then open http://localhost:3100
+  ```
+
+- Screenshots for visual review: `design/handback/` (home at 1440 and 390, the open
+  mobile menu, and the representative inner pages); every page at four widths is produced
+  by `npm run screenshots`.
+- `public/mark.svg` is byte-identical to `main`; `src/` and `tests/` are untouched by the
+  branch.
+
+### Acceptance
+
+| State | Requirement | Evidence |
+| --- | --- | --- |
+| passed | Sixteen home sections in the brief's order, 779 of 800 visible words | `app/page.tsx`; `npm run words` |
+| passed | Daylight direction: warm paper, one gold, Newsreader and Figtree, mark unchanged, blue only in the closing sky, 18.4° on shadows and hatches | `design/TOKENS.md`; `npm run forbidden` (no blue in the theme) |
+| passed | No horizontal overflow at 1440, 1024, 768 and 390 px | `npm run screenshots` |
+| passed | Accessibility 100 (Lighthouse, `/` and `/docs`); axe clean on 24 pages at two widths; keyboard 14 of 14 | `VERIFICATION.md` |
+| passed | Desktop performance 100 on `/` and `/docs` | Lighthouse |
+| passed | Mobile performance ≥ 90: 91 to 95 simulated over seven runs, 90 to 94 under devtools throttling | Lighthouse, `npm run lcp-probe` |
+| passed | CLS < 0.1: 0 simulated, 0.0004 devtools | Lighthouse |
+| passed | Every previous URL kept; `/app` behaviour unchanged; `/demo` in-browser signature verification passes; links, anchors, navigation, install tabs, copy buttons | `npm run functional` (22 of 22) |
+| passed | No cookies, no third-party request, one local-storage key at the visitor's request | `npm run inspect-storage` |
+| passed | No invented customer, logo, price, certification, company fact or install command; status words Available, Pilot, Planned from the capability map | `CONTENT.md`; `npm run forbidden` |
+| passed | Certification criteria kept internal; specimen record fictional; legal drafts visibly draft and noindex; no response or support promise in `security.txt` or the disclosure policy | section 2 above; `VERIFICATION.md` stage 5 |
+| passed | Repository checks: ruff, mypy, pytest, run in stage 4; the only Python file the branch touches is `frontend/scripts/generate-badge.py`, unchanged since | `VERIFICATION.md` |
+| **failed** | **Simulated LCP < 2.5 s.** Latest value 2.89 s: `npm run lcp-graph` on the final build, Lighthouse 13.5, mobile preset, simulated throttling (1,638 Kbps, 150 ms RTT, 4× CPU slowdown), 412×823 at DPR 1.75, Chromium headless, served from `out/` by `scripts/serve.mjs` with gzip on localhost. Observed LCP on the same page: 1.36 s under devtools throttling, 0.12 to 0.18 s unthrottled | `lighthouse/lcp-graph.txt`; `VERIFICATION.md` |
+| unverified | The four Find Suncly destinations resolve | network policy blocks the hosts |
+| unverified | Comparison with the live site; the canonical host | `www.suncly.com` blocked |
+| unverified | Firefox, Safari, real phones, screen readers beyond axe | Chromium only |
+| unverified | Legal applicability against primary sources; counsel's review | `legal/APPLICABILITY.md`, `legal/REVIEW.md` |
+| unverified | `team@suncly.com` as an authorised security reporting destination | `company.securityContactEmail` blank |
+| unverified | The Windows PowerShell commands; importing a real report folder; the pilot form against a live endpoint; browsers without Ed25519 | not run here |
+| deferred | Research note pages under `/research` | the brief's condition (a published note) is unmet |
+| deferred | Coding-agents guide under `/docs`, verified Works-with state, tool install tabs | the brief's condition (a verified tool) is unmet |
+| deferred | Platform glyphs on the Find Suncly row | guidelines unverified; text abbreviations ship |
+| deferred | Hacker News link | no exact URL supplied |
+| deferred | Agent Skill (`REDESIGN_PLAN.md` §7) | no decision |
+| deferred | Commissioned photographic stills | vector renders in place; briefs in `art/README.md` |
+| deferred | ® in place of ™; hosted-API sections of Privacy and Terms; billing | no registration, no hosted API, no billing |
+| deferred | Two fresh-eyes review passes | the founder asked for one agent |
+
+The site does not meet every original target: the simulated LCP target is failed and is
+documented rather than worked around.
+
+### The draft pages, exactly
+
+| Route | Draft notice | noindex | In sitemap | Counsel review |
+| --- | --- | --- | --- | --- |
+| `/privacy` | yes, names the missing facts | yes (`launch.legalPublished`) | no | yes |
+| `/terms` | yes | yes (`launch.legalPublished`) | no | yes |
+| `/legal` | yes | yes (`launch.legalPublished`) | no | yes, including the Estonian summary |
+| `/certified/policy` | yes | yes (`launch.legalPublished`) | no | yes |
+| `/certified/specimen` | no; headed "Specimen record (fictional)", certifies nothing | yes, because `lib/certified/records.json` is empty | no | not a legal draft; read with the policy if counsel wishes |
+| `/cookies` | no; factual from the storage inspection | indexable | yes | optional (referenced by Privacy §8) |
+
+"Five draft pages" in earlier notes meant the four legal drafts plus the specimen; the
+counsel set is the four.
+
+### The security reporting address, today
+
+`team@suncly.com` is currently advertised as the destination for security reports in two
+places: the `Contact:` line of `public/.well-known/security.txt` and the "Reporting a
+vulnerability" paragraph on `/security`. Both state that it is the team's general address
+and that the founders have not confirmed it for security reports. That authorisation is
+unconfirmed, and `company.securityContactEmail` in `lib/launch.ts` is blank.
+
+### Founder decisions, once, with what each controls
+
+Blockers for publication (provisional where legal applicability is unverified):
+
+1. **Company facts.** `frontend/lib/launch.ts`, `company.*`: `legalEntityName`,
+   `registryCode`, `registeredOffice`, `vatNumber`, `privacyContactEmail`,
+   `securityContactEmail`, `governingLawAndCourt`, `hosting`, `dns` and `database`
+   (confirmed, regions), `pilotFormEndpointAndStorage`, `subprocessors`,
+   `retentionPeriods`. Each blank renders as a named blank on the four drafts; the footer
+   legal line omits blanks.
+2. **Legal review.** The questions are in `legal/REVIEW.md`. Sign-off is recorded by
+   setting `launch.legalPublished` to `true` in `lib/launch.ts`, which removes the draft
+   notice and the noindex on `/privacy`, `/terms`, `/legal` and `/certified/policy`
+   together. Do not set it before the facts exist.
+3. **Repository licence.** A `LICENSE` file at the repository root (none exists) and
+   `company.repositoryLicence` in `lib/launch.ts`, which fills Terms §6.
+4. **Canonical host.** `site.domain` in `frontend/lib/content.ts` (used by `metadataBase`,
+   canonical URLs, the sitemap and JSON-LD), plus the literal URLs in
+   `public/.well-known/security.txt` and `public/llms.txt`.
+5. **Security reporting address.** `company.securityContactEmail` in `lib/launch.ts`
+   (clears the Privacy draft notice's item), the `Contact:` line in
+   `public/.well-known/security.txt`, and the paragraph in `app/security/page.tsx`.
+6. **The Estonian summary.** The text is `legalNoticePage.estonian` in
+   `frontend/lib/content.ts`; whether the Language Act requires it is a question in
+   `legal/REVIEW.md`; it publishes with the legal notice under `launch.legalPublished`.
+
+Can stay planned or visibly unresolved:
+
+7. **Pricing**: `pricing.*` in `lib/launch.ts` (`/offer` and Terms §5 read from it).
+8. **Certification**: `certification.*` in `lib/launch.ts` (criteria acceptance and
+   version, validity, re-test triggers, who decides, appeals contact) and records in
+   `lib/certified/records.json`; the proposed criteria are in `REDESIGN_PLAN.md` §9.
+9. **Response and support commitments**: the disclosure paragraph in
+   `app/security/page.tsx`, `public/.well-known/security.txt`, Certification Policy §11,
+   and the drafted periods listed in `legal/REVIEW.md`.
+10. **Hacker News URL**: the `hackernews` entry of `social` in `lib/launch.ts`.
+11. **Platform glyphs**: `components/home/FindSuncly.tsx`, once guidelines and SVGs are on file.
+12. **Coding-agent runs**: `launch.testedIn` in `lib/launch.ts`, one entry per tool, each
+    backed by a recorded run in `VERIFICATION.md`.
+13. **Agent Skill**: `REDESIGN_PLAN.md` §7.
+14. **Research notes**: the `research` list in `lib/content.ts`; note pages are built only
+    after founder review.
+15. **Commissioned stills**: `art/README.md`.

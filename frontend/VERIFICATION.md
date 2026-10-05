@@ -220,9 +220,13 @@ navigation, the footer lockup and the banner on every page.
   reports. Every drafted period or amount (notice periods, dispute answers, confidentiality
   term, badge removal, liability cap) is listed in `legal/REVIEW.md` as a founder or counsel
   decision. No legal verification is claimed: every primary source remains unreachable.
-- **Draft state.** `/privacy`, `/terms`, `/legal`, `/certified/policy` and
-  `/certified/specimen` carry the draft notice (where applicable) and
-  `<meta name="robots" content="noindex, nofollow">` in the export; none is in the sitemap.
+- **Draft state.** Four legal drafts, `/privacy`, `/terms`, `/legal` and
+  `/certified/policy`, carry the draft notice naming their missing facts and
+  `<meta name="robots" content="noindex, nofollow">` in the export, both controlled by
+  `launch.legalPublished`. A fifth page, `/certified/specimen`, is also noindex (because
+  `records.json` is empty) and is labelled a fictional specimen, but it is not a legal
+  draft and carries no draft notice. None of the five is in the sitemap. `/cookies` is
+  indexable and factual.
 - **The security reporting address.** `team@suncly.com` was the previous site's general
   contact (six files at the pre-redesign commit) and is `site.email` and
   `company.contactEmail` now. `company.securityContactEmail` is blank. Whether the founders

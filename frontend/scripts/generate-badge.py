@@ -1,7 +1,8 @@
 """Generate the Suncly Certified badge as vector and raster files.
 
 Circular, the words "suncly certified" on a circular path converted to outlines (so the
-badge needs no font), the badge's circular sun mark (design/badge/mark.svg) untouched at the centre, a fine
+badge needs no font), the badge's own circular sun mark (design/badge/mark.svg) untouched
+at the centre, a fine
 ring, and one notch at the brand angle (18.4 degrees from vertical, from the two cuts in
 the mark). Three versions: paper, dusk and mono. No laurels, shields, stars, ribbons,
 ticks, medal colours or tiers; nothing that resembles the CE mark or a regulator's seal.
@@ -25,7 +26,8 @@ from fontTools.varLib.instancer import instantiateVariableFont
 
 ROOT = Path(__file__).resolve().parents[1]
 FONT = ROOT / "design/directions/fonts/Figtree[wght].ttf"
-MARK = ROOT / "design/badge/mark.svg"  # the badge's own circular mark, kept apart from the brand mark
+# the badge's own circular mark, kept apart from the brand mark in public/mark.svg
+MARK = ROOT / "design/badge/mark.svg"
 OUT = ROOT / "public/brand/badge"
 
 SIZE = 512.0
@@ -33,7 +35,7 @@ CENTRE = SIZE / 2
 RING_OUTER = 244.0  # fine outer ring
 TEXT_RADIUS = 206.0  # baseline circle of the lettering
 RING_INNER = 162.0  # fine inner ring
-MARK_RADIUS = 112.0  # the mark's circle (r=44 of 120 in design/badge/mark.svg) scaled to this radius
+MARK_RADIUS = 112.0  # the mark's circle (r=44 of 120 in the badge's mark) at this radius
 ANGLE = 18.4  # brand angle, degrees from vertical
 TEXT = "suncly certified"
 FONT_SIZE = 40.0
@@ -90,7 +92,7 @@ def text_on_circle(
 
 
 def mark_svg() -> str:
-    """The badge's sun mark exactly as drawn in design/badge/mark.svg, scaled so its circle has MARK_RADIUS."""
+    """The badge's mark exactly as drawn in design/badge/mark.svg, circle scaled to MARK_RADIUS."""
     src = MARK.read_text()
     inner = re.search(r"<svg[^>]*>(.*)</svg>", src, re.S).group(1).strip()
     scale = MARK_RADIUS / 44.0

@@ -23,7 +23,7 @@ export default function CertifiedPage() {
       <Section>
         {!open ? (
           <Notice tone="warn" title="Opening with our pilots" className="mb-10">
-            {c.state} The criteria proposed for the first profile are on the <Link href="/certified/policy">Certification Policy</Link>, marked as a draft until the founders accept them.
+            {c.state} A first set of criteria is in founder review and is not published; the <Link href="/certified/policy">Certification Policy</Link> (a draft) describes how the programme will work once criteria are adopted.
           </Notice>
         ) : null}
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-16">
@@ -62,7 +62,7 @@ export default function CertifiedPage() {
                 <li key={f.href}><a href={f.href} download>{f.label}</a></li>
               ))}
             </ul>
-            <p className="summary">The files are provided for agents that hold a valid record. While no record exists, they are specimens.</p>
+            <p className="summary">The files are provided for agents that hold a valid record. No record exists, so every badge shown on this site is a specimen.</p>
           </article>
           <div className="flex flex-col gap-8 lg:sticky lg:top-24 lg:self-start">
             <figure className="m-0">

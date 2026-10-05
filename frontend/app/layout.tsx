@@ -2,11 +2,18 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { site } from "@/lib/content";
 import { JsonLd } from "@/components/site/JsonLd";
-import { ALL_KEYWORDS, BRAND, graph, organizationLd, softwareLd, websiteLd } from "@/lib/seo";
+import {
+  ALL_KEYWORDS,
+  BRAND,
+  graph,
+  organizationLd,
+  softwareLd,
+  websiteLd,
+} from "@/lib/seo";
 import "./globals.css";
 
 const display = localFont({
-  src: "./fonts/Newsreader-Variable-latin.woff2",
+  src: "./fonts/Newsreader-Variable-opsz18-72-latin.woff2",
   weight: "400",
   style: "normal",
   variable: "--font-newsreader",
@@ -26,8 +33,8 @@ const sans = localFont({
 });
 
 const mono = localFont({
-  src: "./fonts/JetBrainsMono-Variable-latin.woff2",
-  weight: "100 800",
+  src: "./fonts/JetBrainsMono-Regular-latin.woff2",
+  weight: "400",
   style: "normal",
   variable: "--font-jetbrains-mono",
   display: "swap",
@@ -35,8 +42,12 @@ const mono = localFont({
 });
 
 const verification: NonNullable<Metadata["verification"]> = {};
-if (process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION) verification.google = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
-if (process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION) verification.other = { "msvalidate.01": process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION };
+if (process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION)
+  verification.google = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
+if (process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION)
+  verification.other = {
+    "msvalidate.01": process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION,
+  };
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.domain),
@@ -58,7 +69,13 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
-    googleBot: { index: true, follow: true, "max-snippet": -1, "max-image-preview": "large", "max-video-preview": -1 },
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-snippet": -1,
+      "max-image-preview": "large",
+      "max-video-preview": -1,
+    },
   },
   openGraph: {
     type: "website",
@@ -67,7 +84,14 @@ export const metadata: Metadata = {
     description: site.description,
     url: site.domain,
     locale: "en_US",
-    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Suncly. Test the agent. Then decide." }],
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: "Suncly. Test the agent. Then decide.",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
@@ -96,7 +120,10 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${display.variable} ${sans.variable} ${mono.variable}`}>
+    <html
+      lang="en"
+      className={`${display.variable} ${sans.variable} ${mono.variable}`}
+    >
       <body className="min-h-dvh">
         <JsonLd data={graph(organizationLd(), websiteLd(), softwareLd())} />
         {children}

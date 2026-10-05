@@ -11,7 +11,7 @@ checked and what was not), `REDESIGN_PLAN.md` (the plan and the audit) and
 - The public website rebuilt in `frontend/` on the Daylight direction: warm paper, one
   gold, Newsreader and Figtree, six vector-rendered pictures under one sun, the brand
   angle on every shadow and hatch, blue only in the closing sky. Sixteen home sections
-  in the brief's order (786 visible words). New pages: `/offer`, `/certified`,
+  in the brief's order (779 visible words). New pages: `/offer`, `/certified`,
   `/certified/policy`, `/certified/<id>` (specimen only), `/data`, `/research`, `/lab`,
   `/cookies`, `/legal`. Every existing URL kept.
 - The vector logo: the sun mark is `public/mark.svg` unchanged; the wordmark lettering
@@ -27,9 +27,13 @@ checked and what was not), `REDESIGN_PLAN.md` (the plan and the audit) and
   entry per coding agent). Changing a status later is one line.
 - Legal drafts: Privacy Policy, Terms of Service, Certification Policy, cookies page,
   legal notice, the security page's disclosure policy and `security.txt`; the research
-  behind them in `legal/`.
-- Scripts: screenshots at four widths for every page, axe, keyboard, Lighthouse, the word
-  budget, the forbidden-words scan, the storage inspection, the art and badge renderers.
+  behind them in `legal/`. All four legal pages carry a visible draft notice and
+  `noindex` until `launch.legalPublished` is set after sign-off.
+- Scripts: screenshots at four widths for every page, axe, keyboard, Lighthouse (full set
+  and the simulated-versus-observed LCP probe), the functional checks (every internal
+  link, navigation, install tabs, copy buttons, the `/demo` signature verification, the
+  workspace), the word budget, the forbidden-words scan, the storage inspection, the art
+  and badge renderers.
 - `src/` and `tests/` are untouched. `python tasks.py check` still passes.
 
 ## 2. Claims withheld, and why
@@ -64,6 +68,18 @@ checked and what was not), `REDESIGN_PLAN.md` (the plan and the audit) and
   `legal/APPLICABILITY.md` marks every statement as unverified; the legal pages stay drafts.
 - **The live site** (`www.suncly.com`) could not be opened from the build environment, so
   the old build was not compared with the repository and the canonical host is unconfirmed.
+- **Certification criteria.** The v0.1 profile drafted from the code's checks stays in
+  `REDESIGN_PLAN.md` §9, unpublished. `/certified/policy` says that no criteria have been
+  adopted and that a first set is in founder review; `/certified` says the same. The one
+  generated record page, `/certified/specimen`, is labelled a fictional specimen that
+  certifies nothing, is `noindex`, and names no agent.
+- **Response and support promises.** The disclosure policy on `/security` and
+  `public/.well-known/security.txt` state only what is true: reports go to the site's
+  existing address, there is no acknowledgement time, fix time, safe-harbour statement,
+  credit policy or incident-notice promise, and the support period is described as the
+  repository's current practice. Those commitments are founder and counsel decisions
+  (`legal/REVIEW.md`). The Terms draft keeps its thirty-day and fourteen-day notice
+  clauses as questions for counsel, marked in `legal/REVIEW.md`.
 - **Research notes.** The three note titles are listed as drafts in founder review; no
   note is published and none is in the sitemap.
 - **"Trusted by", "A2A certified", "AI Act compliant", ®, "official", "accredited".**
@@ -74,7 +90,7 @@ checked and what was not), `REDESIGN_PLAN.md` (the plan and the audit) and
 | Item | Where | What turns it on |
 | --- | --- | --- |
 | Draft label and `noindex` on `/privacy`, `/terms`, `/certified/policy`, `/legal` | `lib/launch.ts legalPublished` | The company facts and counsel's sign-off |
-| Certification criteria v0.1 | `/certified/policy` §3 (marked proposed) | `certification.criteriaAccepted` after the founder accepts or changes them |
+| Certification criteria v0.1 | `REDESIGN_PLAN.md` §9 only; `/certified/policy` §3 says none are adopted | `certification.criteriaAccepted` plus the accepted text, after the founder accepts or changes them |
 | Hosted-API sections of the Privacy Policy and Terms | `/privacy` §13, `/terms` §3 and §5 | `launch.httpApi = "live"`, `usageBilling = "live"` |
 | "Works with" verified state and tool install tabs | `lib/launch.ts testedIn` | A recorded run per tool in `VERIFICATION.md` |
 | ® instead of ™ | `lib/launch.ts trademark` | A real registration |
@@ -84,24 +100,49 @@ checked and what was not), `REDESIGN_PLAN.md` (the plan and the audit) and
 
 ## 4. Inputs needed from the owners
 
+### 4a. Publication blockers
+
+Without these the site can be deployed, but the pages named stay drafts or stay silent.
+
 1. **Company and legal facts** (block 5): legal entity name, registry code, registered
    office, VAT number, privacy and security contact addresses, governing law and court,
    hosting/DNS/database confirmation with regions, the pilot form endpoint and where it
-   stores submissions, sub-processors, retention periods, the repository licence. They
-   block the draft label on four pages and the legal line in the footer.
-2. **Hacker News**: the exact `news.ycombinator.com` URL of the profile or submission.
-3. **Pricing** (block 4): the billable unit, price and currency, billing period and
-   payment method, pilot terms.
-4. **Certification** (block 6): accept or change the v0.1 profile; validity period;
-   re-test triggers; who decides; the corrections and appeals address.
-5. **Repository licence** and confirmation that public visibility is intended: a public
+   stores submissions, sub-processors, retention periods. They block the draft label and
+   `noindex` on `/privacy`, `/terms`, `/legal` and `/certified/policy`, the legal line in
+   the footer, and the "draft" comment in `security.txt`.
+2. **Counsel's sign-off** on the four legal drafts (`legal/REVIEW.md` lists the questions,
+   including the notice periods in the Terms, the disclosure policy's missing response
+   commitments and the badge's trade-mark form).
+3. **Repository licence** and confirmation that public visibility is intended: a public
    repository with no licence gives visitors no right to run the code the site tells
    them to install. The Terms bridge it with a limited licence; a real licence is the fix.
-6. **Platform glyph permissions** and official SVGs for X, LinkedIn, GitHub and Reddit.
-7. **The Estonian summary** on `/legal`, for review.
-8. **The canonical host** (`suncly.com` or `www.suncly.com`).
-9. **Whether to build the Agent Skill** (`REDESIGN_PLAN.md` §7).
-10. **Commissioned stills**, if the vector renders are not enough (`art/README.md`).
+4. **The canonical host** (`suncly.com` or `www.suncly.com`), which fixes the canonical
+   URLs, the sitemap and `security.txt`'s absolute links.
+
+### 4b. Can remain planned, omitted or marked as such
+
+The site is truthful without them; each is visibly unresolved where it appears.
+
+5. **Pricing** (block 4): the billable unit, price and currency, billing period and
+   payment method, pilot terms. `/offer` shows "not yet published"; the Terms' fee
+   table has named blanks.
+6. **Certification** (block 6): accept or change the v0.1 profile; validity period;
+   re-test triggers; response times; who decides; the corrections and appeals address.
+   Until then the programme reads "Opening with our pilots", no criteria are published
+   and no record exists.
+7. **Response and support commitments** for the disclosure policy and `security.txt`:
+   acknowledgement time, fix window, safe harbour, credit, support period. None are
+   promised now.
+8. **Hacker News**: the exact `news.ycombinator.com` URL of the profile or submission.
+   The row shows four destinations until then.
+9. **Platform glyph permissions** and official SVGs for X, LinkedIn, GitHub and Reddit.
+   Text abbreviations ship until then.
+10. **Coding-agent runs** (block 3): one recorded run per tool turns its Planned label
+    into Available and fills its install tab.
+11. **The Estonian summary** on `/legal`, for review.
+12. **Whether to build the Agent Skill** (`REDESIGN_PLAN.md` §7).
+13. **Research notes**: founder review of the three drafts before any is published.
+14. **Commissioned stills**, if the vector renders are not enough (`art/README.md`).
 
 ## 5. Payment readiness
 
@@ -120,9 +161,15 @@ Privacy Policy §13 and `/data` say the question is open.
 
 ## 7. Known limitations of this delivery
 
-- Lighthouse mobile performance on `/` and the LCP figure are recorded in
-  `VERIFICATION.md`; the remaining cost is hydration JavaScript for the interactive
-  sections and the three self-hosted fonts.
+- Lighthouse mobile performance on `/` is 91 to 95 (simulated throttling, four runs on the
+  final build; 90 under devtools throttling). The simulated LCP is 2.9 s against the
+  brief's 2.5 s: the simulation charges every byte requested before the first paint
+  (the document, 80 KB of fonts, 158 KB of framework and hydration scripts) to the hero
+  picture, even though the picture itself is 5 KB, preloaded, and paints at 0.18 s
+  unthrottled and 1.4 s under devtools throttling. The fixes that were available were
+  made (fonts cut from 117 to 80 KB, the wordmark path written once, the hero preload,
+  the animation library removed); what remains is the Next.js runtime and the fonts
+  themselves. `VERIFICATION.md` has the figures and the reasoning.
 - The home page is long on phones (a tall page of sixteen sections); the four-frame
   story carries one stage on phones and the sticky stage on desktop.
 - Firefox and Safari rendering were not checked (no browser available beyond Chromium).

@@ -29,21 +29,21 @@ const toc = [
 ];
 
 export default function CertificationPolicyPage() {
-  const missing = ["legal entity name", "corrections and appeals contact"];
-  if (!certification.criteriaAccepted) missing.push("founder acceptance of the criteria");
+  const missing = ["legal entity name", "corrections and appeals contact", "validity period", "re-test triggers", "response times"];
+  if (!certification.criteriaAccepted) missing.push("adopted criteria");
   return (
     <SiteLayout>
       <PageHeader eyebrow="Legal" headline="Certification Policy" intro="What Suncly Certified means, in the form a lawyer can sign off. The same statements appear on the home page, on every record page and in the Terms." />
       <Section narrow>
         <DraftNotice page="Certification Policy" needs={missing} />
         <article className="prose-site">
-          <DocMeta version="0.1 (draft)" effective={null} changes={[{ date: "2026-10-05", note: "First complete draft, with the proposed first certification profile." }]} />
+          <DocMeta version="0.1 (draft)" effective={null} changes={[{ date: "2026-10-05", note: "First complete draft. No criteria adopted; the proposed first profile stays in the internal plan." }]} />
           <Toc items={toc} />
 
           <h2 id="issuer">1. Who issues the badge</h2>
           <Summary>Suncly issues it, and a named person at Suncly decides.</Summary>
           <p>
-            The Suncly Certified badge is issued by {company.legalEntityName ?? <Blank what="legal entity name" />}, {site.city} ("Suncly", "we"). Each certification decision is taken by a named Suncly reviewer, recorded on the record, {certification.whoDecides ?? <Blank what="who decides, from founder inputs block 6" />}. Revocations are confirmed by a second person.
+            The Suncly Certified badge is issued by {company.legalEntityName ?? <Blank what="legal entity name" />}, {site.city} ("Suncly", "we"). Each certification decision is taken by a named Suncly reviewer, recorded on the record: {certification.whoDecides ?? <Blank what="who decides, from founder inputs block 6" />}.
           </p>
 
           <h2 id="nature">2. A private, voluntary programme</h2>
@@ -56,23 +56,10 @@ export default function CertificationPolicyPage() {
           </p>
 
           <h2 id="criteria">3. The criteria and their version</h2>
-          <Summary>Every record names the criteria version it was tested against. The first profile below is proposed, not yet accepted.</Summary>
+          <Summary>Every record names the criteria version it was tested against. No criteria are published yet.</Summary>
           <p>
-            Criteria are published here with a version number before any record is issued under them. A record keeps its criteria version until it expires. The current profile is version {certification.criteriaVersion}
-            {certification.criteriaAccepted ? "." : ", a proposal built only from checks that exist in the Suncly software today. It becomes the published criteria only when the founders accept it."}
+            Criteria are published here with a version number before any record is issued under them, and a record keeps its criteria version until it expires. {certification.criteriaAccepted ? `The current criteria are version ${certification.criteriaVersion}.` : "No criteria have been adopted. A first profile, built only from checks that exist in the Suncly software today, is in founder review; it will be published here with its version number if and when it is accepted, and nothing is certified before then."}
           </p>
-          <h3>Criteria v0.1 (proposed)</h3>
-          <p>For one named agent version, identified by its Agent Card hash, at a sandbox or dry-run endpoint the operator declared in writing:</p>
-          <ol>
-            <li>The operator confirms in writing that it operates the agent, or has the operator's permission, and that the endpoint is a sandbox.</li>
-            <li>The Agent Card declares A2A 1.0 over JSON-RPC and is served at <code>/.well-known/agent-card.json</code>.</li>
-            <li>Every declared skill has at least one approved test case. For a skill without examples, the operator writes the test cases into the contract file; a skill nobody can write a test for is not certified.</li>
-            <li>A named person approved the contract, and a named person at Suncly ran the evaluation with Suncly's deployment key, so the signature on the evidence is Suncly's.</li>
-            <li>Each test case ran at least five times and the attestation ended <code>completed</code>: no budget stop and no card change during the run.</li>
-            <li>Every run passed: zero <code>fail</code>, zero <code>inconclusive</code>. Inconclusive is never a pass, so a contract with model-based checks cannot certify until a model-based judge exists.</li>
-            <li><code>suncly verify</code> passes on the report folder.</li>
-            <li>The record lists what was not tested, taken from the report.</li>
-          </ol>
 
           <h2 id="tested">4. What is tested, and what is not</h2>
           <Summary>The record says exactly which agent, operator, endpoint, card, protocol version, date and run counts. The gaps are listed too.</Summary>
@@ -82,10 +69,10 @@ export default function CertificationPolicyPage() {
           <h2 id="validity">5. Validity, expiry and re-tests</h2>
           <Summary>A record is valid for a stated period or until the card changes, whichever comes first.</Summary>
           <p>
-            A record is valid for {certification.validFor ?? <>a period to be set by the founders (proposed: six months)<Blank what="valid_for, from founder inputs block 6" /></>}, or until the agent's card hash changes, whichever comes first. An expired record stays visible, marked expired.
+            A record is valid for {certification.validFor ?? <Blank what="validity period, from founder inputs block 6" />}, or until the agent's card hash changes, whichever comes first. An expired record stays visible, marked expired.
           </p>
           <p>
-            A re-test is required when: {certification.retestTriggers ?? <>the Agent Card changes (its hash is different); the agent's declared version changes; the record expires; a substantiated report shows behaviour that contradicts the record; or a new criteria version is published, in which case existing records keep their version until expiry (proposed)<Blank what="retest_triggers, from founder inputs block 6" /></>}.
+            A re-test is required when: {certification.retestTriggers ?? <Blank what="re-test triggers, from founder inputs block 6" />}. A changed Agent Card (a different hash) always ends the record's validity.
           </p>
 
           <h2 id="suspension">6. Suspension and revocation</h2>
@@ -117,7 +104,7 @@ export default function CertificationPolicyPage() {
           <h2 id="appeals">11. Corrections and appeals</h2>
           <Summary>Tell us what is wrong and we answer within one month.</Summary>
           <p>
-            An operator, or anyone who relies on a record, may ask for a correction or appeal a decision by writing to {certification.correctionsAndAppealsContact ?? <>{site.email} <Blank what="corrections and appeals contact, from founder inputs block 6" /></>}. We acknowledge within five working days and answer within one month. We correct a record when the facts on it are wrong, and we say on the record what was corrected and when. Where we learn that information on a record is incorrect, we correct or withdraw it without being asked; this is the duty of a provider of expert information under Estonian law, and we take it as our own.
+            An operator, or anyone who relies on a record, may ask for a correction or appeal a decision by writing to {certification.correctionsAndAppealsContact ?? <Blank what="corrections and appeals contact, from founder inputs block 6" />}. Response times: <Blank what="acknowledgement and answer periods, to be set by the founders" />. We correct a record when the facts on it are wrong, and we say on the record what was corrected and when. Where we learn that information on a record is incorrect, we correct or withdraw it without being asked.
           </p>
 
           <h2 id="changes">12. Changes</h2>

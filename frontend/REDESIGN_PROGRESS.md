@@ -3,7 +3,7 @@
 Kept current so the work survives a long session. States: done, in progress, blocked on
 (which input), waiting (for a stop).
 
-Last updated: 2026-10-05, phases 3 to 6 done; hand-back.
+Last updated: 2026-10-05, phases 3 to 7 done; hand-back.
 
 ## Phases
 
@@ -17,6 +17,7 @@ Last updated: 2026-10-05, phases 3 to 6 done; hand-back.
 | 4 Home page, section by section (02 to 16) | done | `components/home/*`; 780 visible words; shot at four widths; no horizontal overflow. |
 | 5 Other pages and legal pages | done | `/offer`, `/certified` (+ policy, specimen record), `/data`, `/research`, `/lab`, `/cookies`, `/legal`; Privacy and Terms rewritten; `/security` extended; `legal/*.md`. |
 | 6 Verification and hand-back | done | `VERIFICATION.md`. The founder asked for one agent and no subagents, so the two fresh-eyes reviews were not run. |
+| 7 Stage 4 refinement (founder go-ahead of 2026-10-05) | done | Every section reviewed at 1440, 1024, 768 and 390 px; pictures made block-level with widths from the column (the min-height that forced them wider was removed); the Offer and Certified band restructured (412 px tall at 1440); the demo output kept unwrapped from tablet width; the closing headline set per sentence; every `/demo` tab panel given its id. Certification criteria withdrawn from public pages; specimen record labelled fictional; disclosure policy and `security.txt` stripped of promises. Fonts 117 to 80 KB; wordmark path written once per page. Functional checks and the LCP probe added. |
 
 ## Blocked on founder inputs
 
@@ -25,7 +26,7 @@ Last updated: 2026-10-05, phases 3 to 6 done; hand-back.
 | Draft label on /privacy, /terms, /legal, /certified/policy | block 5 company and legal facts | pages ship complete, noindex, with named blanks |
 | Find Suncly row | Hacker News URL only | four links render; Hacker News omitted |
 | /offer unit and price; Terms fee schedule | block 4 | model stated, "no fees are charged yet" |
-| Certification criteria | block 6 | v0.1 proposal in the plan; policy page marked draft, no criteria published |
+| Certification criteria | block 6 | v0.1 proposal only in `REDESIGN_PLAN.md` §9; policy page says none are adopted; nothing published |
 | Recipients and retention tables in the Privacy Policy | block 5 hosting, endpoint, subprocessors, retention | named blanks |
 | Vector wordmark | resolved | traced lettering in `lib/wordmark.ts`; the mark is `public/mark.svg` unchanged |
 | Agent Skill | §8 decision | not built |

@@ -38,8 +38,8 @@ sign-off. Written 2026-10-05.
 | Clause | Question | Source |
 | --- | --- | --- |
 | §2 nature | Is the "private, voluntary, not accredited" language enough to avoid the appearance of official recognition? | Advertising Act §4; UCPD Annex I pts 2, 4 |
-| §3 criteria | Founder acceptance of v0.1; is publishing "proposed" criteria safe? | |
-| §5 validity | Six months proposed; the card-hash trigger | |
+| §3 criteria | The page now says no criteria are adopted; the v0.1 proposal stays internal (`REDESIGN_PLAN.md` §9) until the founder accepts it. When published: is the wording safe? | |
+| §5 validity | Blank on the page (six months and the card-hash trigger were the proposal, now internal); also blank: re-test triggers, response times | |
 | §8 licence | Badge licence terms; should the badge be an EU certification mark (Suncly tests agents and does not supply them) or an ordinary mark? | EUTMR Arts 83 to 93 |
 | §10 no pay-to-pass | Sufficient to meet seal rules on independence? | FTC Endorsement Guides (if the US is ever a market); UCPD |
 | §11 corrections | The duty to correct incorrect expert information: does §1048 apply to a badge relied on by third parties? Liability exposure? | LOA §1048 |
@@ -53,5 +53,5 @@ sign-off. Written 2026-10-05.
 | Coding-agent names | Cursor, Claude Code, Codex, omp, Pi as plain text with a no-endorsement line; no logos | Each vendor's brand guidelines |
 | Platform glyphs | The "Find Suncly" row uses text abbreviations until the platforms' logo usage rules are confirmed | X, LinkedIn, GitHub, Reddit brand pages |
 | Legal notice | Estonian summary (draft) for the Language Act; company facts | ISSA §4; Commercial Code §15; Language Act §16 |
-| Security | Disclosure policy and `security.txt`; no CRA compliance claimed; support period statement | CRA (2024/2847) |
+| Security | Disclosure policy and `security.txt` state only facts: the report address, no acknowledgement time, fix window, safe harbour, credit or incident-notice promise, support period as current practice. Which commitments to make is a founder and counsel decision | CRA (2024/2847) |
 | Licence | The repository is public with no licence: visitors have no right to run the code the site tells them to install | Copyright Act |

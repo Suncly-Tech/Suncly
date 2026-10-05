@@ -134,13 +134,13 @@ export default function SecurityPage() {
 
             <h2 id="disclosure">Reporting a vulnerability</h2>
             <p>
-              We run a coordinated vulnerability disclosure process. Report a suspected vulnerability in the Suncly software or this website to <a href="mailto:team@suncly.com">team@suncly.com</a> (a dedicated security address is a founder input and will replace this one; the same contact is published in <a href="/.well-known/security.txt">/.well-known/security.txt</a>). We acknowledge within three working days, keep you informed, and do not take legal action against good-faith research that stays within these rules: test only against your own installation or the bundled mock agents, never against a third party's agent or endpoint, do not access or alter data that is not yours, and give us a reasonable time to fix before publishing. We credit reporters who want to be credited.
+              Report a suspected vulnerability in the Suncly software or this website to <a href="mailto:team@suncly.com">team@suncly.com</a>, the team's published address; a dedicated security address is a founder input and will replace it here and in <a href="/.well-known/security.txt">/.well-known/security.txt</a>. What helps: the version or commit, the steps to reproduce, and what you observed. Please test only against your own installation or the bundled mock agents, never against a third party's agent or endpoint, do not access or alter data that is not yours, and give us time to fix before publishing. Acknowledgement and fix times, a safe-harbour statement and credit for reporters are decisions the founders have not yet taken; nothing here promises them.
             </p>
             <p>
-              <strong>Support period.</strong> The current version (0.1.0) is a pilot release installed from the repository. Security fixes are made on the main branch; there is no separate long-term support branch, and no end-of-support date has been set. We state no compliance with the Cyber Resilience Act or any other regulation; what we publish here is what we do.
+              <strong>Support period.</strong> The current version (0.1.0) is a pilot release installed from the repository. Fixes are made on the main branch; there is no separate long-term support branch, and no end-of-support date has been set. We state no compliance with the Cyber Resilience Act or any other regulation; what we publish here is what we do.
             </p>
             <p>
-              <strong>Incident notice.</strong> If we become aware of a security incident affecting data we hold for you, we tell you without undue delay and, for personal data breaches, meet the 72-hour notification duty described in the <a href="/privacy">Privacy Policy</a>.
+              <strong>Incident notice.</strong> In this version Suncly holds no data for you, so there is nothing of yours for an incident to affect. Once a hosted service exists, the Privacy Policy's 72-hour duty for personal data breaches applies as described there.
             </p>
 
             <h2 id="supplier">For a supplier questionnaire</h2>
@@ -151,7 +151,7 @@ export default function SecurityPage() {
                 <tr><td>Who can see our credential?</td><td>Only the Runner process, from one environment variable; it is redacted from every transcript.</td></tr>
                 <tr><td>Data location</td><td>Wherever you run the tool. A hosted service does not exist yet; its regions will be published with it.</td></tr>
                 <tr><td>Sub-processors</td><td>None for the tool. A list is published when a hosted service exists.</td></tr>
-                <tr><td>Incident notice</td><td>Without undue delay; 72 hours for personal data breaches.</td></tr>
+                <tr><td>Incident notice</td><td>Not applicable while Suncly holds no data for you; the GDPR 72-hour duty applies once a hosted service exists.</td></tr>
                 <tr><td>Exit</td><td>Your report folders are files you hold. Nothing to export from us today.</td></tr>
                 <tr><td>Certifications held</td><td>None. We claim no standard we do not hold.</td></tr>
               </tbody>

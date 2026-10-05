@@ -35,23 +35,23 @@ export default async function RecordPage({ params }: { params: Promise<{ id: str
   if (!found && id !== SPECIMEN) notFound();
   const r = found ?? {
     id: "specimen",
-    agentName: "No agent",
-    operator: "No operator",
+    agentName: "Specimen (fictional, no agent)",
+    operator: "Specimen (fictional, no operator)",
     agentVersion: "",
-    cardHash: "sha256:…",
-    a2aVersion: "1.0",
-    sandboxEndpoint: "https://sandbox.example/…",
-    evaluatedOn: "—",
-    validUntil: "—",
-    criteriaVersion: "0.1 (proposed)",
+    cardHash: "the agent's card hash will appear here",
+    a2aVersion: "the A2A version will appear here",
+    sandboxEndpoint: "the declared sandbox endpoint will appear here",
+    evaluatedOn: "the date will appear here",
+    validUntil: "the expiry will appear here",
+    criteriaVersion: "no criteria adopted yet",
     runs: { testCases: 0, perTestCase: 0, pass: 0, fail: 0, inconclusive: 0 },
     notTested: ["Every record lists what the report listed under What was NOT tested."],
-    decidedBy: "A named Suncly reviewer",
-    status: "valid" as const,
+    decidedBy: "the named Suncly reviewer will appear here",
+    status: "specimen" as const,
   };
   const rows: Array<[string, string]> = [
     ["Record", r.id],
-    ["Status", r.status],
+    ["Status", found ? r.status : "specimen: fictional, certifies nothing"],
     ["Agent", `${r.agentName} ${r.agentVersion}`],
     ["Operator", r.operator],
     ["Sandbox endpoint tested", r.sandboxEndpoint],
@@ -65,7 +65,7 @@ export default async function RecordPage({ params }: { params: Promise<{ id: str
   ];
   return (
     <SiteLayout>
-      <PageHeader eyebrow="Suncly Certified · record" headline={found ? `${r.agentName} ${r.agentVersion}` : "Specimen record"} intro={found ? `Record ${r.id}. This page is the single source of truth for this badge.` : "This is the format of a record. No agent is certified yet, and this page certifies nothing."} />
+      <PageHeader eyebrow={found ? "Suncly Certified · record" : "Suncly Certified · fictional specimen"} headline={found ? `${r.agentName} ${r.agentVersion}` : "Specimen record (fictional)"} intro={found ? `Record ${r.id}. This page is the single source of truth for this badge.` : "A fictional specimen showing the format of a record. No agent is certified, no criteria are adopted, and this page certifies nothing."} />
       <Section narrow>
         <article className="prose-site">
           <table tabIndex={0}>

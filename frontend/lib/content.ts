@@ -69,8 +69,10 @@ export const worksWith = {
   /** Shown while no tool is verified (lib/launch.ts testedIn). */
   headingUnverified: "Run it from the coding agent you already use",
   headingVerified: "Works with",
-  lineUnverified: "A command-line tool runs wherever your agent has a terminal. Guided setup for each is planned.",
-  disclaimer: "Names show where Suncly runs. No partnership, certification or endorsement is implied or exists.",
+  lineUnverified:
+    "A command-line tool runs wherever your agent has a terminal. Guided setup for each is planned.",
+  disclaimer:
+    "Names show where Suncly runs. No partnership, certification or endorsement is implied or exists.",
   tools: [
     { id: "cursor", name: "Cursor" },
     { id: "claude-code", name: "Claude Code" },
@@ -143,7 +145,8 @@ export const useCases = {
   items: [
     {
       title: "Support and returns agents",
-      today: "Every declared skill completes, answers in the declared format, within the latency limit.",
+      today:
+        "Every declared skill completes, answers in the declared format, within the latency limit.",
       outside: "Whether the refund amount is right.",
     },
     {
@@ -170,8 +173,12 @@ export const offer = {
   label: "Suncly Offer",
   headline: "Pay for what you run.",
   body: "Suncly charges for your usage of the Suncly API and for nothing else. No seats, no plans.",
-  free: launch.connectingFee === "none" && launch.badgeFee === "none" ? "Connecting and the badge are free." : null,
-  notLive: "Billing starts when the API does. Until then, pilot access is arranged with the team.",
+  free:
+    launch.connectingFee === "none" && launch.badgeFee === "none"
+      ? "Connecting and the badge are free."
+      : null,
+  notLive:
+    "Billing starts when the API does. Until then, pilot access is arranged with the team.",
   notLiveLink: { label: "Pilot access", href: "/access" },
   liveLink: { label: "What counts as usage", href: "/offer" },
 } as const;
@@ -183,16 +190,22 @@ export const certified = {
   body: "Agents that meet Suncly's published criteria can carry the Suncly Certified badge. Every badge links to its record: what was tested, when, on which version, and what was not.",
   link: { label: "The programme", href: "/certified" },
   specimen: "Specimen",
-  sealAlt: "The Suncly Certified badge, blind-embossed in heavy paper under raking light. A specimen; no agent is certified yet.",
+  sealAlt:
+    "The Suncly Certified badge, blind-embossed in heavy paper under raking light. A specimen; no agent is certified yet.",
 } as const;
 
 export const data = {
   label: "Suncly Data",
   headline: "Know what enters a test, and what leaves it.",
   body: "Suncly runs where you run it. One Runner process holds the credential and redacts every transcript before it is stored. Nothing is sent to Suncly or to a model provider in this version.",
-  facts: ["Runs locally.", "Credential stays in the Runner.", "The report folder is yours."],
+  facts: [
+    "Runs locally.",
+    "Credential stays in the Runner.",
+    "The report folder is yours.",
+  ],
   link: { label: "How data is handled", href: "/data" },
-  pictureAlt: "A closed box with one narrow slit. A single blade of light leaves it toward the lower left.",
+  pictureAlt:
+    "A closed box with one narrow slit. A single blade of light leaves it toward the lower left.",
 } as const;
 
 export const research = {
@@ -200,9 +213,14 @@ export const research = {
   headline: "What evidence can tell you, and what it cannot.",
   body: "Notes on what a signed evaluation proves, written from the code and its tests. The first notes are in review.",
   inReview: "In review",
-  notes: ["What a signed Agent Card proves", "Why inconclusive is never a pass", "An unchanged card is not an unchanged agent"],
+  notes: [
+    "What a signed Agent Card proves",
+    "Why inconclusive is never a pass",
+    "An unchanged card is not an unchanged agent",
+  ],
   link: { label: "Research", href: "/research" },
-  pictureAlt: "Small brass discs pinned to a plaster wall in a figure of eight, each with its own shadow: the sun's analemma.",
+  pictureAlt:
+    "Small brass discs pinned to a plaster wall in a figure of eight, each with its own shadow: the sun's analemma.",
 } as const;
 
 export const lab = {
@@ -213,7 +231,8 @@ export const lab = {
   link: { label: "Run the Lab", href: "/lab" },
   pictureAlt:
     "Eleven small forms in a row on a plane at golden hour. Most cast true shadows; one casts a wrong shadow, one casts two, one casts none.",
-  stripLabel: "The eleven mock agents. Choose one to see what Suncly reports for it.",
+  stripLabel:
+    "The eleven mock agents. Choose one to see what Suncly reports for it.",
 } as const;
 
 export const stand = {
@@ -265,7 +284,7 @@ export const questions = {
 } as const;
 
 export const closing = {
-  headline: "Bring one agent. Leave with evidence.",
+  headline: ["Bring one agent.", "Leave with evidence."],
   action: { label: "Request pilot access", href: "/access#request" },
   contact: site.email,
   skyAlt: "",
@@ -284,7 +303,10 @@ export const finalCta = {
   headline: "Bring one agent. Leave with evidence.",
   body: "Suncly is in pilot. If your team approves A2A agents by hand today, tell us about one agent and one sandbox, and we will run the first evaluation together.",
   primary: { label: "Request pilot access", href: "/access#request" },
-  secondary: { label: "Read the getting-started guide", href: "/docs/getting-started" },
+  secondary: {
+    label: "Read the getting-started guide",
+    href: "/docs/getting-started",
+  },
 } as const;
 
 /** Kept for /product, where the comparison table now lives. */
@@ -295,14 +317,52 @@ export const manualVsSuncly = {
     "Manual review is not wrong. It is unrepeatable, and its gaps are invisible. Suncly makes the review a recorded procedure.",
   columns: ["", "Manual review", "With Suncly"],
   rows: [
-    { topic: "What gets tested", manual: "Whatever prompts the reviewer thinks of that day.", suncly: "A test case per declared example of each skill, plus your own criteria, in an approved contract." },
-    { topic: "How often", manual: "Once per approval, usually once per agent.", suncly: "Every test case runs N times per evaluation; the same contract re-runs on every card version." },
-    { topic: "Who approved the tests", manual: "Nobody, explicitly.", suncly: "A named person, recorded as approved_by with a timestamp. Approved contracts are immutable." },
-    { topic: "Evidence", manual: "Screenshots and pasted answers in a ticket.", suncly: "Redacted transcripts with check-by-check results, hashed and signed." },
-    { topic: "Inconsistent behaviour", manual: "Missed unless the reviewer happens to repeat a prompt.", suncly: "Shows up as a pass count and a fail count for the same test case." },
-    { topic: "What was not tested", manual: "Unknown.", suncly: "A required section of every report." },
-    { topic: "Change since last time", manual: "Re-do the review, or trust that nothing changed.", suncly: "Same card hash, same contract, comparable counts. An unchanged card is not treated as an unchanged agent." },
-    { topic: "Verification later", manual: "Ask the reviewer.", suncly: "suncly verify on the report folder, with the public key." },
+    {
+      topic: "What gets tested",
+      manual: "Whatever prompts the reviewer thinks of that day.",
+      suncly:
+        "A test case per declared example of each skill, plus your own criteria, in an approved contract.",
+    },
+    {
+      topic: "How often",
+      manual: "Once per approval, usually once per agent.",
+      suncly:
+        "Every test case runs N times per evaluation; the same contract re-runs on every card version.",
+    },
+    {
+      topic: "Who approved the tests",
+      manual: "Nobody, explicitly.",
+      suncly:
+        "A named person, recorded as approved_by with a timestamp. Approved contracts are immutable.",
+    },
+    {
+      topic: "Evidence",
+      manual: "Screenshots and pasted answers in a ticket.",
+      suncly:
+        "Redacted transcripts with check-by-check results, hashed and signed.",
+    },
+    {
+      topic: "Inconsistent behaviour",
+      manual: "Missed unless the reviewer happens to repeat a prompt.",
+      suncly:
+        "Shows up as a pass count and a fail count for the same test case.",
+    },
+    {
+      topic: "What was not tested",
+      manual: "Unknown.",
+      suncly: "A required section of every report.",
+    },
+    {
+      topic: "Change since last time",
+      manual: "Re-do the review, or trust that nothing changed.",
+      suncly:
+        "Same card hash, same contract, comparable counts. An unchanged card is not treated as an unchanged agent.",
+    },
+    {
+      topic: "Verification later",
+      manual: "Ask the reviewer.",
+      suncly: "suncly verify on the report folder, with the public key.",
+    },
   ],
 } as const;
 
@@ -352,16 +412,39 @@ export const productPage = {
   intro:
     "Suncly turns the approval of an AI agent into a recorded procedure: a reviewed test plan, repeated runs in a sandbox, deterministic verdicts, signed evidence, and an explicit statement of what was not tested.",
   groups: [
-    { id: "evaluation", title: "Evaluation", body: "What is tested, how often, and how it is judged." },
-    { id: "evidence", title: "Evidence", body: "What is kept, how it is signed, and how it is read later." },
-    { id: "approval", title: "Approval", body: "Who decides, on what, and how that is recorded." },
-    { id: "operations", title: "Operations", body: "Sandboxes, credentials, budgets and limits." },
-    { id: "integration", title: "Interfaces and integrations", body: "How Suncly fits into pipelines and registries." },
+    {
+      id: "evaluation",
+      title: "Evaluation",
+      body: "What is tested, how often, and how it is judged.",
+    },
+    {
+      id: "evidence",
+      title: "Evidence",
+      body: "What is kept, how it is signed, and how it is read later.",
+    },
+    {
+      id: "approval",
+      title: "Approval",
+      body: "Who decides, on what, and how that is recorded.",
+    },
+    {
+      id: "operations",
+      title: "Operations",
+      body: "Sandboxes, credentials, budgets and limits.",
+    },
+    {
+      id: "integration",
+      title: "Interfaces and integrations",
+      body: "How Suncly fits into pipelines and registries.",
+    },
   ],
   legend: {
-    available: "Implemented in the current version and covered by tests. A limit, where one exists, is stated beside it.",
-    pilot: "Exists and is used with pilots; the wording on this site says what a pilot gets.",
-    planned: "On the roadmap. No date is promised, and nothing on this site treats it as current.",
+    available:
+      "Implemented in the current version and covered by tests. A limit, where one exists, is stated beside it.",
+    pilot:
+      "Exists and is used with pilots; the wording on this site says what a pilot gets.",
+    planned:
+      "On the roadmap. No date is promised, and nothing on this site treats it as current.",
   },
 } as const;
 
@@ -372,22 +455,62 @@ export const workflowsPage = {
     "Suncly evaluates agents through the A2A protocol. It does not integrate with model providers or agent frameworks directly: if an agent publishes an A2A 1.0 Agent Card and answers over JSON-RPC, Suncly can test it, whatever built it. This page states exactly what is inspected and tested, and where coverage differs.",
   protocol: {
     title: "Protocol coverage",
-    intro: "What the Runner speaks and what the Judge checks. Verified against src/suncly/runner and src/suncly/core.",
+    intro:
+      "What the Runner speaks and what the Judge checks. Verified against src/suncly/runner and src/suncly/core.",
     rows: [
-      { item: "A2A 1.0 over JSON-RPC (HTTP)", status: "available", note: "SendMessage, then GetTask polling until a terminal or interrupted state. The first supportedInterfaces entry with JSONRPC and 1.0 is used." },
-      { item: "Agent Card at /.well-known/agent-card.json", status: "available", note: "Fetched over https (plain http for loopback sandboxes), size-limited, hashed with RFC 8785. Fields the spec requires but the card omits are reported." },
-      { item: "Direct Message replies", status: "available", note: "Handled without error. A direct Message counts as completing a task only if the criteria say accept_direct_message." },
-      { item: "Interrupted states (input or auth required)", status: "available", note: "Recorded as the final observed state and judged against the expected state. The Runner never invents input to continue." },
-      { item: "gRPC and HTTP+JSON bindings", status: "planned", note: "Not spoken. If the card lists them, the report lists them under interfaces not used." },
-      { item: "Streaming, push notifications, extended cards, extensions", status: "planned", note: "Not exercised. A card that declares them gets a 'declared capability not exercised' line in the report." },
-      { item: "Authentication to the agent", status: "available", note: "One Authorization header value from an environment variable read only by the Runner. Other security schemes the card declares are kept as opaque fields and not negotiated." },
+      {
+        item: "A2A 1.0 over JSON-RPC (HTTP)",
+        status: "available",
+        note: "SendMessage, then GetTask polling until a terminal or interrupted state. The first supportedInterfaces entry with JSONRPC and 1.0 is used.",
+      },
+      {
+        item: "Agent Card at /.well-known/agent-card.json",
+        status: "available",
+        note: "Fetched over https (plain http for loopback sandboxes), size-limited, hashed with RFC 8785. Fields the spec requires but the card omits are reported.",
+      },
+      {
+        item: "Direct Message replies",
+        status: "available",
+        note: "Handled without error. A direct Message counts as completing a task only if the criteria say accept_direct_message.",
+      },
+      {
+        item: "Interrupted states (input or auth required)",
+        status: "available",
+        note: "Recorded as the final observed state and judged against the expected state. The Runner never invents input to continue.",
+      },
+      {
+        item: "gRPC and HTTP+JSON bindings",
+        status: "planned",
+        note: "Not spoken. If the card lists them, the report lists them under interfaces not used.",
+      },
+      {
+        item: "Streaming, push notifications, extended cards, extensions",
+        status: "planned",
+        note: "Not exercised. A card that declares them gets a 'declared capability not exercised' line in the report.",
+      },
+      {
+        item: "Authentication to the agent",
+        status: "available",
+        note: "One Authorization header value from an environment variable read only by the Runner. Other security schemes the card declares are kept as opaque fields and not negotiated.",
+      },
     ],
   },
   models: {
     title: "Model providers",
     intro:
       "Suncly is model-agnostic. It never calls a model provider in this version, and it does not need to know which model an agent uses. An agent built on any of these, or on none of them, is tested the same way through its A2A interface.",
-    names: ["Claude", "OpenAI GPT and Codex", "Grok", "Gemini", "Llama", "Mistral", "DeepSeek", "Qwen", "Cohere", "Open-source and fine-tuned models"],
+    names: [
+      "Claude",
+      "OpenAI GPT and Codex",
+      "Grok",
+      "Gemini",
+      "Llama",
+      "Mistral",
+      "DeepSeek",
+      "Qwen",
+      "Cohere",
+      "Open-source and fine-tuned models",
+    ],
     disclaimer:
       "Names are listed to illustrate that the model does not matter to Suncly. They are trademarks of their owners; no partnership, certification or endorsement is implied or exists.",
     futureNote:
@@ -395,11 +518,24 @@ export const workflowsPage = {
   },
   frameworks: {
     title: "Agent frameworks and coding tools",
-    intro: "What matters is whether the thing you want to evaluate exposes an A2A endpoint.",
+    intro:
+      "What matters is whether the thing you want to evaluate exposes an A2A endpoint.",
     rows: [
-      { item: "Any framework that serves an A2A 1.0 Agent Card and JSON-RPC endpoint", status: "available", note: "Point suncly attest at the card URL of its sandbox deployment." },
-      { item: "Agents that only expose a chat or vendor-specific API", status: "planned", note: "Not reachable until they are wrapped in an A2A server. Suncly adds no other transports in this version." },
-      { item: "Coding assistants and IDE agents", status: "planned", note: "They are not A2A agents by themselves. To evaluate one, run it behind an A2A server in a sandbox and declare that sandbox." },
+      {
+        item: "Any framework that serves an A2A 1.0 Agent Card and JSON-RPC endpoint",
+        status: "available",
+        note: "Point suncly attest at the card URL of its sandbox deployment.",
+      },
+      {
+        item: "Agents that only expose a chat or vendor-specific API",
+        status: "planned",
+        note: "Not reachable until they are wrapped in an A2A server. Suncly adds no other transports in this version.",
+      },
+      {
+        item: "Coding assistants and IDE agents",
+        status: "planned",
+        note: "They are not A2A agents by themselves. To evaluate one, run it behind an A2A server in a sandbox and declare that sandbox.",
+      },
     ],
   },
   integrations: {
@@ -412,16 +548,56 @@ export const workflowsPage = {
       "Eleven mock A2A agents ship with the package for the demo and the end-to-end tests. Each one models a behaviour the evaluation has to handle correctly. They are sandboxes by construction and run on your machine.",
     rows: [
       ["honest", "Does what its card says.", "every run passes"],
-      ["honest-async", "Completes asynchronously; the client has to poll GetTask.", "every run passes after polling"],
-      ["lying", "Declares text/plain output but answers with JSON.", "every run fails output_modes"],
-      ["flaky", "Succeeds on odd calls, fails on even calls.", "an exact mix of pass and fail"],
-      ["slow", "Answers correctly after the latency limit.", "every run fails the latency limit"],
-      ["unreachable", "Its endpoint refuses connections.", "no run passes; runs are inconclusive"],
-      ["direct-message", "Replies with a Message instead of a Task.", "handled; not a pass"],
-      ["interrupted", "Always asks for more input.", "fail on final state; never a pass"],
-      ["leaky", "Echoes the Authorization header back.", "the credential appears nowhere"],
-      ["card-changer", "Changes its card during the run.", "the attestation ends invalidated"],
-      ["no-examples", "One skill declares no examples.", "that skill is listed as not tested"],
+      [
+        "honest-async",
+        "Completes asynchronously; the client has to poll GetTask.",
+        "every run passes after polling",
+      ],
+      [
+        "lying",
+        "Declares text/plain output but answers with JSON.",
+        "every run fails output_modes",
+      ],
+      [
+        "flaky",
+        "Succeeds on odd calls, fails on even calls.",
+        "an exact mix of pass and fail",
+      ],
+      [
+        "slow",
+        "Answers correctly after the latency limit.",
+        "every run fails the latency limit",
+      ],
+      [
+        "unreachable",
+        "Its endpoint refuses connections.",
+        "no run passes; runs are inconclusive",
+      ],
+      [
+        "direct-message",
+        "Replies with a Message instead of a Task.",
+        "handled; not a pass",
+      ],
+      [
+        "interrupted",
+        "Always asks for more input.",
+        "fail on final state; never a pass",
+      ],
+      [
+        "leaky",
+        "Echoes the Authorization header back.",
+        "the credential appears nowhere",
+      ],
+      [
+        "card-changer",
+        "Changes its card during the run.",
+        "the attestation ends invalidated",
+      ],
+      [
+        "no-examples",
+        "One skill declares no examples.",
+        "that skill is listed as not tested",
+      ],
     ],
   },
 } as const;
@@ -520,19 +696,30 @@ export const accessPage = {
 
 export const companyPage = {
   title: "Company",
-  headline: "A small team in Tallinn, building the inspection step for AI agents.",
+  headline:
+    "A small team in Tallinn, building the inspection step for AI agents.",
   intro:
     "Suncly is built for the platform and security teams that have to say yes or no to an agent. We write the architecture down before the code, we keep the open questions visible, and we would rather ship a report that says 'not tested' than a score that hides it.",
   principles: [
-    { title: "Approve less, never more.", body: "Every fault in the system is designed to make Suncly approve less. Inconclusive is never a pass; no decision is never an approval." },
-    { title: "Evidence over scores.", body: "Counts per test case, transcripts, hashes and a signature. No universal score, because a score would hide what was not tested." },
-    { title: "A human stays in the loop.", body: "A person approves the test plan. A person resolves a flag. Suncly records who, and when." },
+    {
+      title: "Approve less, never more.",
+      body: "Every fault in the system is designed to make Suncly approve less. Inconclusive is never a pass; no decision is never an approval.",
+    },
+    {
+      title: "Evidence over scores.",
+      body: "Counts per test case, transcripts, hashes and a signature. No universal score, because a score would hide what was not tested.",
+    },
+    {
+      title: "A human stays in the loop.",
+      body: "A person approves the test plan. A person resolves a flag. Suncly records who, and when.",
+    },
   ],
   contact: {
     title: "Contact",
     email: "team@suncly.com",
     location: "Tallinn, Estonia",
-    registration: "Company registration details will be published on the legal notice once supplied.",
+    registration:
+      "Company registration details will be published on the legal notice once supplied.",
   },
   faq: [
     {
@@ -564,22 +751,78 @@ export const docsPage = {
   intro:
     "The repository carries the architecture schema, the component, data model, flow, policy and decision documents, the implementation notes, and a quickstart. The repository is public; these pages carry the parts you need to get started, and the full documents are in the repository.",
   guides: [
-    { href: "/docs/getting-started", title: "Getting started", body: "Install, run the bundled demo, evaluate your own sandbox agent, read and verify the report. Five minutes." },
-    { href: "/docs/cli", title: "Command reference", body: "suncly attest, demo, verify, keys, db and doctor, every option, every exit code, and the contract file format." },
-    { href: "/docs/evidence", title: "Evidence and reports", body: "What a report folder contains, what the signature covers, how to verify it, and how to load it into the workspace." },
+    {
+      href: "/docs/getting-started",
+      title: "Getting started",
+      body: "Install, run the bundled demo, evaluate your own sandbox agent, read and verify the report. Five minutes.",
+    },
+    {
+      href: "/docs/cli",
+      title: "Command reference",
+      body: "suncly attest, demo, verify, keys, db and doctor, every option, every exit code, and the contract file format.",
+    },
+    {
+      href: "/docs/evidence",
+      title: "Evidence and reports",
+      body: "What a report folder contains, what the signature covers, how to verify it, and how to load it into the workspace.",
+    },
   ],
   repositoryDocs: [
-    { file: "SCHEMA.md", title: "Architecture schema", body: "System layout, components, data model, main flow, default approval policy, interfaces, stack, the non-negotiable rules, build order, and what is out of scope. The source of truth." },
-    { file: "docs/QUICKSTART.md", title: "Quickstart", body: "Install, run the demo, attest your own sandbox agent, read and verify a report, use Postgres, troubleshoot." },
-    { file: "docs/ARCHITECTURE.md", title: "Architecture", body: "Each component's responsibility, inputs, outputs, what it must never do, and how it fails safely. The A2A protocol facts Suncly depends on." },
-    { file: "docs/CODE_ARCHITECTURE.md", title: "Code architecture", body: "How the code maps to the components: layers, the Runner boundary, where to add what, and the tests that enforce the boundaries." },
-    { file: "docs/DATA_MODEL.md", title: "Data model", body: "The seven entities: agent, card_version, contract, test_case, attestation, run, decision. Fields, keys, enums, invariants." },
-    { file: "docs/FLOW.md", title: "Attestation flow", body: "One attestation from trigger to result, the status lifecycle, and every failure path." },
-    { file: "docs/API.md", title: "Interfaces", body: "The CLI with its options and exit codes, the contract file format, and the proposed HTTP endpoints." },
-    { file: "docs/POLICY.md", title: "Approval policy", body: "Risk levels, decision outcomes, when a human is required, and how inconclusive results count." },
-    { file: "docs/DECISIONS.md", title: "Decision records", body: "The seven non-negotiable rules, each with its decision, reason and consequences." },
-    { file: "docs/ROADMAP.md", title: "Roadmap", body: "The six build stages, what the current version implements, and what it does not." },
-    { file: "docs/IMPLEMENTATION_NOTES.md", title: "Implementation notes", body: "Every proposal the code implements, every choice that still needs a decision, and the facts that were verified." },
+    {
+      file: "SCHEMA.md",
+      title: "Architecture schema",
+      body: "System layout, components, data model, main flow, default approval policy, interfaces, stack, the non-negotiable rules, build order, and what is out of scope. The source of truth.",
+    },
+    {
+      file: "docs/QUICKSTART.md",
+      title: "Quickstart",
+      body: "Install, run the demo, attest your own sandbox agent, read and verify a report, use Postgres, troubleshoot.",
+    },
+    {
+      file: "docs/ARCHITECTURE.md",
+      title: "Architecture",
+      body: "Each component's responsibility, inputs, outputs, what it must never do, and how it fails safely. The A2A protocol facts Suncly depends on.",
+    },
+    {
+      file: "docs/CODE_ARCHITECTURE.md",
+      title: "Code architecture",
+      body: "How the code maps to the components: layers, the Runner boundary, where to add what, and the tests that enforce the boundaries.",
+    },
+    {
+      file: "docs/DATA_MODEL.md",
+      title: "Data model",
+      body: "The seven entities: agent, card_version, contract, test_case, attestation, run, decision. Fields, keys, enums, invariants.",
+    },
+    {
+      file: "docs/FLOW.md",
+      title: "Attestation flow",
+      body: "One attestation from trigger to result, the status lifecycle, and every failure path.",
+    },
+    {
+      file: "docs/API.md",
+      title: "Interfaces",
+      body: "The CLI with its options and exit codes, the contract file format, and the proposed HTTP endpoints.",
+    },
+    {
+      file: "docs/POLICY.md",
+      title: "Approval policy",
+      body: "Risk levels, decision outcomes, when a human is required, and how inconclusive results count.",
+    },
+    {
+      file: "docs/DECISIONS.md",
+      title: "Decision records",
+      body: "The seven non-negotiable rules, each with its decision, reason and consequences.",
+    },
+    {
+      file: "docs/ROADMAP.md",
+      title: "Roadmap",
+      body: "The six build stages, what the current version implements, and what it does not.",
+    },
+    {
+      file: "docs/IMPLEMENTATION_NOTES.md",
+      title: "Implementation notes",
+      body: "Every proposal the code implements, every choice that still needs a decision, and the facts that were verified.",
+    },
   ],
   howToRead: {
     title: "How the documents are written",
@@ -722,7 +965,12 @@ export const offerPage = {
     },
     never: {
       title: "What is never charged",
-      items: ["Connecting an agent.", "The badge.", "Running the command-line tool on your own machines.", "Reading or verifying a report."],
+      items: [
+        "Connecting an agent.",
+        "The badge.",
+        "Running the command-line tool on your own machines.",
+        "Reading or verifying a report.",
+      ],
     },
     invoices: {
       title: "Invoices and VAT",
@@ -740,17 +988,28 @@ export const certifiedPage = {
   headline: "A badge with the evidence behind it.",
   intro:
     "Suncly Certified is a private, voluntary programme. It is Suncly's statement that a named agent version met a named, published set of criteria on a date, on a sandbox. It is not the customer's approval, not a rating and not a tier.",
-  state: "The programme opens with our pilots. No criteria are published as accepted yet, and no agent is certified.",
+  state:
+    "The programme opens with our pilots. No criteria are published as accepted yet, and no agent is certified.",
   registry: { title: "Registry", empty: "No agents are certified yet." },
   badge: {
     title: "The badge",
-    intro: "Circular, with the words suncly certified on a circular path and the sun mark at the centre. One notch at the brand angle. Versions for paper, for dusk and in one colour.",
+    intro:
+      "Circular, with the words suncly certified on a circular path and the sun mark at the centre. One notch at the brand angle. Versions for paper, for dusk and in one colour.",
     files: [
       { label: "Paper, SVG", href: "/brand/badge/suncly-certified-paper.svg" },
       { label: "Dusk, SVG", href: "/brand/badge/suncly-certified-dusk.svg" },
-      { label: "One colour, SVG", href: "/brand/badge/suncly-certified-mono.svg" },
-      { label: "Paper, PNG 512", href: "/brand/badge/suncly-certified-paper-512.png" },
-      { label: "Dusk, PNG 512", href: "/brand/badge/suncly-certified-dusk-512.png" },
+      {
+        label: "One colour, SVG",
+        href: "/brand/badge/suncly-certified-mono.svg",
+      },
+      {
+        label: "Paper, PNG 512",
+        href: "/brand/badge/suncly-certified-paper-512.png",
+      },
+      {
+        label: "Dusk, PNG 512",
+        href: "/brand/badge/suncly-certified-dusk-512.png",
+      },
     ],
     rules: [
       "Show it unaltered: no recolouring, cropping, rotation, effects or added words.",
@@ -763,7 +1022,14 @@ export const certifiedPage = {
   },
   record: {
     title: "What a record shows",
-    items: ["The agent and its operator", "The sandbox endpoint tested", "The card hash and the A2A version", "The date and the run counts", "The criteria version", "What was not tested"],
+    items: [
+      "The agent and its operator",
+      "The sandbox endpoint tested",
+      "The card hash and the A2A version",
+      "The date and the run counts",
+      "The criteria version",
+      "What was not tested",
+    ],
   },
   limits: {
     title: "What a badge does not mean",
@@ -784,23 +1050,67 @@ export const dataPage = {
     "How Suncly handles data, verified against the code. The command-line tool runs where you run it and sends nothing to Suncly in this version. Suncly Data is how data is handled; it is not a dataset, and nothing you test trains anything.",
   inventory: {
     title: "Inventory",
-    columns: ["What", "Where it is stored", "Who can read it", "How to delete it"],
+    columns: [
+      "What",
+      "Where it is stored",
+      "Who can read it",
+      "How to delete it",
+    ],
     rows: [
-      ["The Agent Card you point Suncly at", "The evidence store (files under ~/.suncly/store, or your Postgres)", "Whoever can read that store", "Remove the files or drop the database"],
-      ["The test plan and its approval (contract, test cases, approved_by)", "The evidence store", "Whoever can read that store", "Remove the files or drop the database"],
-      ["Redacted transcripts of every run", "~/.suncly/transcripts on the machine that ran it", "Whoever can read that folder", "Remove the files"],
-      ["Your agent credential", "Only the Runner process, from one environment variable; never written", "Nobody; it is redacted from every transcript", "Unset the variable"],
-      ["The deployment signing key", "~/.suncly/keys", "Whoever can read that folder", "Delete the key; earlier reports still verify with the public key in result.json"],
-      ["Report folders", "./suncly-reports/<attestation-id>/", "Whoever you give them to", "Delete the folder"],
+      [
+        "The Agent Card you point Suncly at",
+        "The evidence store (files under ~/.suncly/store, or your Postgres)",
+        "Whoever can read that store",
+        "Remove the files or drop the database",
+      ],
+      [
+        "The test plan and its approval (contract, test cases, approved_by)",
+        "The evidence store",
+        "Whoever can read that store",
+        "Remove the files or drop the database",
+      ],
+      [
+        "Redacted transcripts of every run",
+        "~/.suncly/transcripts on the machine that ran it",
+        "Whoever can read that folder",
+        "Remove the files",
+      ],
+      [
+        "Your agent credential",
+        "Only the Runner process, from one environment variable; never written",
+        "Nobody; it is redacted from every transcript",
+        "Unset the variable",
+      ],
+      [
+        "The deployment signing key",
+        "~/.suncly/keys",
+        "Whoever can read that folder",
+        "Delete the key; earlier reports still verify with the public key in result.json",
+      ],
+      [
+        "Report folders",
+        "./suncly-reports/<attestation-id>/",
+        "Whoever you give them to",
+        "Delete the folder",
+      ],
     ],
   },
   anatomy: {
     title: "Anatomy of a report folder",
     rows: [
-      ["report.html", "The report for a reviewer. Self-contained; opens offline."],
+      [
+        "report.html",
+        "The report for a reviewer. Self-contained; opens offline.",
+      ],
       ["report.md", "The same content as Markdown."],
-      ["result.json", "The evidence bundle: attestation, runs, decisions, card version, contract, results, the signed payload and the public key."],
-      ["transcripts/<run-id>.json", "One redacted transcript per run, with its Layer 1 checks."],
+      [
+        "result.json",
+        "The evidence bundle: attestation, runs, decisions, card version, contract, results, the signed payload and the public key.",
+      ],
+      [
+        "transcripts/<run-id>.json",
+        "One redacted transcript per run, with its Layer 1 checks.",
+      ],
     ],
   },
   deletion: {
@@ -822,11 +1132,24 @@ export const researchPage = {
   headline: "What evidence can tell you, and what it cannot.",
   intro:
     "Short notes on what a signed evaluation proves, drafted strictly from facts the repository verifies. Every note carries its author, date, method, limits and sources. No findings, benchmarks, citations or partners are invented.",
-  state: "The first three notes are drafts in founder review and are not published yet.",
+  state:
+    "The first three notes are drafts in founder review and are not published yet.",
   drafts: [
-    { title: "What a signed Agent Card proves", summary: "A signature on a card shows who published it and that it was not altered. It says nothing about how the agent behaves." },
-    { title: "Why inconclusive is never a pass", summary: "A check the judge cannot decide is reported separately, and a test case cannot pass on inconclusive runs." },
-    { title: "An unchanged card is not an unchanged agent", summary: "The same card hash reuses the same approved tests; the counts can still move, and that is the point of re-running them." },
+    {
+      title: "What a signed Agent Card proves",
+      summary:
+        "A signature on a card shows who published it and that it was not altered. It says nothing about how the agent behaves.",
+    },
+    {
+      title: "Why inconclusive is never a pass",
+      summary:
+        "A check the judge cannot decide is reported separately, and a test case cannot pass on inconclusive runs.",
+    },
+    {
+      title: "An unchanged card is not an unchanged agent",
+      summary:
+        "The same card hash reuses the same approved tests; the counts can still move, and that is the point of re-running them.",
+    },
   ],
 } as const;
 
@@ -846,7 +1169,10 @@ export const labPage = {
     title: "Example contract file",
     body: "Export the draft, edit it, run with the file. The example below is the sample agent's contract: four test cases, one skill without a test case, structural criteria only.",
   },
-  planned: ["Prompt-injection, undeclared-behaviour and failure-handling probes (stage 4)", "Model-based judging for criteria Layer 1 cannot decide (stage 4)"],
+  planned: [
+    "Prompt-injection, undeclared-behaviour and failure-handling probes (stage 4)",
+    "Model-based judging for criteria Layer 1 cannot decide (stage 4)",
+  ],
 } as const;
 
 export const cookiesPage = {
@@ -857,15 +1183,24 @@ export const cookiesPage = {
   tableCaption: "Browser storage used by suncly.com, as inspected",
   columns: ["Name", "Type", "Set by", "Purpose", "Duration", "Third parties"],
   rows: [
-    ["suncly.workspace.v1 (local storage)", "localStorage, first party", "The review workspace at /app, only when you load a report or the sample", "Keeps the evaluation bundles and review notes you load, so they survive a reload", "Until you clear the workspace in its settings or clear site data", "None"],
+    [
+      "suncly.workspace.v1 (local storage)",
+      "localStorage, first party",
+      "The review workspace at /app, only when you load a report or the sample",
+      "Keeps the evaluation bundles and review notes you load, so they survive a reload",
+      "Until you clear the workspace in its settings or clear site data",
+      "None",
+    ],
   ],
-  consent: "Nothing non-essential is stored or read, so no consent banner is shown. If anything non-essential is ever added, a real choice with equal Accept and Reject comes first.",
+  consent:
+    "Nothing non-essential is stored or read, so no consent banner is shown. If anything non-essential is ever added, a real choice with equal Accept and Reject comes first.",
 } as const;
 
 export const legalNoticePage = {
   title: "Legal notice",
   headline: "Who runs this site.",
-  intro: "The company details the Information Society Services Act and the Commercial Code ask for, and a summary in Estonian of what Suncly offers.",
+  intro:
+    "The company details the Information Society Services Act and the Commercial Code ask for, and a summary in Estonian of what Suncly offers.",
   estonianTitle: "Kokkuvõte eesti keeles",
   /** Draft for founder review (Language Act): a summary in Estonian of the field of activity. */
   estonian:

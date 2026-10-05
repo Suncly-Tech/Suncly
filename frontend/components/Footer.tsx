@@ -5,7 +5,7 @@ import { InView } from "./InView";
 import { FindSuncly } from "./home/FindSuncly";
 import { banner, footer, site } from "@/lib/content";
 import { company } from "@/lib/launch";
-import { WORDMARK_PATH, WORDMARK_VIEWBOX } from "@/lib/wordmark";
+import { WORDMARK_VIEWBOX } from "@/lib/wordmark";
 
 /**
  * Compact footer navigation in four columns, the legal line, and the signature banner:
@@ -13,7 +13,13 @@ import { WORDMARK_PATH, WORDMARK_VIEWBOX } from "@/lib/wordmark";
  * like a horizon. Dusk surface, "Last light".
  */
 export function Footer({ withFind = false }: { withFind?: boolean }) {
-  const legalLine = [site.copyright, company.legalEntityName, company.registryCode, company.registeredOffice, site.city]
+  const legalLine = [
+    site.copyright,
+    company.legalEntityName,
+    company.registryCode,
+    company.registeredOffice,
+    site.city,
+  ]
     .filter(Boolean)
     .join(" · ");
   return (
@@ -28,11 +34,17 @@ export function Footer({ withFind = false }: { withFind?: boolean }) {
                 {group.links.map((link) => (
                   <li key={link.href} className="text-[15px]">
                     {link.href.startsWith("mailto:") ? (
-                      <a href={link.href} className="inline-block py-1.5 text-paper/85 transition-colors duration-200 hover:text-sun">
+                      <a
+                        href={link.href}
+                        className="inline-block py-1.5 text-paper/85 transition-colors duration-200 hover:text-sun"
+                      >
                         {link.label}
                       </a>
                     ) : (
-                      <Link href={link.href} className="inline-block py-1.5 text-paper/85 transition-colors duration-200 hover:text-sun">
+                      <Link
+                        href={link.href}
+                        className="inline-block py-1.5 text-paper/85 transition-colors duration-200 hover:text-sun"
+                      >
                         {link.label}
                       </Link>
                     )}
@@ -81,7 +93,14 @@ export function Banner() {
           preserveAspectRatio="xMinYMax meet"
         >
           <defs>
-            <mask id="banner-cuts" maskUnits="userSpaceOnUse" x="0" y="0" width="120" height="120">
+            <mask
+              id="banner-cuts"
+              maskUnits="userSpaceOnUse"
+              x="0"
+              y="0"
+              width="120"
+              height="120"
+            >
               <rect width="120" height="120" fill="#fff" />
               <polygon points="20,120 30,120 70,0 60,0" fill="#000" />
               <polygon points="50,120 60,120 100,0 90,0" fill="#000" />
@@ -93,30 +112,56 @@ export function Banner() {
             </linearGradient>
             <mask id="banner-word">
               <g transform={`translate(${markW + gap - vx} ${-vy})`}>
-                <path d={WORDMARK_PATH} fill="#fff" />
+                <use href="#suncly-wordmark" fill="#fff" />
               </g>
             </mask>
           </defs>
           <g transform={`scale(${scale})`}>
-            <circle cx="60" cy="60" r="44" fill="#F2C14E" mask="url(#banner-cuts)" />
+            <circle
+              cx="60"
+              cy="60"
+              r="44"
+              fill="#F2C14E"
+              mask="url(#banner-cuts)"
+            />
           </g>
           <g transform={`translate(${markW + gap - vx} ${-vy})`}>
-            <path d={WORDMARK_PATH} />
+            <use href="#suncly-wordmark" />
           </g>
           <g mask="url(#banner-word)">
-            <rect x={-vw * 0.6} y="0" width={vw * 0.5} height={vh} fill="url(#banner-light)" className="banner-edge-light" />
+            <rect
+              x={-vw * 0.6}
+              y="0"
+              width={vw * 0.5}
+              height={vh}
+              fill="url(#banner-light)"
+              className="banner-edge-light"
+            />
           </g>
           {/* the trade mark symbol, drawn: hairline stroke, at the top right of the last letter, at ascender height */}
-          <g transform={`translate(${totalW + vh * 0.03} ${vh * 0.02}) scale(0.55)`} fill="none" stroke="currentColor" strokeWidth={vh * 0.014} strokeLinecap="round" strokeLinejoin="round">
+          <g
+            transform={`translate(${totalW + vh * 0.03} ${vh * 0.02}) scale(0.55)`}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={vh * 0.014}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             {TRADEMARK_SYMBOL === "®" ? (
               <>
                 <circle cx={vh * 0.11} cy={vh * 0.11} r={vh * 0.1} />
-                <path d={`M${vh * 0.075} ${vh * 0.16} V${vh * 0.06} h${vh * 0.04} a${vh * 0.025} ${vh * 0.025} 0 0 1 0 ${vh * 0.05} h-${vh * 0.04} m${vh * 0.04} 0 l${vh * 0.03} ${vh * 0.05}`} />
+                <path
+                  d={`M${vh * 0.075} ${vh * 0.16} V${vh * 0.06} h${vh * 0.04} a${vh * 0.025} ${vh * 0.025} 0 0 1 0 ${vh * 0.05} h-${vh * 0.04} m${vh * 0.04} 0 l${vh * 0.03} ${vh * 0.05}`}
+                />
               </>
             ) : (
               <>
-                <path d={`M0 ${vh * 0.03} h${vh * 0.09} m-${vh * 0.045} 0 v${vh * 0.16}`} />
-                <path d={`M${vh * 0.12} ${vh * 0.19} v-${vh * 0.16} l${vh * 0.055} ${vh * 0.1} l${vh * 0.055} -${vh * 0.1} v${vh * 0.16}`} />
+                <path
+                  d={`M0 ${vh * 0.03} h${vh * 0.09} m-${vh * 0.045} 0 v${vh * 0.16}`}
+                />
+                <path
+                  d={`M${vh * 0.12} ${vh * 0.19} v-${vh * 0.16} l${vh * 0.055} ${vh * 0.1} l${vh * 0.055} -${vh * 0.1} v${vh * 0.16}`}
+                />
               </>
             )}
           </g>
@@ -126,7 +171,7 @@ export function Banner() {
       <style>{`
         .banner-edge-light { opacity: 0; }
         [data-inview="true"] .banner-edge-light { animation: banner-pass 1.1s cubic-bezier(0.22, 1, 0.36, 1) 150ms 1 both; }
-        @keyframes banner-pass { from { transform: translateX(0); opacity: 1; } to { transform: translateX(${(totalW + vw) }px); opacity: 1; } }
+        @keyframes banner-pass { from { transform: translateX(0); opacity: 1; } to { transform: translateX(${totalW + vw}px); opacity: 1; } }
         @media (prefers-reduced-motion: reduce) { .banner-edge-light { animation: none !important; opacity: 0 !important; } }
       `}</style>
     </InView>

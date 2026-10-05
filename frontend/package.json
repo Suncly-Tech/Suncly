@@ -17,7 +17,9 @@
     "art": "node scripts/render-art.mjs",
     "badge": "python3 scripts/generate-badge.py && node scripts/render-art.mjs",
     "lighthouse": "node scripts/lighthouse.mjs http://localhost:3100",
-    "keyboard": "node scripts/keyboard.mjs http://localhost:3100"
+    "keyboard": "node scripts/keyboard.mjs http://localhost:3100",
+    "functional": "node scripts/functional.mjs http://localhost:3100",
+    "lcp-probe": "CHROME_PATH=/opt/pw-browsers/chromium node scripts/lcp-probe.mjs http://localhost:3100/"
   },
   "dependencies": {
     "lucide-react": "^1.51.0",

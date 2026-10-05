@@ -32,9 +32,9 @@ gradient angle for the "not tested" hatch (`.hatch`, `.hatch-dark`, `.cuts-bulle
 
 | Role | Family | Settings |
 | --- | --- | --- |
-| Display, lead, long reading | Newsreader (variable: opsz 6 to 72, wght 300 to 500) | Display at weight 390, tracking 0, line height 1.05 to 1.15, optical sizing on. Long reading (`.prose-site`) at the text optical size, 19 px, line height 1.55, measure 66ch |
-| Interface and small text | Figtree (variable: wght 300 to 900) | Body 17 px / 1.55; small 14 px |
-| Commands, hashes, labels | JetBrains Mono (variable) | Labels uppercase, 12.5 px, 0.08em tracking (`.text-eyebrow`); evidence strings in `.text-mono-label` |
+| Display, lead, long reading | Newsreader (variable: opsz 18 to 72, the sizes the site sets; wght pinned at 400; 39 KB) | Display at weight 390, tracking 0, line height 1.05 to 1.15, optical sizing on. Long reading (`.prose-site`) at the text optical size, 19 px, line height 1.55, measure 66ch |
+| Interface and small text | Figtree (variable: wght 300 to 900; 20 KB) | Body 17 px / 1.55; small 14 px |
+| Commands, hashes, labels | JetBrains Mono Regular (one 400 face; 21 KB) | Labels uppercase, 12.5 px, 0.08em tracking (`.text-eyebrow`); evidence strings in `.text-mono-label` |
 
 Scale (clamped between phone and desktop): hero `text-display-xl` 40 to 92 px; section
 `text-display-lg` 31 to 54 px; `text-display-md` 27 to 36 px; `text-lead` 19 to 22 px;

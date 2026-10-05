@@ -21,7 +21,7 @@ export interface CertificationRecord {
   runs: { testCases: number; perTestCase: number; pass: number; fail: number; inconclusive: number };
   notTested: string[];
   decidedBy: string;
-  status: "valid" | "expired" | "suspended" | "revoked";
+  status: "valid" | "expired" | "suspended" | "revoked" | "specimen";
 }
 
 export const certificationRecords: CertificationRecord[] = records as CertificationRecord[];

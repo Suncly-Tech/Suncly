@@ -12,13 +12,13 @@ export function OfferCertified() {
   const programmeOpen = launch.certificationProgramme === "open";
   return (
     <section aria-label="Suncly Offer and Suncly Certified" className="bg-cream-deep/60">
-      <div className="container-site grid grid-cols-1 gap-12 py-12 lg:grid-cols-2 lg:gap-16 lg:py-20">
+      <div className="container-site grid grid-cols-1 gap-12 py-12 md:grid-cols-2 md:gap-12 lg:gap-16 lg:py-14">
         <div id="offer" className="scroll-mt-20">
           <p className="text-eyebrow text-ink-soft">
             <span className="mr-3 text-ink-mute">08</span>
             {offer.label}
           </p>
-          <h2 className="mt-4 text-display-lg text-ink">{offer.headline}</h2>
+          <h2 className="mt-4 text-display-md text-ink">{offer.headline}</h2>
           <p className="mt-5 max-w-[40ch] text-body text-ink">
             {offer.body} {offer.free}
           </p>
@@ -28,21 +28,21 @@ export function OfferCertified() {
           </Link>
         </div>
 
-        <div id="certified" className="grid scroll-mt-20 gap-6 sm:grid-cols-[minmax(0,1fr)_200px] lg:grid-cols-[minmax(0,1fr)_240px]">
+        <div id="certified" className="grid scroll-mt-20 grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_200px]">
           <div>
             <p className="text-eyebrow text-ink-soft">
               <span className="mr-3 text-ink-mute">09</span>
               {certified.label}
             </p>
             {!programmeOpen ? <p className="mt-3 text-eyebrow text-ember">{certified.eyebrowNotOpen}</p> : null}
-            <h2 className="mt-3 text-display-lg text-ink">{certified.headline}</h2>
+            <h2 className="mt-3 text-display-md text-ink">{certified.headline}</h2>
             <p className="mt-5 max-w-[36ch] text-body text-ink">{certified.body}</p>
             <Link href={certified.link.href} className="mt-4 inline-block text-[15.5px] underline underline-offset-4 decoration-amber hover:text-ember">
               {certified.link.label}
             </Link>
           </div>
-          <figure className="m-0 w-[200px] sm:w-auto">
-            <Picture name="seal" alt={certified.sealAlt} sizes="(min-width: 640px) 240px, 200px" className="aspect-square rounded-full" />
+          <figure className="m-0 w-[160px] xl:w-auto">
+            <Picture name="seal" alt={certified.sealAlt} sizes="200px" className="aspect-square rounded-full" />
             {!programmeOpen ? <figcaption className="mt-2 text-center text-eyebrow text-ink-mute">{certified.specimen}</figcaption> : null}
           </figure>
         </div>

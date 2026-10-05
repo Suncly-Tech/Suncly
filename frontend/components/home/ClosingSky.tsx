@@ -12,7 +12,13 @@ import { closing } from "@/lib/content";
  */
 export function ClosingSky() {
   return (
-    <InView as="section" once={false} rootMargin="0px" className="closing-sky relative isolate overflow-hidden" id="closing">
+    <InView
+      as="section"
+      once={false}
+      rootMargin="0px"
+      className="closing-sky relative isolate overflow-hidden"
+      id="closing"
+    >
       <style>{`
         .closing-sky { --sky-high: #a9c4e4; --sky-mid: #cfdcec; --sky-low: #f0e2c8; --cloud: #f6f1e6; --cloud-shade: #d8d2c4; }
         .closing-sky .layer { animation-play-state: paused; }
@@ -35,12 +41,18 @@ export function ClosingSky() {
         style={{
           right: "8%",
           bottom: "12%",
-          background: "radial-gradient(circle, rgba(242,193,78,0.95) 0%, rgba(242,193,78,0.55) 22%, rgba(242,193,78,0.12) 48%, rgba(242,193,78,0) 70%)",
+          background:
+            "radial-gradient(circle, rgba(242,193,78,0.95) 0%, rgba(242,193,78,0.55) 22%, rgba(242,193,78,0.12) 48%, rgba(242,193,78,0) 70%)",
           transform: "translate(22%, 22%)",
         }}
       />
       {/* high haze */}
-      <svg aria-hidden="true" className="layer animate-drift-slower absolute left-[-6%] top-[26%] -z-10 w-[112%] opacity-50" viewBox="0 0 1600 200" preserveAspectRatio="none">
+      <svg
+        aria-hidden="true"
+        className="layer animate-drift-slower absolute left-[-6%] top-[26%] -z-10 w-[112%] opacity-50"
+        viewBox="0 0 1600 200"
+        preserveAspectRatio="none"
+      >
         <defs>
           <filter id="haze-blur" x="-20%" y="-50%" width="140%" height="200%">
             <feGaussianBlur stdDeviation="26" />
@@ -53,7 +65,12 @@ export function ClosingSky() {
         </g>
       </svg>
       {/* the cloud deck */}
-      <svg aria-hidden="true" className="layer animate-drift-slow absolute left-[-8%] top-[48%] -z-10 w-[116%] opacity-90" viewBox="0 0 1600 320" preserveAspectRatio="none">
+      <svg
+        aria-hidden="true"
+        className="layer animate-drift-slow absolute left-[-8%] top-[48%] -z-10 w-[116%] opacity-90"
+        viewBox="0 0 1600 320"
+        preserveAspectRatio="none"
+      >
         <defs>
           <filter id="deck-blur" x="-20%" y="-50%" width="140%" height="200%">
             <feGaussianBlur stdDeviation="14" />
@@ -72,7 +89,12 @@ export function ClosingSky() {
         </g>
       </svg>
       {/* near wisps */}
-      <svg aria-hidden="true" className="layer animate-drift-fast absolute left-[-10%] top-[66%] -z-10 w-[120%] opacity-80" viewBox="0 0 1600 200" preserveAspectRatio="none">
+      <svg
+        aria-hidden="true"
+        className="layer animate-drift-fast absolute left-[-10%] top-[66%] -z-10 w-[120%] opacity-80"
+        viewBox="0 0 1600 200"
+        preserveAspectRatio="none"
+      >
         <defs>
           <filter id="wisp-blur" x="-20%" y="-50%" width="140%" height="200%">
             <feGaussianBlur stdDeviation="9" />
@@ -85,13 +107,31 @@ export function ClosingSky() {
         </g>
       </svg>
       {/* the scrim that guarantees text contrast */}
-      <div aria-hidden="true" className="absolute inset-0 -z-[5]" style={{ background: "linear-gradient(180deg, rgba(250,247,240,0.85) 0%, rgba(250,247,240,0.55) 40%, rgba(250,247,240,0) 70%)" }} />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-[5]"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(250,247,240,0.85) 0%, rgba(250,247,240,0.55) 40%, rgba(250,247,240,0) 70%)",
+        }}
+      />
 
       <div className="container-site relative flex min-h-[62svh] flex-col justify-start pb-40 pt-16 md:min-h-[78svh] md:pb-56 md:pt-28">
-        <h2 className="max-w-[16ch] text-display-xl text-ink">{closing.headline}</h2>
+        <h2 className="max-w-[16ch] text-display-xl text-ink">
+          {closing.headline.map((line) => (
+            <span key={line} className="block">
+              {line}
+            </span>
+          ))}
+        </h2>
         <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-          <ButtonLink href={closing.action.href}>{closing.action.label}</ButtonLink>
-          <a href={`mailto:${closing.contact}`} className="text-[16px] text-ink underline underline-offset-4 decoration-amber hover:text-ember">
+          <ButtonLink href={closing.action.href}>
+            {closing.action.label}
+          </ButtonLink>
+          <a
+            href={`mailto:${closing.contact}`}
+            className="text-[16px] text-ink underline underline-offset-4 decoration-amber hover:text-ember"
+          >
             {closing.contact}
           </a>
         </div>

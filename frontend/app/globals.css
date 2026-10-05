@@ -197,7 +197,7 @@
   font-family: var(--font-mono);
   font-size: 12.5px;
   line-height: 1.2;
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -886,6 +886,7 @@
 
 /* Pictures: art-directed crops, a long shadow at the brand angle */
 @utility picture-plate {
+  display: block;
   position: relative;
   overflow: hidden;
   border-radius: 6px;

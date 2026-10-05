@@ -31,7 +31,7 @@ export default function CompanyPage() {
       <PageHeader eyebrow={companyPage.title} headline={companyPage.headline} intro={companyPage.intro} />
       <Section>
         <SectionHeader label="How we work" headline="Three rules we apply to ourselves." />
-        <ul className="mt-10 grid gap-4 md:grid-cols-3">
+        <ul className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-3">
           {companyPage.principles.map((p) => (
             <li key={p.title} className="surface-card flex flex-col gap-3 p-6 md:p-8">
               <h3 className="text-heading-md text-ink">{p.title}</h3>

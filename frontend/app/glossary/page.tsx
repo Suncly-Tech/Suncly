@@ -32,7 +32,7 @@ export default function GlossaryPage() {
         intro="Each term starts with a one-sentence definition you can quote, then what it means inside Suncly. Where a term names something planned rather than built, it says so."
       />
       <Section>
-        <div className="grid gap-12 lg:grid-cols-[minmax(0,3fr)_minmax(0,9fr)] lg:gap-16">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,3fr)_minmax(0,9fr)] lg:gap-16">
           <nav aria-label="Terms" className="lg:sticky lg:top-28 lg:self-start">
             <p className="text-eyebrow text-ink-soft">Terms</p>
             <ol className="mt-4 flex flex-col gap-1 text-small">

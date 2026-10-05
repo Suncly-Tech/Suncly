@@ -1,7 +1,6 @@
 "use client";
 
-import { m, useReducedMotion } from "motion/react";
-import type { ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 
 type Props = {
   children: ReactNode;
@@ -10,22 +9,36 @@ type Props = {
   as?: "div" | "section" | "li" | "article";
 };
 
-/** Fade + 12px rise, once, when the element enters the viewport. Off under reduced motion. */
+/**
+ * Fade and a 10px rise, once, when the element enters the viewport. CSS only (no
+ * animation library): a data attribute flips when the element is seen, and the transition
+ * in the stylesheet does the rest. Off under reduced motion, where the element is simply
+ * shown.
+ */
 export function Reveal({ children, className = "", delay = 0, as = "div" }: Props) {
-  const reduce = useReducedMotion();
-  const Tag = m[as];
-  if (reduce) {
-    const Plain = as;
-    return <Plain className={className}>{children}</Plain>;
-  }
+  const ref = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (typeof IntersectionObserver === "undefined" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      el.setAttribute("data-reveal", "seen");
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          el.setAttribute("data-reveal", "seen");
+          io.disconnect();
+        }
+      },
+      { rootMargin: "0px 0px -10% 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  const Tag = as as "div";
   return (
-    <Tag
-      className={className}
-      initial={{ opacity: 0, y: 12 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "0px 0px -10% 0px" }}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay }}
-    >
+    <Tag ref={ref as React.RefObject<HTMLDivElement>} className={`reveal ${className}`} data-reveal="unseen" style={delay ? { transitionDelay: `${delay * 1000}ms` } : undefined}>
       {children}
     </Tag>
   );

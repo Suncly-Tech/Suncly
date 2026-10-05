@@ -4,7 +4,7 @@ import { AlertTriangle, CheckCircle2, Info, XCircle, FlaskConical } from "lucide
 type Tone = "info" | "warn" | "error" | "success" | "sample";
 
 const styles: Record<Tone, { cls: string; Icon: typeof Info }> = {
-  info: { cls: "bg-info-soft text-ink ring-sky/15", Icon: Info },
+  info: { cls: "bg-info-soft text-ink ring-line", Icon: Info },
   warn: { cls: "bg-partial-soft text-ink ring-partial/20", Icon: AlertTriangle },
   error: { cls: "bg-fail-soft text-ink ring-fail/20", Icon: XCircle },
   success: { cls: "bg-pass-soft text-ink ring-pass/20", Icon: CheckCircle2 },
@@ -12,7 +12,7 @@ const styles: Record<Tone, { cls: string; Icon: typeof Info }> = {
 };
 
 const iconColor: Record<Tone, string> = {
-  info: "text-sky-deep",
+  info: "text-ink-soft",
   warn: "text-partial",
   error: "text-fail",
   success: "text-pass",

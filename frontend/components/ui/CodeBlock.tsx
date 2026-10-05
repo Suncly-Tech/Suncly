@@ -30,7 +30,7 @@ export function CodeBlock({
 
   return (
     <div className={`relative ${className}`}>
-      <pre className="code-block pr-14" tabIndex={0} aria-label={label}>
+      <pre className="code-block pr-24" tabIndex={0} aria-label={label}>
         {lines ? (
           code.split("\n").map((line, i) => (
             <span key={i} className="block">

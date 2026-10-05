@@ -1,0 +1,31 @@
+Lighthouse LCP 2892 ms = 0.5 × optimistic 2892 + 0.5 × pessimistic 2892 (floored at FCP); throttling 1638.4 Kbps, RTT 150 ms, CPU ×4
+
+Pessimistic graph, network nodes (simulated ms):
+  start    end     KB  type        url
+      0    903   57.9  Document    /
+    903   1206    5.3  Image       /art/two-cards-1280.avif
+    975   1278    1.9  Script      …/webpack-c70c5b85da12b1e5.js
+   1278   1432    0.5  Script      …/main-app-cdd2df00fbd31c1d.js
+    903   1656   20.8  Font        …/9cb9291b48011e00-s.p.woff2
+    903   1656   19.7  Font        …/e967d719d9a21b32-s.p.woff2
+   1432   1735    5.0  Script      …/2348-39aa52dd7d6d19bc.js
+   1656   1960    9.4  Script      …/3977-19d22f5dfaf441a6.js
+   1656   2110   10.6  Script      …/app/page-2d0601792d4f5eec.js
+    903   2256   38.8  Font        …/ceaee4e18974db0f-s.p.woff2
+    975   2628   62.1  Script      …/4bd1b696-93bf506b236d6248.js
+   1206   2710   64.7  Script      …/3794-2a848338bc316163.js
+  12 requests, 297 KB transferred before the observed paint
+  plus 4 CPU tasks treated as render-blocking (layout); last ends at 2892 ms
+
+CPU tasks in the pessimistic graph (simulated ms; duration is the trace's × CPU slowdown):
+    903    975  RunTask      dur 18096 ms raw  [DocumentLoader::CommitNavigation 16ms, DocumentLoader::StartLoadingResponse 14ms, DocumentLoader::CreateParserPostCommit 14ms, NavigationBodyLoader::StartLoadingBody 8ms] / extensions::SafeBuiltins v8/LoadTimes …/9cb9291b48011e00-s.p.woff2 …/ceaee4e18974db0f-s.p.woff2 …/e967d719d9a21b32-s.p.woff2 /art/two-cards-1280.avif …/webpack-c70c5b85da12b1e5.js …/4bd1b696-93bf506b236d6248.js …/3794-2a848338bc316163.js …/main-app-cdd2df00fbd31c1d.js …/2348-39aa52dd7d6d19bc.js …/3977-19d22f5dfaf441a6.js …/app/page-2d0601792d4f5eec.js
+    975   1020  RunTask      dur 11364 ms raw  [ParseHTML 11ms, RunMicrotasks 0ms, HTMLDocumentParser::DocumentElementAvailable 0ms, ScheduleStyleRecalculation 0ms]
+   1020   1071  RunTask      dur 25306 ms raw  [Layout 17ms, Paint 3ms, UpdateLayoutTree 2ms, PrePaint 2ms] /art/two-cards-1280.avif
+   2710   2892  RunTask      dur 45482 ms raw  [EvaluateScript 44ms, ScriptCompiled 38ms, v8.run 38ms, RunMicrotasks 11ms] …/3794-2a848338bc316163.js / …/4bd1b696-93bf506b236d6248.js
+
+What-ifs (pessimistic graph re-simulated without the resources named; optimistic unchanged):
+as built                                     pessimistic  2892 ms → simulated LCP ≈ 2892 ms
+without the three fonts                      pessimistic  2360 ms → simulated LCP ≈ 2626 ms
+without every script                         pessimistic  2592 ms → simulated LCP ≈ 2742 ms
+without the two framework chunks only        pessimistic  2892 ms → simulated LCP ≈ 2892 ms
+without fonts and scripts                    pessimistic  2210 ms → simulated LCP ≈ 2551 ms

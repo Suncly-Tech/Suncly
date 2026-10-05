@@ -7,7 +7,7 @@ import { Cuts } from "@/components/Cuts";
 export function SiteLayout({ children }: { children: ReactNode }) {
   return (
     <>
-      <Nav variant="solid" />
+      <Nav />
       <main id="main" className="bg-cream">
         {children}
       </main>
@@ -59,11 +59,11 @@ export function Section({
   id?: string;
   children: ReactNode;
   className?: string;
-  tone?: "cream" | "paper" | "ink" | "sky";
+  tone?: "cream" | "paper" | "ink" | "dusk";
   narrow?: boolean;
 }) {
   const bg =
-    tone === "paper" ? "bg-paper" : tone === "ink" ? "bg-ink text-paper" : tone === "sky" ? "bg-sky text-paper" : "bg-cream";
+    tone === "paper" ? "bg-paper" : tone === "ink" ? "bg-ink text-paper" : tone === "dusk" ? "bg-dusk text-paper" : "bg-cream";
   return (
     <section id={id} className={`scroll-mt-20 py-16 md:py-24 ${bg} ${className}`}>
       <div className={`container-site ${narrow ? "max-w-[880px]" : ""}`}>{children}</div>

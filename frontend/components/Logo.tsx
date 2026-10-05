@@ -1,14 +1,154 @@
 import Link from "next/link";
-import logo from "@/public/brand/logo.json";
+import { TRADEMARK_SYMBOL } from "@/lib/launch";
+import { LOCKUP_GAP, MARK_PATH, MARK_VIEWBOX } from "@/lib/mark";
+import { WORDMARK_PATH, WORDMARK_VIEWBOX } from "@/lib/wordmark";
 
 /**
- * The brand lockup from assets/ (mark + wordmark), keyed to transparency by
- * scripts/generate-logo.mjs. Both tones are rendered and toggled with CSS so
- * the nav can switch on scroll without a flash.
+ * The mark: the bullet-shaped sun with two diagonal cuts, exactly as traced from the original
+ * lockup (lib/mark.ts). Always the logo's gold, on every background. Never redrawn,
+ * recoloured or animated into something else. Like the lettering, the path is written into
+ * the document once (`define`, by the navigation's or workspace shell's Logo) and reused.
  */
+export function Mark({
+  height = 24,
+  className = "",
+  define = false,
+}: {
+  height?: number;
+  className?: string;
+  define?: boolean;
+}) {
+  const [, , w, h] = MARK_VIEWBOX;
+  const width = (height * w) / h;
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox={MARK_VIEWBOX.join(" ")}
+      width={width}
+      height={height}
+      className={className}
+      aria-hidden="true"
+      focusable="false"
+    >
+      {define ? (
+        <defs>
+          <g id="suncly-mark">
+            <path d={MARK_PATH} fillRule="evenodd" />
+          </g>
+        </defs>
+      ) : null}
+      <use href="#suncly-mark" fill="#F2C14E" />
+    </svg>
+  );
+}
+
+/**
+ * The wordmark as vector: the lettering traced from assets/suncly-black.png (see
+ * design/wordmark/). A drawing, never typeset. Fills with currentColor.
+ *
+ * The traced lettering. The path is 4 KB, so it is written into the document once, by the
+ * navigation's or workspace shell's Logo (`define`), and every other instance (the footer
+ * lockup, the banner and its light mask) references it with <use>.
+ */
+export function Wordmark({
+  height = 26,
+  className = "",
+  trademark = false,
+  define = false,
+}: {
+  height?: number;
+  className?: string;
+  trademark?: boolean;
+  define?: boolean;
+}) {
+  const [, , w, h] = WORDMARK_VIEWBOX;
+  const width = (height * w) / h;
+  return (
+    <span
+      className={`relative inline-block ${className}`}
+      style={{ height, width }}
+    >
+      <svg
+        viewBox={WORDMARK_VIEWBOX.join(" ")}
+        width={width}
+        height={height}
+        fill="currentColor"
+        fillRule="evenodd"
+        aria-hidden="true"
+        focusable="false"
+      >
+        {define ? (
+          <defs>
+            <g id="suncly-wordmark">
+              <path d={WORDMARK_PATH} />
+            </g>
+          </defs>
+        ) : null}
+        <use href="#suncly-wordmark" />
+      </svg>
+      {trademark ? <TrademarkSymbol height={height} /> : null}
+    </span>
+  );
+}
+
+/**
+ * The trade mark symbol: drawn, optically sized to the lettering, hairline stroke, set at the
+ * top right of the last letter at ascender height. ™ by default; ® only with a registration
+ * (lib/launch.ts). Appears nowhere else on the site.
+ */
+export function TrademarkSymbol({ height }: { height: number }) {
+  const size = Math.max(8, height * 0.26);
+  return (
+    <span
+      aria-label={
+        TRADEMARK_SYMBOL === "®" ? "registered trade mark" : "trade mark"
+      }
+      className="absolute font-sans leading-none"
+      style={{
+        right: -size * 1.15,
+        top: -size * 0.1,
+        fontSize: size,
+        fontWeight: 500,
+        letterSpacing: 0,
+      }}
+    >
+      {TRADEMARK_SYMBOL}
+    </span>
+  );
+}
+
+/**
+ * Mark and wordmark together, at the proportions and spacing of the original lockup: the
+ * mark is 345/415 of the lettering's height and sits 29/415 of it to the left, as traced.
+ */
+export function Lockup({
+  height = 26,
+  className = "",
+  trademark = false,
+  define = false,
+}: {
+  height?: number;
+  className?: string;
+  trademark?: boolean;
+  define?: boolean;
+}) {
+  const [, , , wordH] = WORDMARK_VIEWBOX;
+  const scale = height / wordH;
+  return (
+    <span
+      className={`inline-flex items-center ${className}`}
+      style={{ gap: LOCKUP_GAP * scale }}
+    >
+      <Mark height={MARK_VIEWBOX[3] * scale} define={define} />
+      <Wordmark height={height} trademark={trademark} define={define} />
+    </span>
+  );
+}
+
+/** The linked lockup used in the navigation and the workspace shell. */
 export function Logo({
   tone = "ink",
-  height = 30,
+  height = 24,
   href = "/",
   className = "",
 }: {
@@ -17,56 +157,13 @@ export function Logo({
   href?: string;
   className?: string;
 }) {
-  const width = Math.round(height * logo.aspect);
   return (
     <Link
       href={href}
-      className={`inline-flex shrink-0 items-center no-underline ${className}`}
+      className={`inline-flex shrink-0 items-center no-underline ${tone === "paper" ? "text-paper" : "text-ink"} ${className}`}
       aria-label="Suncly home"
-      style={{ width, height }}
     >
-      <img
-        src="/brand/logo-light.webp"
-        alt=""
-        width={width}
-        height={height}
-        decoding="async"
-        fetchPriority="low"
-        className={tone === "paper" ? "block" : "hidden"}
-      />
-      <img
-        src="/brand/logo-dark.webp"
-        alt=""
-        width={width}
-        height={height}
-        decoding="async"
-        fetchPriority="low"
-        className={tone === "ink" ? "block" : "hidden"}
-      />
+      <Lockup height={height} define />
     </Link>
-  );
-}
-
-/** The sun with two diagonal cuts, as vector. Always yellow, on every background. */
-export function Mark({ size = 28, className = "" }: { size?: number; className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 120 120"
-      width={size}
-      height={size}
-      className={className}
-      aria-hidden="true"
-      focusable="false"
-    >
-      <defs>
-        <mask id="suncly-cuts" maskUnits="userSpaceOnUse" x="0" y="0" width="120" height="120">
-          <rect width="120" height="120" fill="#fff" />
-          <polygon points="20,120 30,120 70,0 60,0" fill="#000" />
-          <polygon points="50,120 60,120 100,0 90,0" fill="#000" />
-        </mask>
-      </defs>
-      <circle cx="60" cy="60" r="44" fill="#F2C14E" mask="url(#suncly-cuts)" />
-    </svg>
   );
 }

@@ -122,7 +122,7 @@ export function SettingsView() {
               <span className="text-ink">
                 <span className="font-semibold">Usage.</span> Every attestation records its cost in attempts against its budget; that is the unit the code counts today. There is no aggregate usage view across a team yet.
               </span>
-              <AvailabilityBadge status="limited" />
+              <AvailabilityBadge status="available" />
             </li>
             <li className="flex items-start justify-between gap-4">
               <span className="text-ink">

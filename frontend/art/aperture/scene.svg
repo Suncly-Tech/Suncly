@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 1125" width="1500" height="1125">
+  <!-- The aperture. A closed box with one narrow slit and a single blade of light leaving it. Last light: a dark plate with a thin gold rim. -->
+  <defs>
+    <linearGradient id="plate" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2E251C"/><stop offset="1" stop-color="#15110D"/></linearGradient>
+    <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1A1410"/><stop offset="1" stop-color="#0F0C09"/></linearGradient>
+    <linearGradient id="boxtop" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4E3D2B"/><stop offset="1" stop-color="#2E241B"/></linearGradient>
+    <linearGradient id="boxfront" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2B2119"/><stop offset="1" stop-color="#19130F"/></linearGradient>
+    <linearGradient id="boxside" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3D2F22"/><stop offset="1" stop-color="#221A13"/></linearGradient>
+    <linearGradient id="blade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FFEBB0" stop-opacity="0.98"/><stop offset="0.45" stop-color="#F2C14E" stop-opacity="0.5"/><stop offset="1" stop-color="#F2C14E" stop-opacity="0"/></linearGradient>
+    <radialGradient id="warm" cx="1" cy="0" r="1"><stop offset="0" stop-color="#C8842B" stop-opacity="0.28"/><stop offset="1" stop-color="#C8842B" stop-opacity="0"/></radialGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="22"/></filter>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="8"/></filter>
+    <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope="0.11"/></feComponentTransfer></filter>
+  </defs>
+  <rect width="1500" height="1125" fill="url(#plate)"/>
+  <rect width="1500" height="1125" fill="url(#warm)"/>
+  <rect y="830" width="1500" height="295" fill="url(#floor)"/>
+  <!-- the box's own shadow on the floor, long toward the lower left -->
+  <polygon points="500,920 980,920 760,1125 280,1125" fill="#070504" fill-opacity="0.7" filter="url(#soft)"/>
+  <!-- the blade of light, at the brand angle, leaving the slit toward the lower left -->
+  <polygon points="705,585 730,585 180,1125 80,1125" fill="url(#blade)" filter="url(#glow)" opacity="0.95"/>
+  <polygon points="708,585 724,585 215,1125 160,1125" fill="#FFF3CC" opacity="0.9"/>
+  <!-- the box -->
+  <polygon points="500,450 980,450 1140,360 660,360" fill="url(#boxtop)"/>
+  <polygon points="980,450 1140,360 1140,830 980,920" fill="url(#boxside)"/>
+  <polygon points="500,450 980,450 980,920 500,920" fill="url(#boxfront)"/>
+  <!-- the slit, with its rim -->
+  <rect x="705" y="568" width="18" height="26" fill="#FFF3CC"/>
+  <rect x="704" y="567" width="20" height="28" fill="none" stroke="#F2C14E" stroke-opacity="0.7" stroke-width="1.5"/>
+  <!-- rim light from the sun behind the box -->
+  <polyline points="500,450 980,450 1140,360" fill="none" stroke="#F2C14E" stroke-opacity="0.6" stroke-width="2"/>
+  <line x1="1140" y1="360" x2="1140" y2="830" stroke="#C8842B" stroke-opacity="0.45" stroke-width="1.5"/>
+  <rect width="1500" height="1125" filter="url(#grain)"/>
+</svg>

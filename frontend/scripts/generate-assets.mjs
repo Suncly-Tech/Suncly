@@ -1,44 +1,60 @@
-// Derives favicons and the OG image from public/mark.svg.
-// The mark stays yellow; it sits on a sky-blue field for contrast.
+// Derives the favicons and the social preview from public/mark.svg (the bullet-shaped mark
+// traced from the original lockup) and the traced wordmark (design/wordmark/wordmark-trace.svg),
+// which share one coordinate system. The mark stays its own gold on a paper tile; no blue
+// anywhere. No text is drawn, so the output never depends on a font being present.
 import sharp from "sharp";
 import { readFileSync, writeFileSync } from "node:fs";
 
-const SKY = "#3461D1";
-const mark = readFileSync(new URL("../public/mark.svg", import.meta.url), "utf8");
+const PAPER = "#FAF7F0";
+const INK = "#1B1814";
+const mark = readFileSync(
+  new URL("../public/mark.svg", import.meta.url),
+  "utf8",
+);
 const markInner = mark.replace(/<svg[^>]*>/, "").replace("</svg>", "");
+const markVb = mark.match(/viewBox="([^"]+)"/)[1]; // "220 185 502 345"
+const LOCKUP_VB = "220 153 1735 415"; // mark and lettering together, as traced
+const wordmark = readFileSync(
+  new URL("../design/wordmark/wordmark-trace.svg", import.meta.url),
+  "utf8",
+);
+const wordVb = wordmark.match(/viewBox="([^"]+)"/)[1];
+const wordPath = wordmark.match(/<path d="([^"]+)"/)[1];
 
 function tile(size, radius, pad) {
+  // the mark is wider than tall (502:345); it is centred in the tile at the full inner width
   const inner = size - pad * 2;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
-  <rect width="${size}" height="${size}" rx="${radius}" fill="${SKY}"/>
-  <svg x="${pad}" y="${pad}" width="${inner}" height="${inner}" viewBox="0 0 120 120">${markInner}</svg>
+  <rect width="${size}" height="${size}" rx="${radius}" fill="${PAPER}"/>
+  <svg x="${pad}" y="${pad}" width="${inner}" height="${inner}" viewBox="${markVb}" preserveAspectRatio="xMidYMid meet" fill-rule="evenodd">${markInner}</svg>
 </svg>`;
 }
 
-// Favicon SVG (rounded blue tile with the mark)
-writeFileSync("public/favicon.svg", tile(64, 14, 8));
-
+writeFileSync("public/favicon.svg", tile(64, 14, 6));
 const png = async (svg, size, out) =>
   sharp(Buffer.from(svg)).resize(size, size).png().toFile(out);
+await png(tile(64, 14, 6), 32, "public/favicon-32.png");
+await png(tile(180, 40, 20), 180, "public/apple-touch-icon.png");
+await png(tile(192, 42, 22), 192, "public/icon-192.png");
+await png(tile(512, 112, 60), 512, "public/icon-512.png");
 
-await png(tile(64, 14, 8), 32, "public/favicon-32.png");
-await png(tile(180, 40, 24), 180, "public/apple-touch-icon.png");
-await png(tile(192, 42, 26), 192, "public/icon-192.png");
-await png(tile(512, 112, 68), 512, "public/icon-512.png");
-
-// OG image 1200x630: mark on blue, wordmark in Manrope-like fallback is avoided;
-// we draw only the mark so the image never depends on a font being present.
+// Social preview 1200x630: dawn paper, the lockup large, the horizon hairline the name stands on.
 const og = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
   <defs>
-    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#1D3A97"/>
-      <stop offset="1" stop-color="${SKY}"/>
+    <radialGradient id="sun" cx="1.02" cy="-0.1" r="1.1">
+      <stop offset="0" stop-color="#F2C14E" stop-opacity="0.55"/>
+      <stop offset="0.5" stop-color="#F2C14E" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#F2C14E" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="horizon" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#F2C14E" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#1B1814" stop-opacity="0.08"/>
     </linearGradient>
   </defs>
-  <rect width="1200" height="630" fill="url(#sky)"/>
-  <circle cx="600" cy="400" r="330" fill="#ffffff" opacity="0.06"/>
-  <circle cx="600" cy="400" r="240" fill="#ffffff" opacity="0.06"/>
-  <svg x="470" y="185" width="260" height="260" viewBox="0 0 120 120">${markInner}</svg>
+  <rect width="1200" height="630" fill="${PAPER}"/>
+  <rect width="1200" height="630" fill="url(#sun)"/>
+  <svg x="120" y="200" width="760" height="182" viewBox="${LOCKUP_VB}" preserveAspectRatio="xMinYMid meet" fill-rule="evenodd">${markInner}<path d="${wordPath}" fill="${INK}" fill-rule="evenodd"/></svg>
+  <rect x="120" y="430" width="960" height="1.5" fill="url(#horizon)"/>
 </svg>`;
 await sharp(Buffer.from(og)).png().toFile("public/og.png");
 

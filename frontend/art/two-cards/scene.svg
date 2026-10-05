@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="100 280 1300 920" width="1300" height="920">
+  <!-- Two cards. Two identical upright cards on a plaster plane; the right one's shadow does not match its shape. Sun off-frame, upper right. -->
+  <defs>
+    <linearGradient id="wall" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FCF8EE"/><stop offset="1" stop-color="#F0E8D6"/></linearGradient>
+    <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F3EDDE"/><stop offset="1" stop-color="#E6DCC6"/></linearGradient>
+    <radialGradient id="sunlight" cx="1.02" cy="-0.05" r="1.15"><stop offset="0" stop-color="#F2C14E" stop-opacity="0.62"/><stop offset="0.45" stop-color="#F2C14E" stop-opacity="0.16"/><stop offset="1" stop-color="#F2C14E" stop-opacity="0"/></radialGradient>
+    <linearGradient id="cardface" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFEFA"/><stop offset="1" stop-color="#F4EDDD"/></linearGradient>
+    <linearGradient id="cardedge" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D5C8AC"/><stop offset="1" stop-color="#B4A07C"/></linearGradient>
+    <linearGradient id="shadow" x1="0.1" y1="0" x2="0.9" y2="1"><stop offset="0" stop-color="#6E4D22" stop-opacity="0.58"/><stop offset="1" stop-color="#6E4D22" stop-opacity="0.08"/></linearGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="7"/></filter>
+    <filter id="softer" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="20"/></filter>
+    <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope="0.13"/></feComponentTransfer></filter>
+  </defs>
+  <rect width="1500" height="700" fill="url(#wall)"/>
+  <rect y="700" width="1500" height="500" fill="url(#ground)"/>
+  <rect width="1500" height="1200" fill="url(#sunlight)"/>
+  <!-- the wall's own long shadow of the frame edge, a faint diagonal at the brand angle -->
+  <polygon points="0,0 60,0 -320,1200 -380,1200" fill="#6E4D22" fill-opacity="0.05" filter="url(#softer)"/>
+  <!-- contact shadows under both cards -->
+  <ellipse cx="470" cy="842" rx="140" ry="12" fill="#5A3A14" fill-opacity="0.22" filter="url(#soft)"/>
+  <ellipse cx="1010" cy="842" rx="140" ry="12" fill="#5A3A14" fill-opacity="0.22" filter="url(#soft)"/>
+  <!-- left card: honest shadow, a parallelogram the card's own width at 18.4° -->
+  <polygon points="380,840 580,840 330,1180 130,1180" fill="url(#shadow)" filter="url(#soft)"/>
+  <rect x="384" y="450" width="200" height="390" rx="8" fill="url(#cardedge)"/>
+  <rect x="378" y="442" width="200" height="390" rx="8" fill="url(#cardface)"/>
+  <rect x="408" y="486" width="92" height="6" rx="3" fill="#D6CAB0"/>
+  <rect x="408" y="508" width="140" height="6" rx="3" fill="#E4DAC5"/>
+  <rect x="408" y="530" width="116" height="6" rx="3" fill="#E4DAC5"/>
+  <!-- right card: identical, with a shadow it does not deserve -->
+  <polygon points="920,840 1200,840 1090,950 1170,1030 940,1180 660,1180 790,1040 740,980" fill="url(#shadow)" filter="url(#soft)"/>
+  <polygon points="960,890 1040,890 950,1060 870,1060" fill="#5A3A14" fill-opacity="0.16" filter="url(#softer)"/>
+  <rect x="924" y="450" width="200" height="390" rx="8" fill="url(#cardedge)"/>
+  <rect x="918" y="442" width="200" height="390" rx="8" fill="url(#cardface)"/>
+  <rect x="948" y="486" width="92" height="6" rx="3" fill="#D6CAB0"/>
+  <rect x="948" y="508" width="140" height="6" rx="3" fill="#E4DAC5"/>
+  <rect x="948" y="530" width="116" height="6" rx="3" fill="#E4DAC5"/>
+  <!-- lit edges: a thin gold rim on the top-right of each card -->
+  <path d="M396 442 h182 a8 8 0 0 1 8 8 v40" fill="none" stroke="#F2C14E" stroke-opacity="0.55" stroke-width="2"/>
+  <path d="M936 442 h182 a8 8 0 0 1 8 8 v40" fill="none" stroke="#F2C14E" stroke-opacity="0.55" stroke-width="2"/>
+  <!-- horizon hairline -->
+  <rect y="700" width="1500" height="1.5" fill="#1B1814" fill-opacity="0.08"/>
+  <rect width="1500" height="1200" filter="url(#grain)"/>
+</svg>

@@ -7,7 +7,7 @@ import { AvailabilityBadge } from "@/components/ui/Badge";
 import { Table } from "@/components/ui/Table";
 import { Faq } from "@/components/Faq";
 import { byGroup, type Capability } from "@/lib/capabilities";
-import { faq, productPage } from "@/lib/content";
+import { faq, manualVsSuncly, productPage } from "@/lib/content";
 import { JsonLd } from "@/components/site/JsonLd";
 import { breadcrumbLd, faqLd, graph, KEYWORDS, pageMeta, webPageLd } from "@/lib/seo";
 
@@ -32,8 +32,8 @@ export default function ProductPage() {
         )}
       />
       <PageHeader eyebrow={productPage.title} headline={productPage.headline} intro={productPage.intro}>
-        <dl className="grid gap-3 sm:grid-cols-3">
-          {(["available", "limited", "planned"] as const).map((status) => (
+        <dl className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {(["available", "pilot", "planned"] as const).map((status) => (
             <div key={status} className="surface flex flex-col gap-2 p-4">
               <dt>
                 <AvailabilityBadge status={status} />
@@ -46,7 +46,7 @@ export default function ProductPage() {
 
       {productPage.groups.map((group, i) => (
         <Section key={group.id} id={group.id} tone={i % 2 === 0 ? "cream" : "paper"}>
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:gap-16">
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:gap-16">
             <div className="lg:sticky lg:top-28 lg:self-start">
               <SectionHeader label={group.title} headline={group.body} />
               <nav aria-label={`${group.title} sections`} className="mt-6 hidden lg:block">
@@ -70,6 +70,29 @@ export default function ProductPage() {
         </Section>
       ))}
 
+      <Section id="comparison">
+        <SectionHeader label={manualVsSuncly.label} headline={manualVsSuncly.headline} intro={manualVsSuncly.intro} />
+        <div className="mt-10">
+          <Table caption="Manual review compared with Suncly, row by row">
+            <thead>
+              <tr>
+                {manualVsSuncly.columns.map((c, i) => (
+                  <th key={i} scope="col">{c || "Topic"}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {manualVsSuncly.rows.map((row) => (
+                <tr key={row.topic}>
+                  <th scope="row" className="font-semibold text-ink">{row.topic}</th>
+                  <td className="text-ink-soft">{row.manual}</td>
+                  <td className="text-ink">{row.suncly}</td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </div>
+      </Section>
       <Section tone="ink">
         <SectionHeader
           label="Risk levels and policy"

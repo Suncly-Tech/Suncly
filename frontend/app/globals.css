@@ -1,50 +1,56 @@
 @import "tailwindcss";
 
 /* ------------------------------------------------------------------ */
-/* Brand tokens                                                        */
+/* Brand tokens: paper, ink, one sun. Blue exists only inside the      */
+/* closing sky (components/home/ClosingSky.tsx), scoped there.         */
 /* ------------------------------------------------------------------ */
 @theme {
   --color-*: initial;
-  --color-sky: #3461d1;
-  --color-sky-deep: #1d3a97;
-  --color-sky-soft: #5f86e6;
-  --color-sun: #f2c14e;
-  --color-ink: #16171c;
-  --color-ink-soft: #5b5e6b;
-  --color-ink-mute: #8a8d99;
-  --color-cream: #fbf6ec;
-  --color-cream-deep: #f1e9d8;
-  --color-paper: #ffffff;
-  --color-signal: #e8662b;
-  --color-pass: #1f7a4d;
-  --color-pass-soft: #e6f4ec;
+  /* page and surfaces */
+  --color-cream: #faf7f0;        /* the page: "paper" in the brief */
+  --color-cream-deep: #f1ebdd;   /* bands: "paper-deep" */
+  --color-paper: #fffdf8;        /* raised surfaces, and text on dark bands */
+  --color-dusk: #17130f;         /* the dark surface: warm, never blue-black */
+  /* ink */
+  --color-ink: #1b1814;
+  --color-ink-soft: #5c564c;
+  --color-ink-mute: #6f685d;
+  /* light */
+  --color-sun: #f2c14e;          /* sampled from public/mark.svg */
+  --color-amber: #c8842b;
+  --color-ember: #8f4a1e;
+  --color-signal: #c8842b;       /* legacy name used by a few workspace states */
+  /* evidence only: muted, never decoration */
+  --color-pass: #2f6b4a;
+  --color-pass-soft: #e8f0e9;
   --color-partial: #8a5a0b;
-  --color-partial-soft: #fbf1dc;
-  --color-fail: #c2371f;
-  --color-fail-soft: #fdebe7;
-  --color-info-soft: #e9eefb;
-  --color-line: rgb(22 23 28 / 0.1);
-  --color-line-strong: rgb(22 23 28 / 0.18);
+  --color-partial-soft: #f6ead2;
+  --color-fail: #a9391f;
+  --color-fail-soft: #f7e6e0;
+  --color-info-soft: #f1ebdd;    /* warm neutral tint; no blue */
+  --color-line: rgb(27 24 20 / 0.1);
+  --color-line-strong: rgb(27 24 20 / 0.18);
   --color-white: #ffffff;
   --color-black: #000000;
   --color-transparent: transparent;
   --color-current: currentColor;
 
-  --font-display: var(--font-instrument-serif), "Instrument Serif", Georgia, serif;
-  --font-sans: var(--font-manrope), "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-newsreader), "Newsreader", Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-figtree), "Figtree", system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
   --radius-*: initial;
   --radius-none: 0;
   --radius-full: 9999px;
-  --radius-control: 12px;
-  --radius-card: 24px;
-  --radius-panel: 16px;
+  --radius-control: 10px;
+  --radius-card: 18px;
+  --radius-panel: 12px;
   --radius-badge: 999px;
 
   --shadow-*: initial;
   --shadow-none: none;
-  --shadow-raised: 0 32px 64px -24px rgb(22 23 28 / 0.35), 0 2px 0 0 rgb(22 23 28 / 0.04);
+  --shadow-raised: 0 32px 64px -24px rgb(27 24 20 / 0.35), 0 2px 0 0 rgb(27 24 20 / 0.04);
+  --shadow-long: 24px 40px 60px -30px rgb(110 77 34 / 0.45);
 
   --breakpoint-*: initial;
   --breakpoint-sm: 40rem;
@@ -53,6 +59,12 @@
   --breakpoint-xl: 80rem;
 
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:root {
+  /* the brand angle: the two cuts in public/mark.svg lean 18.4° from vertical */
+  --angle-brand: 18.4deg;
+  --angle-hatch: calc(90deg + var(--angle-brand));
 }
 
 /* ------------------------------------------------------------------ */
@@ -82,8 +94,7 @@
     color: var(--color-ink);
     font-family: var(--font-sans);
     font-size: 17px;
-    line-height: 1.6;
-    font-feature-settings: "ss01", "cv11";
+    line-height: 1.55;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -94,9 +105,15 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-sky);
+    outline: 2px solid var(--color-ink);
     outline-offset: 3px;
     border-radius: 4px;
+  }
+
+  .bg-dusk :focus-visible,
+  .bg-ink :focus-visible,
+  .on-dark :focus-visible {
+    outline-color: var(--color-sun);
   }
 
   code,
@@ -104,61 +121,71 @@
   kbd {
     font-family: var(--font-mono);
   }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
 }
 
 /* ------------------------------------------------------------------ */
-/* Type scale: display 72 / 56 / 40, headings 28 / 20, body 17, small 14 */
+/* Type scale. Display is Newsreader set light with the optical axis.  */
+/* hero 72–96 / 40–48 · section 44–56 / 30–36 · lead 20–22 · body 17 */
 /* ------------------------------------------------------------------ */
 @utility text-display-xl {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: 40px;
-  line-height: 1.02;
-  letter-spacing: -0.015em;
-  @media (min-width: 40rem) {
-    font-size: 56px;
-  }
-  @media (min-width: 64rem) {
-    font-size: 72px;
-  }
+  font-optical-sizing: auto;
+  font-size: clamp(40px, 4vw + 26px, 92px);
+  line-height: 1.05;
+  letter-spacing: 0;
 }
 
 @utility text-display-lg {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: 40px;
-  line-height: 1.05;
-  letter-spacing: -0.012em;
-  @media (min-width: 40rem) {
-    font-size: 56px;
-  }
+  font-optical-sizing: auto;
+  font-size: clamp(31px, 2vw + 22px, 54px);
+  line-height: 1.08;
+  letter-spacing: 0;
 }
 
 @utility text-display-md {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: 40px;
-  line-height: 1.08;
-  letter-spacing: -0.01em;
+  font-optical-sizing: auto;
+  font-size: clamp(27px, 1.2vw + 20px, 36px);
+  line-height: 1.12;
+  letter-spacing: 0;
+}
+
+@utility text-lead {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-optical-sizing: auto;
+  font-size: clamp(19px, 0.4vw + 17px, 22px);
+  line-height: 1.4;
 }
 
 @utility text-heading-lg {
+  font-family: var(--font-display);
+  font-weight: 400;
   font-size: 28px;
   line-height: 1.2;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
 }
 
 @utility text-heading-md {
-  font-size: 20px;
+  font-size: 19px;
   line-height: 1.3;
   font-weight: 600;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.005em;
 }
 
 @utility text-body {
   font-size: 17px;
-  line-height: 1.6;
+  line-height: 1.55;
 }
 
 @utility text-small {
@@ -167,11 +194,19 @@
 }
 
 @utility text-eyebrow {
-  font-size: 14px;
-  line-height: 1;
-  font-weight: 600;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.2;
+  font-weight: 400;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+@utility text-mono-label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
 }
 
 /* ------------------------------------------------------------------ */
@@ -179,19 +214,19 @@
 /* ------------------------------------------------------------------ */
 @utility container-site {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1280px;
   margin-inline: auto;
   padding-inline: 16px;
   @media (min-width: 40rem) {
     padding-inline: 24px;
   }
   @media (min-width: 64rem) {
-    padding-inline: 32px;
+    padding-inline: 40px;
   }
 }
 
 /* ------------------------------------------------------------------ */
-/* Buttons                                                             */
+/* Buttons: gold is light, so one primary action per screen            */
 /* ------------------------------------------------------------------ */
 @utility btn-base {
   display: inline-flex;
@@ -199,10 +234,10 @@
   justify-content: center;
   gap: 8px;
   min-height: 48px;
-  padding: 0 24px;
-  border-radius: var(--radius-control);
-  font-weight: 600;
-  font-size: 16px;
+  padding: 0 22px;
+  border-radius: 9999px;
+  font-weight: 500;
+  font-size: 15.5px;
   line-height: 1;
   white-space: nowrap;
   text-decoration: none;
@@ -210,30 +245,23 @@
   transition:
     background-color 200ms var(--ease-out-soft),
     color 200ms var(--ease-out-soft),
-    transform 200ms var(--ease-out-soft),
     box-shadow 200ms var(--ease-out-soft);
 }
 
 @utility btn-primary {
   background: var(--color-sun);
   color: var(--color-ink);
-  border-radius: 9999px;
-  box-shadow: 0 1px 0 rgb(22 23 28 / 0.08);
+  box-shadow: 0 1px 0 rgb(27 24 20 / 0.08);
   &:hover {
-    background: var(--color-signal);
-    color: var(--color-paper);
-    transform: translateY(-1px);
-    box-shadow: 0 6px 16px -6px rgb(232 102 43 / 0.5);
-  }
-  &:active {
-    transform: translateY(0);
+    background: #f6cd6b;
+    box-shadow: 0 8px 24px -12px rgb(200 132 43 / 0.6);
   }
 }
 
 @utility btn-ghost {
   background: transparent;
   color: currentColor;
-  padding-inline: 12px;
+  padding-inline: 10px;
   & svg {
     transition: transform 200ms var(--ease-out-soft);
   }
@@ -242,8 +270,32 @@
   }
 }
 
+@utility btn-secondary {
+  background: transparent;
+  color: var(--color-ink);
+  box-shadow: inset 0 0 0 1px var(--color-line-strong);
+  &:hover {
+    box-shadow: inset 0 0 0 1px var(--color-ink);
+  }
+}
+
+@utility btn-danger {
+  background: var(--color-paper);
+  color: var(--color-fail);
+  box-shadow: inset 0 0 0 1px rgb(169 57 31 / 0.4);
+  &:hover {
+    background: var(--color-fail-soft);
+  }
+}
+
+@utility btn-sm {
+  min-height: 36px;
+  padding: 0 14px;
+  font-size: 14px;
+}
+
 /* ------------------------------------------------------------------ */
-/* The // motif                                                        */
+/* The // motif and the hatch for "not tested"                         */
 /* ------------------------------------------------------------------ */
 @utility cuts-bullet {
   position: relative;
@@ -256,7 +308,7 @@
     width: 18px;
     height: 0.9em;
     background: linear-gradient(
-      100deg,
+      var(--angle-hatch),
       transparent 0 20%,
       currentColor 20% 36%,
       transparent 36% 56%,
@@ -267,41 +319,54 @@
   }
 }
 
+@utility hatch {
+  background-image: repeating-linear-gradient(
+    var(--angle-hatch),
+    rgb(27 24 20 / 0.2) 0 1px,
+    transparent 1px 6px
+  );
+}
+
+@utility hatch-dark {
+  background-image: repeating-linear-gradient(
+    var(--angle-hatch),
+    rgb(250 247 240 / 0.22) 0 1px,
+    transparent 1px 6px
+  );
+}
+
 /* Hairline that shows once the nav has scrolled */
 @utility hairline-b {
-  box-shadow: inset 0 -1px 0 rgb(22 23 28 / 0.1);
+  box-shadow: inset 0 -1px 0 rgb(27 24 20 / 0.1);
 }
 
 /* ------------------------------------------------------------------ */
-/* Keyframes used by the sky, terminal and loading states              */
+/* Keyframes: the sky layers, a caret, the loading cuts                */
 /* ------------------------------------------------------------------ */
 @keyframes drift-slow {
   from {
-    transform: translate3d(-4%, 0, 0);
+    transform: translate3d(-3%, 0, 0);
   }
   to {
-    transform: translate3d(4%, 0, 0);
+    transform: translate3d(3%, 0, 0);
   }
 }
 
 @keyframes drift-slower {
   from {
-    transform: translate3d(3%, 0, 0);
+    transform: translate3d(2%, 0, 0);
   }
   to {
-    transform: translate3d(-3%, 0, 0);
+    transform: translate3d(-2%, 0, 0);
   }
 }
 
-@keyframes rays-breathe {
-  0%,
-  100% {
-    opacity: 0.55;
-    transform: scale(1);
+@keyframes drift-fast {
+  from {
+    transform: translate3d(-5%, 0, 0);
   }
-  50% {
-    opacity: 0.85;
-    transform: scale(1.04);
+  to {
+    transform: translate3d(5%, 0, 0);
   }
 }
 
@@ -325,18 +390,61 @@
   }
 }
 
+@keyframes edge-light {
+  0% {
+    transform: translateX(-120%) skewX(calc(-1 * var(--angle-brand)));
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(220%) skewX(calc(-1 * var(--angle-brand)));
+    opacity: 0;
+  }
+}
+
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @utility animate-drift-slow {
-  animation: drift-slow 38s ease-in-out infinite alternate;
+  animation: drift-slow 46s ease-in-out infinite alternate;
 }
 @utility animate-drift-slower {
-  animation: drift-slower 52s ease-in-out infinite alternate;
+  animation: drift-slower 70s ease-in-out infinite alternate;
 }
-@utility animate-rays {
-  animation: rays-breathe 9s ease-in-out infinite;
-  transform-origin: center;
+@utility animate-drift-fast {
+  animation: drift-fast 30s ease-in-out infinite alternate;
 }
 @utility animate-caret {
   animation: caret-blink 1s steps(1) infinite;
+}
+@utility animate-settle {
+  animation: settle 700ms var(--ease-out-soft) both;
+}
+
+/* the picture settles by moving only: it must paint at once, so it stays the first large paint */
+@keyframes settle-move {
+  from {
+    transform: translateY(8px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@utility animate-settle-move {
+  animation: settle-move 800ms var(--ease-out-soft) both;
 }
 
 /* Loading bar built from the // motif */
@@ -345,7 +453,7 @@
   width: 72px;
   border-radius: 2px;
   background-image: linear-gradient(
-    100deg,
+    var(--angle-hatch),
     transparent 0 25%,
     currentColor 25% 40%,
     transparent 40% 60%,
@@ -359,8 +467,10 @@
 @media (prefers-reduced-motion: reduce) {
   .animate-drift-slow,
   .animate-drift-slower,
-  .animate-rays,
+  .animate-drift-fast,
   .animate-caret,
+  .animate-settle,
+  .animate-settle-move,
   .cuts-loading {
     animation: none !important;
   }
@@ -382,7 +492,7 @@
 }
 
 @utility surface-sunken {
-  background: var(--color-cream);
+  background: var(--color-cream-deep);
   border-radius: var(--radius-panel);
   box-shadow: inset 0 0 0 1px var(--color-line);
 }
@@ -446,7 +556,7 @@
     border-bottom: 0;
   }
   & tbody tr:hover td {
-    background: rgb(22 23 28 / 0.02);
+    background: rgb(27 24 20 / 0.02);
   }
   & .num {
     text-align: right;
@@ -474,16 +584,16 @@
     color: var(--color-ink-mute);
   }
   &:hover {
-    border-color: rgb(22 23 28 / 0.32);
+    border-color: rgb(27 24 20 / 0.32);
   }
   &:focus {
     outline: none;
-    border-color: var(--color-sky);
-    box-shadow: 0 0 0 3px rgb(52 97 209 / 0.2);
+    border-color: var(--color-ink);
+    box-shadow: 0 0 0 3px rgb(242 193 78 / 0.35);
   }
   &[aria-invalid="true"] {
     border-color: var(--color-fail);
-    box-shadow: 0 0 0 3px rgb(194 55 31 / 0.14);
+    box-shadow: 0 0 0 3px rgb(169 57 31 / 0.14);
   }
   &:disabled {
     background: var(--color-cream);
@@ -521,35 +631,9 @@
     transform: translateY(-1px) rotate(-45deg) scale(1);
   }
   &:focus-visible {
-    outline: 2px solid var(--color-sky);
+    outline: 2px solid var(--color-ink);
     outline-offset: 2px;
   }
-}
-
-@utility btn-secondary {
-  background: var(--color-paper);
-  color: var(--color-ink);
-  border-radius: 9999px;
-  box-shadow: inset 0 0 0 1px var(--color-line-strong);
-  &:hover {
-    box-shadow: inset 0 0 0 1px var(--color-ink);
-  }
-}
-
-@utility btn-danger {
-  background: var(--color-paper);
-  color: var(--color-fail);
-  border-radius: 9999px;
-  box-shadow: inset 0 0 0 1px rgb(194 55 31 / 0.4);
-  &:hover {
-    background: var(--color-fail-soft);
-  }
-}
-
-@utility btn-sm {
-  min-height: 36px;
-  padding: 0 14px;
-  font-size: 14px;
 }
 
 /* Dialog */
@@ -564,7 +648,7 @@
   color: var(--color-ink);
   box-shadow: var(--shadow-raised);
   &::backdrop {
-    background: rgb(22 23 28 / 0.45);
+    background: rgb(23 19 15 / 0.5);
     backdrop-filter: blur(2px);
   }
 }
@@ -590,8 +674,8 @@
   font-family: var(--font-mono);
   font-size: 13px;
   line-height: 1.6;
-  background: var(--color-ink);
-  color: #e9ecf4;
+  background: var(--color-dusk);
+  color: #efe8da;
   border-radius: var(--radius-panel);
   padding: 16px 18px;
   overflow-x: auto;
@@ -609,25 +693,30 @@
   overflow-wrap: anywhere;
 }
 
-/* Prose for long-form pages (docs, legal, security) */
+/* Prose for long-form pages (docs, legal, research): the text optical size, a measure under 68 characters */
 @utility prose-site {
-  font-size: 17px;
-  line-height: 1.65;
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-size: 19px;
+  line-height: 1.55;
   color: var(--color-ink);
+  max-width: 66ch;
   & h2 {
-    font-size: 28px;
-    line-height: 1.2;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    margin-top: 2.5em;
+    font-family: var(--font-display);
+    font-size: 32px;
+    line-height: 1.15;
+    font-weight: 400;
+    letter-spacing: 0;
+    margin-top: 2.4em;
     margin-bottom: 0.6em;
     scroll-margin-top: 96px;
   }
   & h3 {
-    font-size: 20px;
+    font-family: var(--font-sans);
+    font-size: 18px;
     line-height: 1.3;
     font-weight: 600;
-    letter-spacing: -0.015em;
+    letter-spacing: 0;
     margin-top: 1.8em;
     margin-bottom: 0.5em;
     scroll-margin-top: 96px;
@@ -654,17 +743,18 @@
     list-style: decimal;
   }
   & a {
-    color: var(--color-sky-deep);
+    color: var(--color-ink);
     text-decoration: underline;
     text-decoration-thickness: 1px;
+    text-decoration-color: var(--color-amber);
     text-underline-offset: 3px;
   }
   & a:hover {
-    color: var(--color-sky);
+    color: var(--color-ember);
   }
   & code {
     font-family: var(--font-mono);
-    font-size: 0.88em;
+    font-size: 0.8em;
     background: var(--color-cream-deep);
     border-radius: 6px;
     padding: 1px 6px;
@@ -672,6 +762,7 @@
   }
   & pre {
     margin: 0 0 1.2em;
+    font-family: var(--font-mono);
   }
   & pre code {
     background: transparent;
@@ -679,10 +770,19 @@
     font-size: 13px;
   }
   & table {
+    display: block;
     width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
     border-collapse: collapse;
+    font-family: var(--font-sans);
     font-size: 15px;
     margin: 0 0 1.4em;
+  }
+  & table tbody,
+  & table thead {
+    display: table;
+    width: 100%;
   }
   & th,
   & td {
@@ -692,9 +792,10 @@
     vertical-align: top;
   }
   & th {
+    font-family: var(--font-mono);
     font-size: 12px;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
     color: var(--color-ink-soft);
   }
   & strong {
@@ -703,10 +804,23 @@
   & blockquote {
     margin: 0 0 1.2em;
     padding: 12px 18px;
-    border-left: 3px solid var(--color-sun);
-    background: var(--color-paper);
-    border-radius: 0 12px 12px 0;
+    border-left: 2px solid var(--color-sun);
     color: var(--color-ink-soft);
+  }
+  & .summary {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--color-ink-soft);
+    margin: -0.3em 0 1em;
+  }
+  & .blank {
+    font-family: var(--font-mono);
+    font-size: 0.78em;
+    background: var(--color-partial-soft);
+    color: var(--color-partial);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-style: normal;
   }
 }
 
@@ -724,7 +838,7 @@
   text-decoration: none;
   transition: background-color 120ms, color 120ms;
   &:hover {
-    background: rgb(22 23 28 / 0.05);
+    background: rgb(27 24 20 / 0.05);
     color: var(--color-ink);
   }
   &[aria-current="page"] {
@@ -742,13 +856,45 @@
   overflow: hidden;
 }
 
-/* Visually hidden but focusable (skip links etc.) handled by Tailwind sr-only */
-
 /* Sample-data banner stripe: the // motif in sun on ink */
 @utility stripe-sample {
   background-image: repeating-linear-gradient(
-    100deg,
+    var(--angle-hatch),
     var(--color-sun) 0 8px,
     transparent 8px 16px
   );
+}
+
+/* Reveal: fade and a 10px rise, once, CSS only */
+.reveal[data-reveal="unseen"] {
+  opacity: 0;
+  transform: translateY(10px);
+}
+.reveal[data-reveal="seen"] {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 280ms var(--ease-out-soft),
+    transform 280ms var(--ease-out-soft);
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal[data-reveal="unseen"] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Pictures: art-directed crops, a long shadow at the brand angle */
+@utility picture-plate {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--color-cream-deep);
+  & img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 }

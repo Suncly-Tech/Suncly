@@ -521,4 +521,8 @@ def doctor(ctx: click.Context, card_url: str | None, debug: bool) -> None:
 from suncly.cli import hosted  # noqa: E402, F401
 
 if __name__ == "__main__":  # pragma: no cover - exercised as a subprocess
-    main()
+    # ``python -m suncly.cli.main`` runs this file as ``__main__``; the hosted commands
+    # registered themselves on the canonical module's group, so that is the one to run.
+    from suncly.cli.main import main as entry
+
+    entry()

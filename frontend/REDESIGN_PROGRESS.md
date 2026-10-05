@@ -9,7 +9,7 @@ Last updated: 2026-10-05, phase 1.
 
 | Phase | State | Notes |
 | --- | --- | --- |
-| 1 Read and audit; write REDESIGN_PLAN.md | in progress | No site files edited. Four parallel reads (CLI verification, frontend audit, references, legal sources) feed section 12 of the plan. |
+| 1 Read and audit; write REDESIGN_PLAN.md | done | No site files edited. Four parallel reads (CLI verification, frontend audit, references, legal sources) are in section 12 of the plan. |
 | Stop 1: founder go-ahead | waiting | Questions are batched in REDESIGN_PLAN.md §11. |
 | 2 Art direction: three directions, wordmark trace, recommendation | not started | `art_direction: show me three, then wait`. |
 | Stop 2: founder pick | waiting | |
@@ -29,6 +29,10 @@ Last updated: 2026-10-05, phase 1.
 | Recipients and retention tables in the Privacy Policy | block 5 hosting, endpoint, subprocessors, retention | named blanks |
 | Vector wordmark | block 7 | trace of assets/suncly-black.png shown at stop 2 |
 | Agent Skill | §8 decision | not built |
+
+## Not possible in this environment
+
+- The live site, the legal statute sites and registers, and eight of ten reference sites are refused by the environment's network policy. Listed in REDESIGN_PLAN.md §0 and §12.
 
 ## Built switched off (none yet)
 

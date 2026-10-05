@@ -465,6 +465,54 @@ allows `suncly.com`, the check runs then.
 
 ### 12.3 References and research pointers
 
+Reference sites: of the ten in the brief, only claude.com and anthropic.com could be
+fetched from this container; lightspark.com, alven.ai, zobi.com, blume.codes, arcade.dev,
+exa.ai, browserbase.com and resend.com were refused by the network policy, as were the
+three further candidates (linear.app, workos.com, modal.com). So the study of computed
+type and colour at 1440 and 390 px that the brief asks for did not happen here. Your notes
+in brief 4.2 and the two fetched pages are the reference base for the art-direction
+round; what search snippets added is secondary and marked so in
+`scratchpad/research-references.md`. Two points from the fetched pages: claude.com sets
+its hero serif at weight 330 on `#f8f8f6` and anthropic.com sets `#141413` ink on
+`#faf9f5` ivory with cream and black bands; both already own the light-serif-on-cream
+hero, so Suncly's distinction has to come from the gold and amber light, the brand angle
+and the pictures, not from weight alone. If the environment is given access to those
+hosts, the study runs at the start of phase 2.
+
+Coding agents, from primary sources where reachable (Claude Code docs fetched; the Codex,
+oh-my-pi and Pi repositories read on GitHub; Cursor docs from snippets only):
+
+| Tool | `.agents/skills/<name>/SKILL.md` | `.claude/skills/<name>/SKILL.md` | `AGENTS.md` | MCP |
+| --- | --- | --- | --- | --- |
+| Cursor | yes (snippet) | yes, for compatibility (snippet) | yes (snippet) | not verified today |
+| Claude Code | no: the docs list only `.claude/skills` and say `.agents/` is not read | yes | yes (when no CLAUDE.md is present, or with the setting that reads both) | yes (`.mcp.json`) |
+| Codex | yes (`AGENTS_SKILLS_SUFFIX = ".agents/skills"` in the source) | not found in the source; not verified | yes | yes |
+| omp (oh-my-pi; the binary is `omp`, written lowercase) | yes | yes | yes | yes |
+| Pi (capital P in prose; the command is `pi`; repository now `earendil-works/pi`) | yes | no: zero matches in the source | yes | yes |
+
+So the brief's pointer holds: one skill folder at `.agents/skills/suncly/` reaches Codex,
+Cursor, Pi and omp, and a copy at `.claude/skills/suncly/` reaches Claude Code, Cursor and
+omp. Pi's homepage wording and the exact Cursor and Codex page texts were not fetched.
+
+Trade marks: the EUIPO, TMview, WIPO and Estonian Patent Office databases were refused
+(and are JavaScript applications in any case). Web search finds no trade mark, company or
+domain for the exact string "Suncly"; absence in search is not a register search. For
+"SUNLY", Sunly AS (Tallinn, registry code 14695483) is confirmed as a company; its EU or
+Estonian registrations and classes were not found by search. Both points go to counsel in
+REVIEW.md.
+
+Linux Foundation: the trademark usage page was refused; its rules are known from
+snippets (adjective use, no alteration, no greater prominence than our own name, no
+implied endorsement). The A2A repository is Apache-2.0 and publishes no attribution
+wording of its own. Proposed footer line: "Agent2Agent (A2A) is an open protocol hosted by
+The Linux Foundation. Suncly is independent and is not affiliated with, endorsed by or
+certified by The Linux Foundation or the A2A project. Other names belong to their
+owners." To be checked against the page on the day it becomes reachable.
+
+Fonts (from the google/fonts repository metadata, fetched): Newsreader is OFL with `opsz`
+6 to 72 and `wght` 200 to 800; Figtree OFL, `wght` 300 to 900; Hanken Grotesk OFL, `wght`
+100 to 900; JetBrains Mono OFL 1.1. All four may be self-hosted.
+
 ### 12.4 Legal primary sources
 
 The environment's network policy denied every legal-source host tried on 2026-10-05:

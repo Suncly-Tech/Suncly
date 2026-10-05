@@ -133,7 +133,7 @@ export function ImportView() {
             onDragLeave={() => setDragging(false)}
             onDrop={onDrop}
             className={`flex flex-col items-center justify-center gap-4 rounded-card border-2 border-dashed p-10 text-center transition-colors ${
-              dragging ? "border-sky bg-info-soft" : "border-line-strong bg-paper"
+              dragging ? "border-ink bg-info-soft" : "border-line-strong bg-paper"
             }`}
           >
             <span className="flex h-12 w-12 items-center justify-center rounded-full bg-sun text-ink">

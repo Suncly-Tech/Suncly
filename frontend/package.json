@@ -7,12 +7,20 @@
     "build": "next build --webpack",
     "start": "python3 -m http.server 3100 --directory out",
     "typecheck": "tsc --noEmit",
-    "assets": "node scripts/generate-assets.mjs && node scripts/generate-logo.mjs",
-    "screenshots": "node scripts/screenshots.mjs"
+    "assets": "node scripts/generate-assets.mjs",
+    "screenshots": "node scripts/screenshots.mjs http://localhost:3100",
+    "serve": "node scripts/serve.mjs 3100",
+    "words": "node scripts/words.mjs http://localhost:3100",
+    "forbidden": "node scripts/forbidden.mjs",
+    "axe": "node scripts/axe.mjs http://localhost:3100",
+    "inspect-storage": "node scripts/inspect-storage.mjs http://localhost:3100",
+    "art": "node scripts/render-art.mjs",
+    "badge": "python3 scripts/generate-badge.py && node scripts/render-art.mjs",
+    "lighthouse": "node scripts/lighthouse.mjs http://localhost:3100",
+    "keyboard": "node scripts/keyboard.mjs http://localhost:3100"
   },
   "dependencies": {
     "lucide-react": "^1.51.0",
-    "motion": "^14.0.0",
     "next": "^16.3.8",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"
@@ -22,6 +30,7 @@
     "@types/node": "^26.6.4",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "axe-core": "^4.13.0",
     "lighthouse": "^13.5.0",
     "playwright": "^1.63.0",
     "sharp": "^0.35.5",

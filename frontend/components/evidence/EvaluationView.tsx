@@ -65,7 +65,7 @@ export function EvaluationView({
       <Tabs items={items} value={tab} onChange={(id) => setTab(id as EvaluationTab)} label="Evaluation sections" />
 
       {tab === "summary" ? (
-        <div className="flex flex-col gap-6">
+        <div id={`panel-${tab}`} role="tabpanel" tabIndex={0} className="flex flex-col gap-6">
           {actionsPending.length ? (
             <div className="flex flex-col gap-3">
               {actionsPending.map((action) => (

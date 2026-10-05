@@ -1,53 +1,11 @@
 import Link from "next/link";
-import logo from "@/public/brand/logo.json";
+import { TRADEMARK_SYMBOL } from "@/lib/launch";
+import { WORDMARK_PATH, WORDMARK_VIEWBOX } from "@/lib/wordmark";
 
 /**
- * The brand lockup from assets/ (mark + wordmark), keyed to transparency by
- * scripts/generate-logo.mjs. Both tones are rendered and toggled with CSS so
- * the nav can switch on scroll without a flash.
+ * The sun with two diagonal cuts, exactly as drawn in public/mark.svg. Always the logo's
+ * gold, on every background. Never redrawn, recoloured or animated into something else.
  */
-export function Logo({
-  tone = "ink",
-  height = 30,
-  href = "/",
-  className = "",
-}: {
-  tone?: "ink" | "paper";
-  height?: number;
-  href?: string;
-  className?: string;
-}) {
-  const width = Math.round(height * logo.aspect);
-  return (
-    <Link
-      href={href}
-      className={`inline-flex shrink-0 items-center no-underline ${className}`}
-      aria-label="Suncly home"
-      style={{ width, height }}
-    >
-      <img
-        src="/brand/logo-light.webp"
-        alt=""
-        width={width}
-        height={height}
-        decoding="async"
-        fetchPriority="low"
-        className={tone === "paper" ? "block" : "hidden"}
-      />
-      <img
-        src="/brand/logo-dark.webp"
-        alt=""
-        width={width}
-        height={height}
-        decoding="async"
-        fetchPriority="low"
-        className={tone === "ink" ? "block" : "hidden"}
-      />
-    </Link>
-  );
-}
-
-/** The sun with two diagonal cuts, as vector. Always yellow, on every background. */
 export function Mark({ size = 28, className = "" }: { size?: number; className?: string }) {
   return (
     <svg
@@ -68,5 +26,73 @@ export function Mark({ size = 28, className = "" }: { size?: number; className?:
       </defs>
       <circle cx="60" cy="60" r="44" fill="#F2C14E" mask="url(#suncly-cuts)" />
     </svg>
+  );
+}
+
+/**
+ * The wordmark as vector: the lettering traced from assets/suncly-black.png (see
+ * design/wordmark/). A drawing, never typeset. Fills with currentColor.
+ */
+export function Wordmark({ height = 26, className = "", trademark = false }: { height?: number; className?: string; trademark?: boolean }) {
+  const [, , w, h] = WORDMARK_VIEWBOX;
+  const width = (height * w) / h;
+  return (
+    <span className={`relative inline-block ${className}`} style={{ height, width }}>
+      <svg viewBox={WORDMARK_VIEWBOX.join(" ")} width={width} height={height} fill="currentColor" fillRule="evenodd" aria-hidden="true" focusable="false">
+        <path d={WORDMARK_PATH} />
+      </svg>
+      {trademark ? <TrademarkSymbol height={height} /> : null}
+    </span>
+  );
+}
+
+/**
+ * The trade mark symbol: drawn, optically sized to the lettering, hairline stroke, set at the
+ * top right of the last letter at ascender height. ™ by default; ® only with a registration
+ * (lib/launch.ts). Appears nowhere else on the site.
+ */
+export function TrademarkSymbol({ height }: { height: number }) {
+  const size = Math.max(8, height * 0.26);
+  return (
+    <span
+      aria-label={TRADEMARK_SYMBOL === "®" ? "registered trade mark" : "trade mark"}
+      className="absolute font-sans leading-none"
+      style={{ right: -size * 1.15, top: -size * 0.1, fontSize: size, fontWeight: 500, letterSpacing: 0 }}
+    >
+      {TRADEMARK_SYMBOL}
+    </span>
+  );
+}
+
+/** Mark and wordmark together. */
+export function Lockup({ height = 26, className = "", trademark = false }: { height?: number; className?: string; trademark?: boolean }) {
+  return (
+    <span className={`inline-flex items-center ${className}`} style={{ gap: height * 0.32 }}>
+      <Mark size={height * 1.08} />
+      <Wordmark height={height * 0.82} trademark={trademark} />
+    </span>
+  );
+}
+
+/** The linked lockup used in the navigation and the workspace shell. */
+export function Logo({
+  tone = "ink",
+  height = 26,
+  href = "/",
+  className = "",
+}: {
+  tone?: "ink" | "paper";
+  height?: number;
+  href?: string;
+  className?: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className={`inline-flex shrink-0 items-center no-underline ${tone === "paper" ? "text-paper" : "text-ink"} ${className}`}
+      aria-label="Suncly home"
+    >
+      <Lockup height={height} />
+    </Link>
   );
 }

@@ -40,7 +40,7 @@ export default function WorkflowsPage() {
       </Section>
 
       <Section id="models" tone="paper">
-        <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">
           <SectionHeader label="Model providers" headline={w.models.title} intro={w.models.intro} />
           <div className="flex flex-col gap-5">
             <ul className="flex flex-wrap gap-2" aria-label="Examples of models an evaluated agent may use">
@@ -65,7 +65,7 @@ export default function WorkflowsPage() {
 
       <Section id="integrations" tone="paper">
         <SectionHeader label="Integrations" headline={w.integrations.title} intro={w.integrations.intro} />
-        <ul className="mt-10 grid gap-4 md:grid-cols-2">
+        <ul className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-2">
           {byGroup("integration").map((item) => (
             <li key={item.id} className="surface flex flex-col gap-2 p-5">
               <div className="flex flex-wrap items-start justify-between gap-2">

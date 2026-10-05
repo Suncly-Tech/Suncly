@@ -7,16 +7,17 @@
 
 import type { Metadata } from "next";
 import { site } from "@/lib/content";
+import { socialLinks } from "@/lib/launch";
 
 export const BRAND = "Suncly";
 export const DOMAIN = site.domain;
 
 /** The canonical one-paragraph definition. Reused verbatim so every engine sees one entity. */
 export const DEFINITION =
-  "Suncly is an evaluation tool for AI agents that speak the A2A (Agent2Agent) protocol. It reads an agent's Agent Card, tests every declared skill repeatedly in a sandbox, judges each run deterministically, signs the evidence, and gives platform and security teams a report that states what passed, what failed, what stayed inconclusive and what was never tested, so they can approve the agent on evidence instead of a spreadsheet.";
+  "Suncly is an evaluation tool for AI agents that speak the A2A (Agent2Agent) protocol. It reads an agent's Agent Card, tests each declared skill repeatedly in a sandbox against the card's claims, judges each run deterministically, signs the evidence, and gives platform and security teams a report that states what passed, what failed, what stayed inconclusive and what was never tested, so they can decide on evidence before they give the agent access. It charges only for usage of its API, and agents that meet its published criteria can carry the Suncly Certified badge, which links to the record behind it.";
 
 export const SHORT_DEFINITION =
-  "Suncly evaluates A2A AI agents before approval: repeated sandbox tests of every declared skill, deterministic verdicts, signed evidence and an explicit list of what was not tested.";
+  "Suncly tests A2A AI agents against their Agent Card claims before approval: repeated sandbox tests, deterministic verdicts, signed evidence and an explicit list of what was not tested.";
 
 export const KEYWORDS = {
   brand: ["Suncly", "Suncly AI", "Suncly agent evaluation", "suncly.com"],
@@ -91,7 +92,7 @@ export function pageMeta({
       title: `${title} — ${BRAND}`,
       description,
       locale: "en_US",
-      images: [{ url: "/og.png", width: 1200, height: 630, alt: `${BRAND}: evaluate AI agents before you approve them` }],
+      images: [{ url: "/og.png", width: 1200, height: 630, alt: `${BRAND}. Test the agent. Then decide.` }],
     },
     twitter: { card: "summary_large_image", title: `${title} — ${BRAND}`, description, images: ["/og.png"] },
     robots: noindex ? { index: false, follow: false } : { index: true, follow: true, googleBot: { index: true, follow: true, "max-snippet": -1, "max-image-preview": "large", "max-video-preview": -1 } },
@@ -118,6 +119,7 @@ export function organizationLd(): Json {
     logo: { "@type": "ImageObject", url: `${DOMAIN}/icon-512.png`, width: 512, height: 512 },
     image: `${DOMAIN}/og.png`,
     description: DEFINITION,
+    sameAs: socialLinks.map((s) => s.url),
     email: site.email,
     foundingLocation: { "@type": "Place", name: "Tallinn, Estonia" },
     address: { "@type": "PostalAddress", addressLocality: "Tallinn", addressCountry: "EE" },

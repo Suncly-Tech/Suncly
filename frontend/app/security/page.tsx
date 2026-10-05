@@ -42,7 +42,7 @@ export default function SecurityPage() {
       />
       <PageHeader eyebrow={securityPage.title} headline={securityPage.headline} intro={securityPage.intro} />
       <Section>
-        <div className="grid gap-12 lg:grid-cols-[minmax(0,3fr)_minmax(0,9fr)] lg:gap-16">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,3fr)_minmax(0,9fr)] lg:gap-16">
           <nav aria-label="On this page" className="lg:sticky lg:top-28 lg:self-start">
             <p className="text-eyebrow text-ink-soft">On this page</p>
             <ol className="mt-4 flex flex-col gap-1 text-small">
@@ -131,6 +131,31 @@ export default function SecurityPage() {
               <li><strong>Tests hit a sandbox or dry-run endpoint.</strong> Never production.</li>
               <li><strong>Reports state what was NOT tested.</strong> No score hides the gaps.</li>
             </ol>
+
+            <h2 id="disclosure">Reporting a vulnerability</h2>
+            <p>
+              We run a coordinated vulnerability disclosure process. Report a suspected vulnerability in the Suncly software or this website to <a href="mailto:team@suncly.com">team@suncly.com</a> (a dedicated security address is a founder input and will replace this one; the same contact is published in <a href="/.well-known/security.txt">/.well-known/security.txt</a>). We acknowledge within three working days, keep you informed, and do not take legal action against good-faith research that stays within these rules: test only against your own installation or the bundled mock agents, never against a third party's agent or endpoint, do not access or alter data that is not yours, and give us a reasonable time to fix before publishing. We credit reporters who want to be credited.
+            </p>
+            <p>
+              <strong>Support period.</strong> The current version (0.1.0) is a pilot release installed from the repository. Security fixes are made on the main branch; there is no separate long-term support branch, and no end-of-support date has been set. We state no compliance with the Cyber Resilience Act or any other regulation; what we publish here is what we do.
+            </p>
+            <p>
+              <strong>Incident notice.</strong> If we become aware of a security incident affecting data we hold for you, we tell you without undue delay and, for personal data breaches, meet the 72-hour notification duty described in the <a href="/privacy">Privacy Policy</a>.
+            </p>
+
+            <h2 id="supplier">For a supplier questionnaire</h2>
+            <table tabIndex={0}>
+              <thead><tr><th>Question</th><th>Answer today</th></tr></thead>
+              <tbody>
+                <tr><td>Where does our data go?</td><td>Nowhere. The tool runs on your machines and sends Suncly nothing in this version.</td></tr>
+                <tr><td>Who can see our credential?</td><td>Only the Runner process, from one environment variable; it is redacted from every transcript.</td></tr>
+                <tr><td>Data location</td><td>Wherever you run the tool. A hosted service does not exist yet; its regions will be published with it.</td></tr>
+                <tr><td>Sub-processors</td><td>None for the tool. A list is published when a hosted service exists.</td></tr>
+                <tr><td>Incident notice</td><td>Without undue delay; 72 hours for personal data breaches.</td></tr>
+                <tr><td>Exit</td><td>Your report folders are files you hold. Nothing to export from us today.</td></tr>
+                <tr><td>Certifications held</td><td>None. We claim no standard we do not hold.</td></tr>
+              </tbody>
+            </table>
 
             <h2 id="limits">Evaluation limitations</h2>
             <ul>

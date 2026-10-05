@@ -32,7 +32,7 @@ export default function DocsPage() {
 
       <Section>
         <SectionHeader label="Guides" headline="Start here." />
-        <ul className="mt-10 grid gap-4 md:grid-cols-3">
+        <ul className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-3">
           {docsPage.guides.map((g) => (
             <li key={g.href}>
               <Link href={g.href} className="surface-card group flex h-full flex-col gap-3 p-6 transition-shadow hover:shadow-raised">

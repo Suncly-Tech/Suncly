@@ -11,7 +11,7 @@ export function Table({
   className?: string;
 }) {
   return (
-    <div className={`table-wrap ${className}`}>
+    <div className={`table-wrap ${className}`} tabIndex={0} aria-label={caption}>
       <table className="table-base">
         <caption className="sr-only">{caption}</caption>
         {children}

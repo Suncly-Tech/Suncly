@@ -29,7 +29,7 @@ export default function AccessPage() {
       />
       <PageHeader eyebrow={a.title} headline={a.headline} intro={a.intro} />
       <Section>
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="surface-card p-6 md:p-8">
             <h2 className="text-heading-md text-ink">{a.whatYouGet.title}</h2>
             <ul className="mt-4 flex flex-col gap-3">
@@ -60,7 +60,7 @@ export default function AccessPage() {
         </div>
       </Section>
       <Section id="request" tone="ink">
-        <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">
           <div>
             <SectionLabel tone="paper">Pilot</SectionLabel>
             <h2 className="mt-5 text-display-lg text-paper">{a.form.headline}</h2>

@@ -15,7 +15,7 @@ const toneClass: Record<Tone, string> = {
   pass: "bg-pass-soft text-pass",
   fail: "bg-fail-soft text-fail",
   inconclusive: "bg-partial-soft text-partial",
-  info: "bg-info-soft text-sky-deep",
+  info: "bg-info-soft text-ink-soft",
   neutral: "bg-cream-deep text-ink-soft",
   ink: "bg-ink text-paper",
   sun: "bg-sun text-ink",
@@ -110,7 +110,7 @@ export function RiskBadge({ level }: { level: RiskLevel }) {
 }
 
 export function AvailabilityBadge({ status }: { status: Availability }) {
-  const tone: Tone = status === "available" ? "pass" : status === "limited" ? "inconclusive" : "neutral";
+  const tone: Tone = status === "available" ? "pass" : status === "pilot" ? "inconclusive" : "neutral";
   return (
     <Badge tone={tone} dot>
       {AVAILABILITY_LABEL[status]}

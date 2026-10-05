@@ -54,7 +54,7 @@ export function Tabs({
             role="tab"
             id={`${base}-tab-${item.id}`}
             aria-selected={selected}
-            aria-controls={`${base}-panel-${item.id}`}
+            aria-controls={selected ? `panel-${item.id}` : undefined}
             tabIndex={selected ? 0 : -1}
             type="button"
             onClick={() => onChange(item.id)}

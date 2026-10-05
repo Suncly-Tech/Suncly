@@ -1,5 +1,7 @@
 # Art direction: three quick drafts
 
+**Chosen on 2026-10-05: A, Daylight, with B's restrained linework for hatches and diagrams.** The drafts below are kept as the record of the choice; the built site is the reference now.
+
 Stop two of the redesign. Three directions, each as a static draft page showing the hero
 and one representative lower section (10, Suncly Data), shot at 1440 and 390 px. Open the
 HTML files in a browser, or look at `board.png` and the `shots/` folder. All three obey

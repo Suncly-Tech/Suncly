@@ -1,0 +1,6 @@
+# Suncly security contact (RFC 9116). Draft: the dedicated security address is a founder input.
+Contact: mailto:team@suncly.com
+Expires: 2027-10-05T00:00:00.000Z
+Preferred-Languages: en, et
+Canonical: https://suncly.com/.well-known/security.txt
+Policy: https://suncly.com/security#disclosure

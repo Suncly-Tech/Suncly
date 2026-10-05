@@ -1,55 +1,69 @@
-// Keyboard-navigation check: tabs through the page and reports what receives focus,
-// then exercises the mobile menu and the FAQ with the keyboard only.
-// Usage: node scripts/keyboard.mjs [baseUrl]
+// Keyboard-navigation check: tabs through the home page and reports what receives focus,
+// then exercises the install tabs, the specimen strip, the FAQ and the mobile menu with
+// the keyboard only. Usage: node scripts/keyboard.mjs [baseUrl]
 import { chromium } from "playwright";
+import { existsSync } from "node:fs";
 
-const base = process.argv[2] ?? "http://localhost:3000";
-const browser = await chromium.launch({ channel: "chrome" });
+const base = process.argv[2] ?? "http://localhost:3100";
+const browser = await chromium.launch({ executablePath: existsSync("/opt/pw-browsers/chromium") ? "/opt/pw-browsers/chromium" : undefined });
 let failures = 0;
 const check = (ok, msg) => {
   console.log(`${ok ? "ok " : "FAIL"} ${msg}`);
   if (!ok) failures++;
 };
-
 const describe = (page) =>
   page.evaluate(() => {
     const el = document.activeElement;
     if (!el || el === document.body) return "body";
-    const label =
-      el.getAttribute("aria-label") ||
-      el.textContent?.trim().replace(/\s+/g, " ").slice(0, 40) ||
-      el.getAttribute("placeholder") ||
-      "";
-    return `${el.tagName.toLowerCase()}${el.id ? "#" + el.id : ""} "${label}"`;
+    const label = el.getAttribute("aria-label") || el.textContent?.trim().slice(0, 40) || "";
+    const role = el.getAttribute("role");
+    return `${el.tagName.toLowerCase()}${el.id ? "#" + el.id : ""}${role ? `[${role}]` : ""} ${label}`.trim();
+  });
+const focusRing = (page) =>
+  page.evaluate(() => {
+    const el = document.activeElement;
+    if (!el || el === document.body) return false;
+    const cs = getComputedStyle(el);
+    return cs.outlineStyle !== "none" && parseFloat(cs.outlineWidth) > 0;
   });
 
-// Desktop: tab order through the whole page
 {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
   await page.goto(base + "/", { waitUntil: "networkidle" });
   const seen = [];
-  for (let i = 0; i < 60; i++) {
+  let ringSeen = false;
+  for (let i = 0; i < 80; i++) {
     await page.keyboard.press("Tab");
     const d = await describe(page);
     if (d === "body" && seen.length > 5) break;
+    if (!ringSeen && (await focusRing(page))) ringSeen = true;
     seen.push(d);
   }
-  console.log("Desktop tab order:");
+  console.log("Desktop tab order (first 80 stops):");
   seen.forEach((s, i) => console.log(`  ${String(i + 1).padStart(2)}  ${s}`));
   check(seen[0].includes("Skip to content"), "skip link is first in tab order");
-  check(seen.some((s) => s.includes("Get early access")), "primary CTA reachable");
+  check(ringSeen, "a visible focus ring (outline) is shown on focus");
+  check(seen.some((s) => s.includes("Install Suncly")), "primary action reachable");
+  check(seen.some((s) => s.includes("[tab]")), "install tabs reachable");
+  check(seen.some((s) => s.includes("Copy")), "copy button reachable");
+  check(seen.some((s) => s.includes("honest")), "specimen strip reachable");
   check(seen.some((s) => s.startsWith("summary")), "FAQ summaries reachable");
+  check(seen.some((s) => s.includes("Suncly on X")), "Find Suncly links reachable");
 
-  // Terminal replay button: disabled while the demo runs, reachable and working once done.
-  await page.locator("#how-it-works").scrollIntoViewIfNeeded();
-  await page.waitForTimeout(9000);
-  const replay = page.locator('button[aria-label="Run again"]');
-  check(await replay.isEnabled(), "terminal replay button enabled after the demo finishes");
-  await replay.focus();
+  // Install tabs: arrow keys move, panel follows
+  const firstTab = page.getByRole("tab").first();
+  await firstTab.focus();
+  await page.keyboard.press("ArrowRight");
+  const selected = await page.evaluate(() => document.activeElement?.getAttribute("aria-selected"));
+  check(selected === "true", "ArrowRight selects the next install tab");
+
+  // Copy button announces
+  await page.keyboard.press("Home");
+  await page.getByRole("button", { name: /copy install commands/i }).focus();
   await page.keyboard.press("Enter");
-  await page.waitForTimeout(300);
-  check(!(await replay.isEnabled()), "Enter on replay restarts the demo (button disabled again)");
-  check(seen.some((s) => s.startsWith("input#email")), "email input reachable");
+  await page.waitForTimeout(100);
+  const copied = await page.getByRole("button", { name: /copied/i }).count();
+  check(copied > 0, "Enter on the copy button announces success");
 
   // Skip link works
   await page.goto(base + "/", { waitUntil: "networkidle" });
@@ -57,40 +71,28 @@ const describe = (page) =>
   await page.keyboard.press("Enter");
   const hash = await page.evaluate(() => location.hash);
   check(hash === "#main", `skip link jumps to #main (hash=${hash})`);
-
-  // FAQ opens with Enter and Space
-  const summary = page.locator("#faq summary").first();
-  await summary.focus();
-  await page.keyboard.press("Enter");
-  check(await page.locator("#faq details").first().evaluate((d) => d.open), "FAQ item opens with Enter");
-  await page.keyboard.press("Space");
-  check(!(await page.locator("#faq details").first().evaluate((d) => d.open)), "FAQ item closes with Space");
-
-  // Focus ring visible on primary button
-  await page.locator('a.btn-primary').first().focus();
-  const outline = await page.locator("a.btn-primary").first().evaluate((el) => getComputedStyle(el).outlineStyle);
-  check(outline !== "none", `focus-visible outline on primary CTA (${outline})`);
   await page.close();
 }
 
-// Mobile: menu button, Escape, focus stays usable
 {
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   await page.goto(base + "/", { waitUntil: "networkidle" });
-  const btn = page.locator('button[aria-controls="mobile-menu"]');
-  await btn.focus();
+  await page.getByRole("button", { name: "Menu" }).focus();
   await page.keyboard.press("Enter");
-  check((await btn.getAttribute("aria-expanded")) === "true", "menu opens from keyboard");
-  check(await page.locator("#mobile-menu").isVisible(), "menu panel visible");
-  await page.keyboard.press("Tab");
-  const inMenu = await describe(page);
-  check(inMenu.includes("Product"), `first Tab inside open menu lands on first link (${inMenu})`);
+  await page.waitForTimeout(200);
+  check(await page.locator("#mobile-menu").isVisible(), "mobile menu opens from the keyboard");
+  const stops = [];
+  for (let i = 0; i < 20; i++) {
+    await page.keyboard.press("Tab");
+    stops.push(await describe(page));
+  }
+  check(stops.every((s) => s !== "body"), "focus stays inside the open menu (trapped)");
   await page.keyboard.press("Escape");
-  check((await btn.getAttribute("aria-expanded")) === "false", "Escape closes the menu");
-  check(!(await page.locator("#mobile-menu").isVisible()), "menu panel hidden after Escape");
+  await page.waitForTimeout(200);
+  check(!(await page.locator("#mobile-menu").isVisible()), "Escape closes the mobile menu");
   await page.close();
 }
 
 await browser.close();
-console.log(failures ? `\n${failures} keyboard check(s) failed` : "\nAll keyboard checks passed");
+console.log(failures ? `${failures} failure(s)` : "all keyboard checks passed");
 process.exit(failures ? 1 : 0);

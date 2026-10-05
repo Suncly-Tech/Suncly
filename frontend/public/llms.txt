@@ -1,28 +1,23 @@
 # Suncly
 
-> Suncly is an evaluation tool for AI agents that speak the A2A (Agent2Agent) protocol. It reads an agent's Agent Card, tests every declared skill repeatedly in a sandbox, judges each run deterministically, signs the evidence, and gives platform and security teams a report that states what passed, what failed, what stayed inconclusive and what was never tested, so they can approve the agent on evidence instead of a spreadsheet.
+> Suncly tests an A2A (Agent2Agent) agent against what its Agent Card claims and hands security and platform teams signed evidence: what passed, what failed, and what was never tested. A command-line tool in pilot; the hosted API is planned. It charges only for usage of its API (billing not live), and agents that meet its published criteria can carry the Suncly Certified badge, which links to the record behind it (programme opening with pilots).
 
-Suncly is a command-line tool in pilot, made in Tallinn, Estonia. It is model-agnostic: any agent that publishes an A2A 1.0 Agent Card and answers over JSON-RPC can be evaluated, whatever model or framework built it. In the current version every automatic decision is "flag", so a human reviews every result; approve and block are never produced automatically. Suncly never calls a model provider, never tests a production endpoint, and holds the agent credential only inside an isolated Runner process. Nothing on suncly.com states customers, prices, benchmarks or guarantees. Contact: team@suncly.com.
+Brand line: Evidence before access. Based in Tallinn, Estonia. Contact team@suncly.com.
 
-## Product
+## Pages
 
-- [Product](https://suncly.com/product): what Suncly does today (available), with limits (available with limits), and what is planned, each entry naming the code and test behind it.
-- [Supported workflows and integrations](https://suncly.com/workflows): A2A 1.0 over JSON-RPC coverage, model-agnosticism, frameworks, integrations, and the eleven bundled sandbox agents.
-- [Sample evaluation](https://suncly.com/demo): three signed evaluations of a fictional agent produced by the real code path: a baseline, a regression behind an unchanged card, and a budget-stopped failure.
-- [Security and data handling](https://suncly.com/security): what Suncly accesses, where credentials are handled, what reaches external providers (nothing), what evidence is stored, retention, deployment, sandbox requirements, limitations.
-- [Glossary](https://suncly.com/glossary): A2A protocol, Agent Card, attestation, contract, test case, run, verdict, inconclusive, decision, probe, sandbox declaration, card_hash, signed evidence, what was NOT tested.
+- [Home](https://suncly.com/): what it does, how it works, how to install, evidence, use cases, Offer, Certified, Data, Research, Lab, what a pass does not cover.
+- [Offer](https://suncly.com/offer): usage-only pricing, no seats, no plans; connecting and the badge are free; billing not live.
+- [Certified](https://suncly.com/certified): the badge, its files and rules, the registry (empty at launch).
+- [Data](https://suncly.com/data): what enters a test and what leaves it; the data inventory; deletion.
+- [Research](https://suncly.com/research): notes on what evidence proves (drafts in review).
+- [Lab](https://suncly.com/lab): the eleven mock agents, how to run them, the sample generator, an example contract.
+- [Product](https://suncly.com/product): every capability with its status, and the comparison with manual review.
+- [Sample evaluation](https://suncly.com/demo): one fictional agent, three real evaluations.
+- [Security](https://suncly.com/security): what the tool touches, credentials, disclosure policy.
+- [Docs](https://suncly.com/docs): getting started, command reference, evidence and reports.
+- [Glossary](https://suncly.com/glossary): the terms, one sentence each.
 
-## Documentation
+## Full text
 
-- [Getting started](https://suncly.com/docs/getting-started): install, run `suncly demo`, evaluate a sandbox agent with `suncly attest <card-url> --sandbox`, read and verify the report.
-- [Command reference](https://suncly.com/docs/cli): every command, option, exit code, environment variable and the contract file format.
-- [Evidence and reports](https://suncly.com/docs/evidence): the report folder (result.json, transcripts, report.md, report.html), what the Ed25519 signature covers, `suncly verify`.
-
-## Company
-
-- [Company](https://suncly.com/company): principles and contact.
-- [Access](https://suncly.com/access): pilot access by email; no self-serve sign-up, no published price, no checkout.
-
-## Optional
-
-- [Full text for language models](https://suncly.com/llms-full.txt)
+- [llms-full.txt](https://suncly.com/llms-full.txt)

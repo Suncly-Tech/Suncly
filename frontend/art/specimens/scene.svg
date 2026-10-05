@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1800 800" width="1800" height="800">
+  <!-- Eleven specimens. Eleven small forms in a row at golden hour. Most cast true shadows; the fourth casts a wrong shadow, the fifth casts two, the third casts none. They are the eleven mock agents. -->
+  <defs>
+    <linearGradient id="wall" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F6EEDB"/><stop offset="1" stop-color="#E9DCC0"/></linearGradient>
+    <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E9DEC5"/><stop offset="1" stop-color="#D8C9A8"/></linearGradient>
+    <radialGradient id="sunlight" cx="1.05" cy="0" r="1.1"><stop offset="0" stop-color="#F2C14E" stop-opacity="0.7"/><stop offset="0.5" stop-color="#E8A93C" stop-opacity="0.18"/><stop offset="1" stop-color="#C8842B" stop-opacity="0"/></radialGradient>
+    <linearGradient id="face" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFCF3"/><stop offset="1" stop-color="#EFE5CF"/></linearGradient>
+    <linearGradient id="side" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#CDBD9B"/><stop offset="1" stop-color="#A8956F"/></linearGradient>
+    <linearGradient id="shadow" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6E4D22" stop-opacity="0.55"/><stop offset="1" stop-color="#6E4D22" stop-opacity="0.08"/></linearGradient>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="5"/></filter>
+    <filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope="0.13"/></feComponentTransfer></filter>
+    <!-- a block: 70 wide, h tall, at origin bottom-left; true shadow at 18.4° toward the lower left -->
+    <g id="shadow-true"><polygon points="0,0 70,0 -52,160 -122,160" fill="url(#shadow)" filter="url(#soft)"/></g>
+    <g id="block"><rect x="4" y="-130" width="70" height="130" rx="4" fill="url(#side)"/><rect x="0" y="-134" width="70" height="130" rx="4" fill="url(#face)"/><path d="M8 -134 h58 a4 4 0 0 1 4 4 v20" fill="none" stroke="#F2C14E" stroke-opacity="0.6" stroke-width="1.5"/></g>
+    <g id="block-short"><rect x="4" y="-86" width="70" height="86" rx="4" fill="url(#side)"/><rect x="0" y="-90" width="70" height="86" rx="4" fill="url(#face)"/><path d="M8 -90 h58 a4 4 0 0 1 4 4 v20" fill="none" stroke="#F2C14E" stroke-opacity="0.6" stroke-width="1.5"/></g>
+    <g id="shadow-short"><polygon points="0,0 70,0 -34,106 -104,106" fill="url(#shadow)" filter="url(#soft)"/></g>
+    <g id="cyl"><ellipse cx="35" cy="-134" rx="35" ry="10" fill="#E5D9BF"/><path d="M0 -134 v134 a35 10 0 0 0 70 0 v-134" fill="url(#side)"/><path d="M0 -134 v134 a35 10 0 0 0 70 0 v-134 a35 10 0 0 1 -70 0" fill="url(#face)" fill-opacity="0.9"/><ellipse cx="35" cy="-134" rx="35" ry="10" fill="none" stroke="#F2C14E" stroke-opacity="0.6" stroke-width="1.5"/></g>
+  </defs>
+  <rect width="1800" height="560" fill="url(#wall)"/>
+  <rect y="560" width="1800" height="240" fill="url(#ground)"/>
+  <rect width="1800" height="800" fill="url(#sunlight)"/>
+  <rect y="560" width="1800" height="1.5" fill="#1B1814" fill-opacity="0.08"/>
+  <!-- row of eleven, baseline y=600 -->
+  <g transform="translate(120 600)"><use href="#shadow-true"/><use href="#block"/></g>
+  <g transform="translate(270 600)"><use href="#shadow-short"/><use href="#block-short"/></g>
+  <!-- the third casts no shadow -->
+  <g transform="translate(420 600)"><use href="#cyl"/></g>
+  <!-- the fourth casts a wrong shadow: wider and notched -->
+  <g transform="translate(570 600)"><polygon points="0,0 110,0 60,70 90,110 -30,160 -140,160 -70,80 -40,50" fill="url(#shadow)" filter="url(#soft)"/><use href="#block"/></g>
+  <!-- the fifth casts two -->
+  <g transform="translate(720 600)"><use href="#shadow-true"/><g transform="translate(60 0)"><polygon points="0,0 70,0 20,160 -50,160" fill="url(#shadow)" filter="url(#soft)" opacity="0.7"/></g><use href="#block"/></g>
+  <g transform="translate(870 600)"><use href="#shadow-true"/><use href="#cyl"/></g>
+  <g transform="translate(1020 600)"><use href="#shadow-short"/><use href="#block-short"/></g>
+  <g transform="translate(1170 600)"><use href="#shadow-true"/><use href="#block"/></g>
+  <g transform="translate(1320 600)"><use href="#shadow-true"/><use href="#cyl"/></g>
+  <g transform="translate(1470 600)"><use href="#shadow-short"/><use href="#block-short"/></g>
+  <g transform="translate(1620 600)"><use href="#shadow-true"/><use href="#block"/></g>
+  <rect width="1800" height="800" filter="url(#grain)"/>
+</svg>

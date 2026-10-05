@@ -221,7 +221,7 @@ export function SetupForm() {
             <div className="mt-4 flex flex-col gap-2 text-[13px]">
               <div className="flex items-center justify-between gap-3"><span className="text-ink-soft">Start runs from this page</span><AvailabilityBadge status="planned" /></div>
               <div className="flex items-center justify-between gap-3"><span className="text-ink-soft">Schedules and card-change triggers</span><AvailabilityBadge status="planned" /></div>
-              <div className="flex items-center justify-between gap-3"><span className="text-ink-soft">Run from CI with the CLI</span><AvailabilityBadge status="limited" /></div>
+              <div className="flex items-center justify-between gap-3"><span className="text-ink-soft">Run from CI with the CLI</span><AvailabilityBadge status="available" /></div>
             </div>
           </Card>
         </div>

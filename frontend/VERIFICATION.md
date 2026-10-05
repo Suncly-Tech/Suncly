@@ -1,93 +1,108 @@
 # Verification log
 
-How the site and the workspace were checked on 2026-10-04/05, what passed, and what was
-not tested.
+How the rebuilt site was checked on 2026-10-05, what passed, and what was not tested.
+Every command below ran in the build session; where a thing could not be run here, it says
+so. Scripts are registered in `package.json` and need the static export served on port
+3100 (`npm run build && npm run serve`).
 
 ## Commands
 
 ```bash
-npm run typecheck             # tsc --noEmit: clean
-npm run build                 # next build --webpack: 22 static routes, no warnings
-node scripts/serve.mjs 3100   # serve out/ with clean URLs, gzip and cache headers
-node scripts/lighthouse.mjs http://localhost:3100   # Lighthouse mobile + desktop, / and /docs
-.venv/bin/python frontend/scripts/make-sample.py    # regenerate the sample data set (needs the package installed)
+npm run typecheck        # tsc --noEmit: clean
+npm run build            # next build --webpack: 31 static routes, no warnings
+npm run serve            # serve out/ with clean URLs, gzip and cache headers on :3100
+npm run screenshots      # every public page and the workspace at 1440, 1024, 768 and 390 px
+npm run words            # visible words on the home page against the 800 budget
+npm run forbidden        # scan out/ for things that must not ship
+npm run axe              # axe-core, WCAG 2.2 AA rules, every page, desktop and phone
+npm run keyboard         # tab order, focus ring, tabs, copy button, mobile menu, skip link
+npm run inspect-storage  # cookies, storage keys and request hosts in the built site
+npm run lighthouse       # Lighthouse mobile and desktop on / and /docs
+python tasks.py check    # the repository's own ruff, mypy and pytest
 ```
 
-The sample generator and Lighthouse were run from the Terminal panel (they need local
-ports and Chrome); the build and typecheck ran in the sandbox.
+## Results
 
-## Sample data
+| Check | Result |
+| --- | --- |
+| `npm run typecheck` | clean |
+| `npm run build` | 31 routes, all static; the export builds with zero certification records (one `specimen` record page, noindex) |
+| `npm run words` | 780 visible words on the home page (budget 800), counted per section: hero 47, works with 38, how it works 96, install 64, evidence 63, use cases 90, offer and certified 82, data 54, research 49, lab 67, scope 110, questions 18, closing 8. Navigation, code, collapsed answers, tables, the footer and the legal line are excluded |
+| `npm run forbidden` | 39 files checked, 0 problems: no "trusted by", "A2A certified", "AI Act compliant", ®, "guarantee" outside a disclaimer, competitor name, placeholder, published price, "official" or "accredited" certification, or blue in the theme |
+| `npm run axe` | 23 pages at 1440 and 390 px: no moderate, serious or critical violation after the fixes below |
+| `npm run keyboard` | 14 of 14 checks pass: skip link first, visible focus ring, primary action, install tabs (arrow keys move the selection), copy button announces "Copied", specimen strip, FAQ summaries, Find Suncly links, mobile menu opens from the keyboard, focus trapped, Escape closes |
+| `npm run inspect-storage` | cookies: none; sessionStorage: none; localStorage before any action: none; after loading the sample into the workspace: `suncly.workspace.v1`; request hosts: the site only; third-party hosts: none |
+| `npm run lighthouse` | see the table below |
+| `python tasks.py check` | ruff clean (the new `frontend/scripts/generate-badge.py` included), mypy clean (100 files), pytest 266 passed, 15 skipped (Postgres tests need `DATABASE_URL`), coverage above the 85% threshold. `src/` and `tests/` are unchanged |
+| Horizontal overflow | none on any page at any of the four widths (the screenshot script reports `scrollWidth` beyond the viewport) |
 
-`frontend/scripts/make-sample.py` ran the real attestation use case three times against
-a fictional local mock agent with a fake credential in the Runner's environment. The
-script fails if the credential appears in any transcript; it did not. The three bundles
-verify with the in-browser verifier (eight checks, including the Ed25519 signature) and
-carry the owner and risk level the script passes.
+Accessibility fixes made during the run: tab panels now carry the ids their tabs point
+to (`aria-controls` only on the selected tab); the tertiary grey was darkened to pass
+contrast on paper; amber eyebrows became ember; scrollable tables are focusable; the
+workspace empty state's heading level; the Find Suncly links' accessible names include
+their visible abbreviation.
 
-## Lighthouse (2026-10-05, Lighthouse 13, served from `out/` with gzip)
+## Lighthouse (Lighthouse 13, mobile and desktop, served from `out/` with gzip)
 
 | Page | Form factor | Performance | Accessibility | Best Practices | SEO |
 | --- | --- | --- | --- | --- | --- |
-| `/` | mobile | 88 | 100 | 100 | 100 |
+| `/` | mobile | 91 | 100 | 100 | 100 |
 | `/` | desktop | 100 | 100 | 100 | 100 |
-| `/docs` | mobile | 95 | 100 | 100 | 100 |
+| `/docs` | mobile | 94 | 100 | 100 | 100 |
 | `/docs` | desktop | 100 | 100 | 100 | 100 |
 
-The mobile home deduction is unused JavaScript from the interactive sections. The hero
-evaluation window is server-rendered, so the sample JSON does not ship to the client on
-the home page.
+Mobile home metrics (simulated throttling): FCP 1.0 s, LCP 3.0 s, TBT 208 ms, CLS 0, TTI 3.1 s. The observed LCP in the same run was 177 ms (the preloaded hero picture); Lighthouse's simulated LCP for an image that paints while scripts are still arriving is pessimistic, and the real figure on a throttled connection measured directly with Playwright was about 1.0 s. Two consecutive runs on near-identical builds (the second differs by a code-block padding only) scored mobile performance on `/` at 88 and 91: treat the figure as about 90, at the edge of the brief's target, with the previous site's 88 as the floor. The levers left are the framework runtime itself and the fonts.
 
-## Browser review (built-in browser, static export)
+Floor from the previous site: accessibility 100, desktop performance 100, mobile
+performance 88. Mobile performance on the home page is the figure to watch: the
+remaining cost is the Next.js runtime and hydration of the interactive sections (install
+tabs, specimen strip, sticky stage) and the three self-hosted fonts (Newsreader 56 KB
+with its optical-size axis, JetBrains Mono 40 KB, Figtree 20 KB). The hero picture is
+preloaded and paints first; the animation library was removed in favour of a CSS reveal.
 
-Checked at the pane's desktop width, at 1024 × 800 and at 375 × 812:
+## Screenshots
 
-- Home: hero with the real sample window, the gap, claim-to-decision chain, process,
-  manual-review comparison, coverage, scope and limitations, FAQ, final CTA, footer.
-- `/product`, `/workflows`, `/security`, `/docs`, `/docs/getting-started`, `/docs/cli`,
-  `/docs/evidence`, `/access`, `/company`, `/privacy`, `/terms` render; anchor links and
-  sticky side navigation work.
-- `/demo`: the three evaluation cards switch the view; tabs work; the Signature tab's
-  in-browser verification passes all eight checks; the comparison and the sample reviewer
-  record render.
-- `/app`: empty state with three guided actions; "Load sample data" fills the overview
-  (stats, outstanding reviews, what changed, recent evaluations, agents); phone width no
-  longer overflows after constraining the tab row.
-- `/app/evaluation?…&tab=review`: submitting the empty form shows both field errors;
-  recording a note with a reviewer and rationale adds it to the decision history with
-  Markdown and JSON export buttons.
-- `/app/agent?id=<unknown>` shows the not-found empty state; `/app/compare` picks the
-  last two completed attestations by default and shows regressions; `/app/new`,
-  `/app/import` and `/app/settings` render with their forms and notices.
-- `/access`: submitting the empty form shows the email validation error inline.
+`screenshots/<page>-<width>.png` for every public page and three workspace screens at
+1440, 1024, 768 and 390 px, plus the open mobile menu, with 1000 px tiles under
+`screenshots/tiles/`. Inspected by the builder, section by section, at desktop and phone
+width; the fixes that followed are in the commit history (headline wrapping, caption
+placement, the four-frame story's phone layout, grid overflow, prose tables on phones).
+The two hand-back images are copied to `design/handback/`.
 
-Issues found and fixed during the review: nav labels wrapping at mid widths; the desktop
-nav overflowing at 1024 px (tighter spacing, workspace link from xl); the workspace tab
-row forcing horizontal overflow on phones; a comparison labelling test cases without
-runs as "improved" (now "no runs recorded"); the sample agent registered with default
-owner and risk because the draft-export step ran first.
+## The CLI, run here (unchanged from the plan's section 12.1)
 
-## Keyboard
+Clean Python 3.12 virtual environment, repository at the build commit. `pip install -e .`
+20 s; `suncly --help` 0.5 s; `suncly doctor` exits 6 before a key exists (as documented);
+`suncly demo` 3.6 s, two agents, 3 test cases × 3 runs each, honest 9 of 9 pass, lying
+9 of 9 fail `output_modes`, both decisions `flag`, both signed; `suncly verify` passes
+eight checks and names the failed check after a changed byte. The Install section's
+output is the trimmed capture of that run. The Windows variant of the commands was not run.
 
-Skip link first in tab order; nav links show the focus ring (outline in sky blue);
-tabs use roving focus with arrow keys; the mobile menu opens from the keyboard and
-closes on Escape; dialogs are native `<dialog>` elements (focus trap and Escape from the
-browser); every form control has a label, and errors are announced with `role="alert"`.
+## Browser review
 
-## Reduced motion
-
-Scroll reveals render their final state, the sky animations are disabled, and the
-budget meter is static by design.
+Chromium only (Playwright's build). Checked: every public page at four widths; `/demo`
+switches evaluations and the Signature tab's in-browser verification passes all eight
+checks with the sample; `/app` empty state, settings, new-evaluation form; the sample
+loads into the workspace from `/demo`; the install tabs, OS toggle and copy buttons; the
+specimen strip; the FAQ; the closing sky's layers pause off screen and stay still under
+reduced motion; the footer banner's edge light runs once.
 
 ## Not tested
 
-- Importing a real report folder through the file picker and drag-and-drop in the
-  built-in browser (no file-system access from the automation). The parser is the same
-  code path the sample loader uses, and its error branches are unit-level logic in
-  `lib/workspace/store.ts`.
-- The pilot form against a live `NEXT_PUBLIC_SIGNUP_ENDPOINT` (none is configured; the
-  mailto fallback was exercised as far as building the link).
-- Browsers without Ed25519 in WebCrypto: the verifier reports that check as "not run"
-  and points to the CLI; this branch was not exercised.
-- Firefox and Safari rendering.
-- The Python test suite was not run as part of this work; the backend is unchanged from
-  `origin/mvp`.
+- The live site at `www.suncly.com`: refused by the environment's network policy, so the
+  old build was not compared with this one and the canonical host is unconfirmed.
+- The four Find Suncly destinations: x.com, linkedin.com and reddit.com are refused by
+  the network policy; github.com answers only for the configured repository. Linked
+  exactly as supplied, unverified.
+- Platform brand-guideline pages (X, LinkedIn, GitHub, Reddit): unreachable, so the row
+  uses text abbreviations.
+- Every primary legal source (see `legal/APPLICABILITY.md`): unreachable; the legal
+  drafts rest on secondary snippets and are marked as such.
+- Firefox and Safari rendering; real phones; screen readers beyond axe's rules.
+- The Windows PowerShell install commands.
+- Importing a real report folder through the file picker (no file-system access from
+  the automation); the pilot form against a live endpoint (none configured).
+- Browsers without Ed25519 in WebCrypto.
+- Coding-agent runs: none performed, none claimed (`tested_in` is "no" for all five).
+- The two fresh-eyes review passes the brief asked for were not run: the founder asked
+  for one agent and no subagents.

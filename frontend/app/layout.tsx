@@ -1,27 +1,28 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { site } from "@/lib/content";
-import { MotionProvider } from "@/components/MotionProvider";
 import { JsonLd } from "@/components/site/JsonLd";
 import { ALL_KEYWORDS, BRAND, graph, organizationLd, softwareLd, websiteLd } from "@/lib/seo";
 import "./globals.css";
 
 const display = localFont({
-  src: "./fonts/InstrumentSerif-Regular-latin.woff2",
+  src: "./fonts/Newsreader-Variable-latin.woff2",
   weight: "400",
   style: "normal",
-  variable: "--font-instrument-serif",
+  variable: "--font-newsreader",
   display: "swap",
   fallback: ["Georgia", "Times New Roman", "serif"],
+  adjustFontFallback: "Times New Roman",
 });
 
 const sans = localFont({
-  src: "./fonts/Manrope-Variable-latin.woff2",
-  weight: "200 800",
+  src: "./fonts/Figtree-Variable-latin.woff2",
+  weight: "300 900",
   style: "normal",
-  variable: "--font-manrope",
+  variable: "--font-figtree",
   display: "swap",
   fallback: ["system-ui", "Helvetica Neue", "Arial", "sans-serif"],
+  adjustFontFallback: "Arial",
 });
 
 const mono = localFont({
@@ -66,7 +67,7 @@ export const metadata: Metadata = {
     description: site.description,
     url: site.domain,
     locale: "en_US",
-    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Suncly: evaluate AI agents before you approve them" }],
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Suncly. Test the agent. Then decide." }],
   },
   twitter: {
     card: "summary_large_image",
@@ -86,7 +87,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#3461D1",
+  themeColor: "#FAF7F0",
   width: "device-width",
   initialScale: 1,
 };
@@ -98,7 +99,7 @@ export default function RootLayout({
     <html lang="en" className={`${display.variable} ${sans.variable} ${mono.variable}`}>
       <body className="min-h-dvh">
         <JsonLd data={graph(organizationLd(), websiteLd(), softwareLd())} />
-        <MotionProvider>{children}</MotionProvider>
+        {children}
       </body>
     </html>
   );

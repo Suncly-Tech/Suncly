@@ -24,9 +24,7 @@ human-readable copy; the CSS wins where they differ.
 Blue exists only inside `components/home/ClosingSky.tsx`, in variables scoped to that
 component (`--sky-high #A9C4E4`, `--sky-mid #CFDCEC`, `--sky-low #F0E2C8`).
 
-The brand angle: `--angle-brand: 18.4deg`, the lean of the two cuts in `mark.svg` (40
-units across 120 up). Every shadow, hatch and diagonal uses it; `--angle-hatch` is the
-gradient angle for the "not tested" hatch (`.hatch`, `.hatch-dark`, `.cuts-bullet`).
+The brand angle: `--angle-brand: 18.4deg`, the value the brief fixes for every shadow, hatch and diagram. It was first read from the previous circular mark's cuts (40 units across 120); the official bullet mark's bars, as traced from the original lockup (`lib/mark.ts`), lean about 24° from vertical. The angle stays at 18.4° by the brief; the mark is never redrawn to match it.
 
 ## Type
 

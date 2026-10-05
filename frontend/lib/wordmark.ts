@@ -1,7 +1,7 @@
 /**
  * The wordmark lettering as a vector path, traced on 2026-10-05 from assets/suncly-black.png
  * (scripts: design/wordmark/, potrace at a 128 luminance threshold). The sun mark is NOT
- * here: it is public/mark.svg, drawn in components/Logo.tsx. Generated; do not edit by hand.
+ * here: it is lib/mark.ts, traced from the same lockup. Generated; do not edit by hand.
  */
 export const WORDMARK_VIEWBOX = [751, 153, 1204, 415] as const;
 export const WORDMARK_PATH =

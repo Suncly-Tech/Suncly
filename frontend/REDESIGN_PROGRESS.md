@@ -3,7 +3,7 @@
 Kept current so the work survives a long session. States: done, in progress, blocked on
 (which input), waiting (for a stop).
 
-Last updated: 2026-10-05, phases 3 to 9 done; final hand-back in `HANDOFF.md` §9.
+Last updated: 2026-10-05, phases 3 to 10 done; release in `HANDOFF.md` §9 and §10.
 
 ## Phases
 
@@ -20,6 +20,7 @@ Last updated: 2026-10-05, phases 3 to 9 done; final hand-back in `HANDOFF.md` §
 | 7 Stage 4 refinement (founder go-ahead of 2026-10-05) | done | Every section reviewed at 1440, 1024, 768 and 390 px; pictures made block-level with widths from the column (the min-height that forced them wider was removed); the Offer and Certified band restructured (412 px tall at 1440); the demo output kept unwrapped from tablet width; the closing headline set per sentence; every `/demo` tab panel given its id. Certification criteria withdrawn from public pages; specimen record labelled fictional; disclosure policy and `security.txt` stripped of promises. Fonts 117 to 80 KB; wordmark path written once per page. Functional checks and the LCP probe added. |
 | 8 Stage 5: inner pages and legal drafts (founder go-ahead of 2026-10-05) | done | Section 6 of the brief reconciled with the routes (two conditional pages deferred, nothing missing); every distinct inner layout inspected at 1440 and 390; Lab table and Getting started fixed; legal drafts read for consistency with the product, pricing and certification state (four wording fixes, counsel questions extended); the security address flagged as unconfirmed; the simulated LCP explained from Lighthouse's own graph and one small fix tested and rejected. |
 | 9 Stage 6: final acceptance and handover | done | `HANDOFF.md` §9: branch state, preview instructions, the four-way acceptance table (the simulated LCP stays failed at 2.89 s), the draft pages reconciled, the security address stated as advertised but unauthorised, and every founder decision with the setting it controls. No code changed in this stage. |
+| 10 Stage 7: logo correction and release (founder instruction of 2026-10-05) | in progress | The brand mark is the bullet-shaped sun traced from `assets/suncly-black.png` (`lib/mark.ts`, `public/mark.svg`), replacing the circular mark in the nav, footer lockup, banner, mobile menu, workspace shell, stage diagram, favicons, app icons and `og.png`; the badge keeps its own circular mark (`design/badge/mark.svg`) and its files are byte-identical (`npm run logo-check`). `security.txt` removed and no address designated for security reports. Remote `main` merged in; checks re-run; merge to `main` and deployment per the founder's authorisation. |
 
 ## Blocked on founder inputs
 

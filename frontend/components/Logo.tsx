@@ -1,43 +1,43 @@
 import Link from "next/link";
 import { TRADEMARK_SYMBOL } from "@/lib/launch";
+import { LOCKUP_GAP, MARK_PATH, MARK_VIEWBOX } from "@/lib/mark";
 import { WORDMARK_PATH, WORDMARK_VIEWBOX } from "@/lib/wordmark";
 
 /**
- * The sun with two diagonal cuts, exactly as drawn in public/mark.svg. Always the logo's
- * gold, on every background. Never redrawn, recoloured or animated into something else.
+ * The mark: the bullet-shaped sun with two diagonal cuts, exactly as traced from the original
+ * lockup (lib/mark.ts). Always the logo's gold, on every background. Never redrawn,
+ * recoloured or animated into something else. Like the lettering, the path is written into
+ * the document once (`define`, by the navigation's or workspace shell's Logo) and reused.
  */
 export function Mark({
-  size = 28,
+  height = 24,
   className = "",
+  define = false,
 }: {
-  size?: number;
+  height?: number;
   className?: string;
+  define?: boolean;
 }) {
+  const [, , w, h] = MARK_VIEWBOX;
+  const width = (height * w) / h;
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 120 120"
-      width={size}
-      height={size}
+      viewBox={MARK_VIEWBOX.join(" ")}
+      width={width}
+      height={height}
       className={className}
       aria-hidden="true"
       focusable="false"
     >
-      <defs>
-        <mask
-          id="suncly-cuts"
-          maskUnits="userSpaceOnUse"
-          x="0"
-          y="0"
-          width="120"
-          height="120"
-        >
-          <rect width="120" height="120" fill="#fff" />
-          <polygon points="20,120 30,120 70,0 60,0" fill="#000" />
-          <polygon points="50,120 60,120 100,0 90,0" fill="#000" />
-        </mask>
-      </defs>
-      <circle cx="60" cy="60" r="44" fill="#F2C14E" mask="url(#suncly-cuts)" />
+      {define ? (
+        <defs>
+          <g id="suncly-mark">
+            <path d={MARK_PATH} fillRule="evenodd" />
+          </g>
+        </defs>
+      ) : null}
+      <use href="#suncly-mark" fill="#F2C14E" />
     </svg>
   );
 }
@@ -117,7 +117,10 @@ export function TrademarkSymbol({ height }: { height: number }) {
   );
 }
 
-/** Mark and wordmark together. */
+/**
+ * Mark and wordmark together, at the proportions and spacing of the original lockup: the
+ * mark is 345/415 of the lettering's height and sits 29/415 of it to the left, as traced.
+ */
 export function Lockup({
   height = 26,
   className = "",
@@ -129,13 +132,15 @@ export function Lockup({
   trademark?: boolean;
   define?: boolean;
 }) {
+  const [, , , wordH] = WORDMARK_VIEWBOX;
+  const scale = height / wordH;
   return (
     <span
       className={`inline-flex items-center ${className}`}
-      style={{ gap: height * 0.32 }}
+      style={{ gap: LOCKUP_GAP * scale }}
     >
-      <Mark size={height * 1.08} />
-      <Wordmark height={height * 0.82} trademark={trademark} define={define} />
+      <Mark height={MARK_VIEWBOX[3] * scale} define={define} />
+      <Wordmark height={height} trademark={trademark} define={define} />
     </span>
   );
 }
@@ -143,7 +148,7 @@ export function Lockup({
 /** The linked lockup used in the navigation and the workspace shell. */
 export function Logo({
   tone = "ink",
-  height = 26,
+  height = 24,
   href = "/",
   className = "",
 }: {

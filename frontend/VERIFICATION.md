@@ -21,6 +21,7 @@ npm run inspect-storage  # cookies, storage keys and request hosts in the built 
 npm run lighthouse       # Lighthouse mobile and desktop on / and /docs
 npm run lcp-probe        # Lighthouse mobile on /, simulated and devtools throttling side by side
 npm run lcp-graph        # Lighthouse's own Lantern graph for the simulated LCP, with what-ifs
+npm run logo-check       # the brand mark is the traced bullet mark everywhere; the badge is byte-identical
 python tasks.py check    # the repository's own ruff, mypy and pytest
 ```
 
@@ -216,8 +217,8 @@ navigation, the footer lockup and the banner on every page.
   within one month while its body leaves response times blank; the Terms' certification
   section now says no criteria are published and no record exists; the legal notice now
   presents the Estonian Acts as our reading for counsel to confirm; the security page and
-  `security.txt` say the contact is the general address, not yet confirmed for security
-  reports. Every drafted period or amount (notice periods, dispute answers, confidentiality
+  `security.txt` said the contact was the general address, not yet confirmed for security
+  reports; in stage 7 the file was removed and the designation withdrawn (below). Every drafted period or amount (notice periods, dispute answers, confidentiality
   term, badge removal, liability cap) is listed in `legal/REVIEW.md` as a founder or counsel
   decision. No legal verification is claimed: every primary source remains unreachable.
 - **Draft state.** Four legal drafts, `/privacy`, `/terms`, `/legal` and
@@ -231,6 +232,29 @@ navigation, the footer lockup and the banner on every page.
   contact (six files at the pre-redesign commit) and is `site.email` and
   `company.contactEmail` now. `company.securityContactEmail` is blank. Whether the founders
   want security reports at that address is unknown and is flagged in `HANDOFF.md` §4a.
+
+## Stage 7: the logo correction and the release build
+
+- **The mark.** On the founder's instruction of 2026-10-05 the brand mark is the
+  bullet-shaped sun with two diagonal cuts from the original lockup
+  (`assets/suncly-black.png`), used as traced (`design/wordmark/mark-trace.svg`,
+  `lib/mark.ts`, `public/mark.svg`), not redrawn. Mark and lettering compose at the traced
+  proportions (the mark 345/415 of the lettering's height, 29/415 to its left). Replaced
+  in: the navigation and mobile menu (`Logo`), the footer lockup and banner, the workspace
+  shell, the How-it-works stage suns, `favicon.svg`, `favicon-32.png`,
+  `apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, `og.png`. The path is written
+  once per page and reused with `<use>`, so the home document stays at 59 KB gzipped.
+- **The badge.** `public/brand/badge/*` are byte-identical to commit `dd03931` (the last
+  before the change); the generator reads its own copy of the circular mark from
+  `design/badge/mark.svg` and was not run. `npm run logo-check` asserts all of this and
+  that no page still draws the circular mark: 7 of 7 checks pass on 30 pages.
+- **Inspected** in the screenshots at 1440 and 390 px: nav, mobile menu, footer lockup,
+  banner, workspace header, stage diagram, and `og.png`.
+- **Security.** `public/.well-known/security.txt` removed; `/security` designates no
+  address for security reports and names `team@suncly.com` as the general contact only.
+- **Checks on the release build** (after merging remote `main`): typecheck, build,
+  functional 22 of 22, axe clean on 24 pages at two widths, keyboard 14 of 14, 779 words,
+  forbidden scan clean (38 files), logo check 7 of 7.
 
 ## Acceptance against the stage-4 brief
 
@@ -251,8 +275,8 @@ navigation, the footer lockup and the banner on every page.
 | Unapproved certification criteria kept internal | pass | `REDESIGN_PLAN.md` §9 only; `/certified/policy` says none adopted |
 | Specimen record clearly fictional, no real agent implied | pass | `/certified/specimen`: "Specimen record (fictional)", "certifies nothing", noindex |
 | Legal pages visibly draft and noindex | pass | draft notice and robots meta on `/privacy`, `/terms`, `/legal`, `/certified/policy` |
-| No invented contacts or promises in `security.txt` and the disclosure policy | pass, with a flag | contact is the site's existing general address, stated as not yet confirmed for security reports; no acknowledgement, fix-time, safe-harbour, credit or incident-notice promise |
-| Security reporting address founder-authorised | unverified | `securityContactEmail` is blank; founder decision needed |
+| No invented contacts or promises in the disclosure policy; no `security.txt` until a monitored address exists | pass | no address is designated for security reports; `team@suncly.com` appears as the general contact only; no acknowledgement, fix-time, safe-harbour, credit or incident-notice promise |
+| Security reporting address | deferred | none published; `securityContactEmail` is blank; founder decision needed before any is advertised |
 | Legal drafts consistent with the product, data flows, pricing and certification state | pass | stage 5 read; four wording fixes above |
 | Legal applicability verified against primary sources | unverified | every source unreachable (`legal/APPLICABILITY.md`) |
 | `/demo` signature verification | pass | in-browser verification, every check passing (`npm run functional`) |

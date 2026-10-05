@@ -104,8 +104,7 @@ As before (`lib/content.ts` page objects), with these changes: the manual-review
 table moved from the home page to `/product`; statuses read Available / Pilot / Planned;
 "the repository is private" became "the repository is public" (`RUN`); `/security` gained
 the disclosure policy, the support-period statement and the supplier-questionnaire table
-(`CODE`; no compliance claimed), and `public/.well-known/security.txt` (marked draft; `Contact` is the site's existing
-address `site.email`, which the founders have not confirmed as the destination for security reports; no acknowledgement, fix-time, safe-harbour, credit or
+(`CODE`; no compliance claimed). `public/.well-known/security.txt` was removed on the founder's instruction of 2026-10-05 (stage 7) until a monitored security address is confirmed; the disclosure section says no address is designated for security reports and names `site.email` as the general contact only ( no acknowledgement, fix-time, safe-harbour, credit or
 incident-notice promise anywhere, because none has been decided — `INPUTS` block 5).
 
 ## Legal: Privacy (`/privacy`), Terms (`/terms`), Cookies (`/cookies`), Legal notice (`/legal`)
@@ -137,5 +136,18 @@ comparison is computed in the browser and says so; no run can be started from th
   response times are a named blank.
 - `/terms` §7: states that no criteria are published and no record exists while
   `certification.criteriaAccepted` is false.
-- `/security` and `security.txt`: say that `team@suncly.com` is the general address and not
-  yet confirmed for security reports.
+- `/security`: no security reporting address is designated and no `security.txt` is
+  published until the founders confirm a monitored address; `team@suncly.com` appears as
+  the general contact only (stage 7).
+
+## Stage 7 corrections (release)
+
+- The brand mark is the bullet-shaped sun with two diagonal cuts from the original lockup
+  (`assets/suncly-black.png`), traced in `design/wordmark/mark-trace.svg` and carried in
+  `lib/mark.ts`; `public/mark.svg` now holds it. The founder's instruction of 2026-10-05
+  overrides the earlier one to keep the circular mark. The lockup's proportions and the
+  gap between mark and lettering are the traced ones (`LOCKUP_VIEWBOX`, `LOCKUP_GAP`).
+- The certification badge is unchanged: `public/brand/badge/*` are byte-identical, and the
+  badge generator now reads its own copy of the circular mark from `design/badge/mark.svg`.
+- Favicons, app icons and `og.png` were regenerated from the new mark; the diagram suns
+  in the How-it-works stage are the mark in line.

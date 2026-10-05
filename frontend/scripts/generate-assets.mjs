@@ -1,27 +1,38 @@
-// Derives the favicons and the social preview from public/mark.svg and the traced wordmark
-// (design/wordmark/wordmark-trace.svg). The mark stays its own gold on a paper tile; no
-// blue anywhere. No text is drawn, so the output never depends on a font being present.
+// Derives the favicons and the social preview from public/mark.svg (the bullet-shaped mark
+// traced from the original lockup) and the traced wordmark (design/wordmark/wordmark-trace.svg),
+// which share one coordinate system. The mark stays its own gold on a paper tile; no blue
+// anywhere. No text is drawn, so the output never depends on a font being present.
 import sharp from "sharp";
 import { readFileSync, writeFileSync } from "node:fs";
 
 const PAPER = "#FAF7F0";
 const INK = "#1B1814";
-const mark = readFileSync(new URL("../public/mark.svg", import.meta.url), "utf8");
+const mark = readFileSync(
+  new URL("../public/mark.svg", import.meta.url),
+  "utf8",
+);
 const markInner = mark.replace(/<svg[^>]*>/, "").replace("</svg>", "");
-const wordmark = readFileSync(new URL("../design/wordmark/wordmark-trace.svg", import.meta.url), "utf8");
+const markVb = mark.match(/viewBox="([^"]+)"/)[1]; // "220 185 502 345"
+const LOCKUP_VB = "220 153 1735 415"; // mark and lettering together, as traced
+const wordmark = readFileSync(
+  new URL("../design/wordmark/wordmark-trace.svg", import.meta.url),
+  "utf8",
+);
 const wordVb = wordmark.match(/viewBox="([^"]+)"/)[1];
 const wordPath = wordmark.match(/<path d="([^"]+)"/)[1];
 
 function tile(size, radius, pad) {
+  // the mark is wider than tall (502:345); it is centred in the tile at the full inner width
   const inner = size - pad * 2;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
   <rect width="${size}" height="${size}" rx="${radius}" fill="${PAPER}"/>
-  <svg x="${pad}" y="${pad}" width="${inner}" height="${inner}" viewBox="0 0 120 120">${markInner}</svg>
+  <svg x="${pad}" y="${pad}" width="${inner}" height="${inner}" viewBox="${markVb}" preserveAspectRatio="xMidYMid meet" fill-rule="evenodd">${markInner}</svg>
 </svg>`;
 }
 
 writeFileSync("public/favicon.svg", tile(64, 14, 6));
-const png = async (svg, size, out) => sharp(Buffer.from(svg)).resize(size, size).png().toFile(out);
+const png = async (svg, size, out) =>
+  sharp(Buffer.from(svg)).resize(size, size).png().toFile(out);
 await png(tile(64, 14, 6), 32, "public/favicon-32.png");
 await png(tile(180, 40, 20), 180, "public/apple-touch-icon.png");
 await png(tile(192, 42, 22), 192, "public/icon-192.png");
@@ -42,9 +53,8 @@ const og = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" vi
   </defs>
   <rect width="1200" height="630" fill="${PAPER}"/>
   <rect width="1200" height="630" fill="url(#sun)"/>
-  <svg x="120" y="222" width="170" height="170" viewBox="0 0 120 120">${markInner}</svg>
-  <svg x="330" y="238" width="430" height="148" viewBox="${wordVb}" preserveAspectRatio="xMinYMid meet"><path d="${wordPath}" fill="${INK}" fill-rule="evenodd"/></svg>
-  <rect x="120" y="420" width="960" height="1.5" fill="url(#horizon)"/>
+  <svg x="120" y="200" width="760" height="182" viewBox="${LOCKUP_VB}" preserveAspectRatio="xMinYMid meet" fill-rule="evenodd">${markInner}<path d="${wordPath}" fill="${INK}" fill-rule="evenodd"/></svg>
+  <rect x="120" y="430" width="960" height="1.5" fill="url(#horizon)"/>
 </svg>`;
 await sharp(Buffer.from(og)).png().toFile("public/og.png");
 

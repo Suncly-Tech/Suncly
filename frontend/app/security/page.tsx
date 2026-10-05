@@ -3,7 +3,7 @@ import Link from "next/link";
 import { SiteLayout, PageHeader, Section } from "@/components/site/SiteLayout";
 import { FinalCta } from "@/components/site/FinalCta";
 import { Notice } from "@/components/ui/Notice";
-import { limitations, securityPage } from "@/lib/content";
+import { limitations, securityPage, site } from "@/lib/content";
 import { JsonLd } from "@/components/site/JsonLd";
 import {
   breadcrumbLd,
@@ -290,20 +290,20 @@ export default function SecurityPage() {
 
             <h2 id="disclosure">Reporting a vulnerability</h2>
             <p>
-              Report a suspected vulnerability in the Suncly software or this
-              website to <a href="mailto:team@suncly.com">team@suncly.com</a>,
-              the team's general published address, which the founders have not
-              yet confirmed as the destination for security reports; a dedicated
-              security address is a founder input and will replace it here and
-              in{" "}
-              <a href="/.well-known/security.txt">/.well-known/security.txt</a>.
-              What helps: the version or commit, the steps to reproduce, and
-              what you observed. Please test only against your own installation
-              or the bundled mock agents, never against a third party's agent or
-              endpoint, do not access or alter data that is not yours, and give
-              us time to fix before publishing. Acknowledgement and fix times, a
-              safe-harbour statement and credit for reporters are decisions the
-              founders have not yet taken; nothing here promises them.
+              Suncly does not yet publish a security reporting address or a{" "}
+              <code>security.txt</code> file: a monitored address for
+              vulnerability reports is a founder input that has not been
+              confirmed, and until it is, no address on this site is designated
+              for security reports. When one is confirmed it will appear here
+              and at <code>/.well-known/security.txt</code>, together with what
+              to include in a report. The team's general contact address,{" "}
+              <a href={`mailto:${site.email}`}>{site.email}</a>, remains the
+              contact for ordinary enquiries. Please test only against your own
+              installation or the bundled mock agents, never against a third
+              party's agent or endpoint, and do not access or alter data that is
+              not yours. Acknowledgement and fix times, a safe-harbour statement
+              and credit for reporters are decisions the founders have not yet
+              taken; nothing here promises them.
             </p>
             <p>
               <strong>Support period.</strong> The current version (0.1.0) is a

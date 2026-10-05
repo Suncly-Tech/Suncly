@@ -1,9 +1,0 @@
-# Suncly security contact (RFC 9116). Draft: the dedicated security address and the
-# policy's response commitments are founder inputs not yet supplied. The contact below is
-# the team's general published address; the founders have not yet confirmed it as the
-# destination for security reports. Expires is the RFC's required field, set one year out.
-Contact: mailto:team@suncly.com
-Expires: 2027-10-05T00:00:00.000Z
-Preferred-Languages: en, et
-Canonical: https://suncly.com/.well-known/security.txt
-Policy: https://suncly.com/security#disclosure

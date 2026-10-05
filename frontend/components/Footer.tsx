@@ -5,7 +5,7 @@ import { InView } from "./InView";
 import { FindSuncly } from "./home/FindSuncly";
 import { banner, footer, site } from "@/lib/content";
 import { company } from "@/lib/launch";
-import { WORDMARK_VIEWBOX } from "@/lib/wordmark";
+import { LOCKUP_VIEWBOX } from "@/lib/mark";
 
 /**
  * Compact footer navigation in four columns, the legal line, and the signature banner:
@@ -72,95 +72,67 @@ export function Footer({ withFind = false }: { withFind?: boolean }) {
  * crosses the word when it enters view, once, about a second, absent under reduced motion.
  */
 export function Banner() {
-  const [vx, vy, vw, vh] = WORDMARK_VIEWBOX;
-  // the mark (public/mark.svg, 120 units) scaled to the lettering's height, a gap, then the lettering
-  const scale = vh / 120;
-  const markW = 120 * scale;
-  const gap = vh * 0.28;
-  const totalW = markW + gap + vw;
+  // the lockup as traced: the mark and the lettering share one coordinate system (lib/mark.ts)
+  const [lx, ly, lw, lh] = LOCKUP_VIEWBOX;
   return (
     <InView as="div" className="relative" once>
       <div className="container-site flex items-center justify-between gap-6 pb-5">
         <p className="text-eyebrow text-paper/70">{banner.line}</p>
-        <Lockup height={18} className="text-paper" trademark />
+        <Lockup height={15} className="text-paper" trademark />
       </div>
       <div className="relative mx-auto w-[92vw] max-w-none" aria-hidden="true">
         <svg
-          viewBox={`0 0 ${totalW + vh * 0.2} ${vh}`}
+          viewBox={`${lx} ${ly} ${lw + lh * 0.2} ${lh}`}
           className="block w-full text-paper"
           fill="currentColor"
           fillRule="evenodd"
           preserveAspectRatio="xMinYMax meet"
         >
           <defs>
-            <mask
-              id="banner-cuts"
-              maskUnits="userSpaceOnUse"
-              x="0"
-              y="0"
-              width="120"
-              height="120"
-            >
-              <rect width="120" height="120" fill="#fff" />
-              <polygon points="20,120 30,120 70,0 60,0" fill="#000" />
-              <polygon points="50,120 60,120 100,0 90,0" fill="#000" />
-            </mask>
             <linearGradient id="banner-light" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0" stopColor="#F2C14E" stopOpacity="0" />
               <stop offset="0.5" stopColor="#F2C14E" stopOpacity="0.85" />
               <stop offset="1" stopColor="#F2C14E" stopOpacity="0" />
             </linearGradient>
             <mask id="banner-word">
-              <g transform={`translate(${markW + gap - vx} ${-vy})`}>
-                <use href="#suncly-wordmark" fill="#fff" />
-              </g>
+              <use href="#suncly-wordmark" fill="#fff" />
             </mask>
           </defs>
-          <g transform={`scale(${scale})`}>
-            <circle
-              cx="60"
-              cy="60"
-              r="44"
-              fill="#F2C14E"
-              mask="url(#banner-cuts)"
-            />
-          </g>
-          <g transform={`translate(${markW + gap - vx} ${-vy})`}>
-            <use href="#suncly-wordmark" />
-          </g>
+          <use href="#suncly-mark" fill="#F2C14E" />
+          <use href="#suncly-wordmark" />
           <g mask="url(#banner-word)">
             <rect
-              x={-vw * 0.6}
-              y="0"
-              width={vw * 0.5}
-              height={vh}
+              x={lx - lw * 0.6}
+              y={ly}
+              width={lw * 0.5}
+              height={lh}
               fill="url(#banner-light)"
               className="banner-edge-light"
             />
           </g>
           {/* the trade mark symbol, drawn: hairline stroke, at the top right of the last letter, at ascender height */}
           <g
-            transform={`translate(${totalW + vh * 0.03} ${vh * 0.02}) scale(0.55)`}
+            transform={`translate(${lx + lw + lh * 0.03} ${ly + lh * 0.02}) scale(0.55)`}
             fill="none"
             stroke="currentColor"
-            strokeWidth={vh * 0.014}
+            strokeWidth={lh * 0.014}
             strokeLinecap="round"
             strokeLinejoin="round"
           >
             {TRADEMARK_SYMBOL === "®" ? (
               <>
-                <circle cx={vh * 0.11} cy={vh * 0.11} r={vh * 0.1} />
+                <circle cx={lh * 0.11} cy={lh * 0.11} r={lh * 0.1} />
                 <path
-                  d={`M${vh * 0.075} ${vh * 0.16} V${vh * 0.06} h${vh * 0.04} a${vh * 0.025} ${vh * 0.025} 0 0 1 0 ${vh * 0.05} h-${vh * 0.04} m${vh * 0.04} 0 l${vh * 0.03} ${vh * 0.05}`}
+                  d={`M${lh * 0.075} ${lh * 0.16} V${lh * 0.06} h${lh * 0.04} a${lh * 0.025} ${lh * 0.025} 0 0 1 0 ${lh * 0.05} h-${lh * 0.04} m${lh * 0.04} 0 l${lh * 0.03} ${lh * 0.05}`}
                 />
               </>
             ) : (
               <>
                 <path
-                  d={`M0 ${vh * 0.03} h${vh * 0.09} m-${vh * 0.045} 0 v${vh * 0.16}`}
+                  d={`M0 ${lh * 0.03} h${lh * 0.09} m-${lh * 0.045} 0 v${lh * 0.16}`}
                 />
                 <path
-                  d={`M${vh * 0.12} ${vh * 0.19} v-${vh * 0.16} l${vh * 0.055} ${vh * 0.1} l${vh * 0.055} -${vh * 0.1} v${vh * 0.16}`}
+                  d={`M${lh * 0.12} ${lh * 0.19} v-${lh * 0.16} l${lh * 0.055} ${lh * 0.1} l${lh * 0.055} -${lh * 0.1} v${lh * 0.16}`}
                 />
               </>
             )}
@@ -171,7 +143,7 @@ export function Banner() {
       <style>{`
         .banner-edge-light { opacity: 0; }
         [data-inview="true"] .banner-edge-light { animation: banner-pass 1.1s cubic-bezier(0.22, 1, 0.36, 1) 150ms 1 both; }
-        @keyframes banner-pass { from { transform: translateX(0); opacity: 1; } to { transform: translateX(${totalW + vw}px); opacity: 1; } }
+        @keyframes banner-pass { from { transform: translateX(0); opacity: 1; } to { transform: translateX(${lw * 1.3}px); opacity: 1; } }
         @media (prefers-reduced-motion: reduce) { .banner-edge-light { animation: none !important; opacity: 0 !important; } }
       `}</style>
     </InView>

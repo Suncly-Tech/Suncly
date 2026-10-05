@@ -76,7 +76,9 @@ class JobContext:
         with self._lock:
             self._progress.update(changes)
             snapshot = dict(self._progress)
-        self.store.update_progress(self.job.id, snapshot)
+            lost = self._lease_lost
+        if not lost:  # a worker without the lease no longer writes to the job
+            self.store.update_progress(self.job.id, snapshot)
         return snapshot
 
     def progress(self) -> JsonObject:

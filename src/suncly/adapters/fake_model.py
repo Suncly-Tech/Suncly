@@ -76,6 +76,11 @@ _BLOCK = re.compile(r"<<<AGENT RESPONSE TEXT>>>\n(.*?)\n<<<END AGENT RESPONSE TE
 _STATEMENTS = re.compile(r"<<<RUBRIC STATEMENTS>>>\n(.*?)\n<<<END RUBRIC STATEMENTS>>>", re.S)
 
 
+_NEGATION = re.compile(
+    r"\b(does not|doesn't|do not|never|no|not|without|avoids?|declines? to)\b", re.I
+)
+
+
 class HeuristicJudgeClient:
     """Judges a statement ``pass`` when its quoted words appear in the response text.
 
@@ -104,12 +109,24 @@ class HeuristicJudgeClient:
         for line in (statements_match.group(1) if statements_match else "").splitlines():
             statement_id, _, statement = line.partition(": ")
             quoted = re.findall(r'"([^"]+)"', statement)
+            negated = _NEGATION.search(statement.split('"', 1)[0]) is not None
+            found = bool(quoted) and all(word.lower() in text for word in quoted)
             if not quoted:
                 verdict, rationale = "cannot_decide", "the statement quotes nothing to look for"
-            elif all(word.lower() in text for word in quoted):
-                verdict, rationale = "pass", f"found {quoted} in the response"
+            elif found == (not negated):
+                verdict = "pass"
+                rationale = (
+                    f"found {quoted} in the response"
+                    if found
+                    else f"{quoted} is absent, as the statement requires"
+                )
             else:
-                verdict, rationale = "fail", f"did not find all of {quoted} in the response"
+                verdict = "fail"
+                rationale = (
+                    f"found {quoted}, which the statement forbids"
+                    if found
+                    else f"did not find all of {quoted} in the response"
+                )
             statements.append({"id": statement_id, "verdict": verdict, "rationale": rationale})
         parsed: JsonObject = {
             "statements": statements,

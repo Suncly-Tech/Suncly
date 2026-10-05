@@ -38,6 +38,10 @@ class FakeClock:
         self._now = current + timedelta(seconds=1)
         return current
 
+    def advance(self, **delta: float) -> None:
+        """Jump forward (``seconds=``, ``minutes=``, ``hours=``, ``days=``)."""
+        self._now = self._now + timedelta(**delta)
+
 
 class SeqIds:
     def __init__(self) -> None:

@@ -183,7 +183,10 @@ class UsageService:
         outcome: UsageOutcome,
         note: str = "",
         operation: UsageOperation = UsageOperation.AGENT_CALL,
+        logical_run_id: UUID | None = None,
     ) -> UsageEvent:
+        """One line per Runner call. ``logical_run_id`` is the recorded run's id, so a
+        resumed execution can tell which runs the ledger already carries."""
         line = self._table.line_for("suncly-runner", operation, None)
         measured: JsonObject = {"calls": 1}
         cost, billable = price_usage(self._table, line, measured)
@@ -204,6 +207,7 @@ class UsageService:
             billable=0 if outcome is UsageOutcome.UNKNOWN else billable,
             byok=False,
             note=note,
+            logical_run_id=logical_run_id,
         )
 
     def record_model_call(
@@ -255,7 +259,7 @@ class UsageService:
             id=self._ids.new_id(),
             organization_id=organization_id,
             attestation_id=attestation_id,
-            logical_run_id=attestation_id,
+            logical_run_id=None,
             execution_attempt_id=None,
             reservation_id=None,
             provider="suncly",
@@ -294,6 +298,7 @@ class UsageService:
         billable: int,
         byok: bool,
         note: str,
+        logical_run_id: UUID | None = None,
     ) -> UsageEvent:
         if byok:
             billable_minor, allowance, settlement = 0, 0, SettlementState.NOT_BILLABLE
@@ -313,7 +318,7 @@ class UsageService:
             id=self._ids.new_id(),
             organization_id=organization_id,
             attestation_id=attestation_id,
-            logical_run_id=attestation_id,
+            logical_run_id=logical_run_id,
             execution_attempt_id=execution_attempt_id,
             reservation_id=reservation_id,
             provider=provider,

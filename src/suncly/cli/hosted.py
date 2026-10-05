@@ -332,3 +332,71 @@ def trust_rotate(ctx: click.Context, debug: bool) -> None:
         services.close()
     click.echo(f"New current key {signer.key_id} registered for issuer {app_config.issuer}.")
     sys.exit(exit_codes.OK)
+
+
+@main.group("judge")
+def judge_group() -> None:
+    """The model judge: calibration against the human-labelled dataset."""
+
+
+@judge_group.command("calibrate")
+@click.argument("dataset", type=ExistingFile)
+@click.option(
+    "--provider",
+    type=click.Choice(["fake", "configured"]),
+    default="fake",
+    show_default=True,
+    help="`fake` is the offline heuristic judge; `configured` uses SUNCLY_MODEL_* and the "
+    "provider's API key (paid usage, never run in CI).",
+)
+@click.option("--repeats", type=int, default=1, show_default=True)
+@click.option(
+    "--max-false-approval-rate",
+    type=float,
+    default=None,
+    help="Exit non-zero when the false approval rate is above this (reported otherwise).",
+)
+@click.option("--json", "as_json", is_flag=True)
+@click.option("--debug", is_flag=True)
+@handles_errors
+def judge_calibrate(
+    dataset: Path,
+    provider: str,
+    repeats: int,
+    max_false_approval_rate: float | None,
+    as_json: bool,
+    debug: bool,
+) -> None:
+    """Run the judge over the labelled dataset and report false approvals and rejections."""
+    from suncly.adapters.app_wiring import build_model_client
+    from suncly.adapters.fake_model import HeuristicJudgeClient
+    from suncly.core.model_calibration import calibrate_judge, summarize_for_humans
+    from suncly.core.model_judge import ModelJudge
+    from suncly.ports.model import ModelConfig
+
+    if provider == "fake":
+        config = ModelConfig(provider="fake", model="heuristic/1")
+        client: Any = HeuristicJudgeClient()
+    else:
+        app_config = load_app_config(os.environ)
+        if app_config.model is None:
+            raise RefusedError(
+                "No model provider is configured.",
+                "SUNCLY_MODEL_PROVIDER and SUNCLY_MODEL are not set.",
+            )
+        config = app_config.model
+        client = build_model_client(app_config, os.environ)
+        if client is None:
+            raise RefusedError("The configured provider has no client.", "Check the API key.")
+    report = calibrate_judge(dataset, lambda: ModelJudge(client, config), repeats=repeats)
+    summary = report.to_json()
+    if as_json:
+        _emit(summary)
+    else:
+        for line in summarize_for_humans(report):
+            click.echo(line)
+    if (
+        max_false_approval_rate is not None
+        and float(str(summary["false_approval_rate"])) > max_false_approval_rate
+    ):
+        sys.exit(exit_codes.REFUSED)

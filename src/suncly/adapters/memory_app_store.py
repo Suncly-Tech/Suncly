@@ -27,6 +27,7 @@ from suncly.domain.ledger import (
     SettlementState,
     SpendingLimit,
     UsageEvent,
+    UsageOperation,
     UsageOutcome,
 )
 from suncly.domain.models import JsonObject
@@ -453,6 +454,18 @@ class MemoryApplicationStore:
         with self._lock:
             if event.id in self.usage:
                 raise ConflictError("This usage event id was already recorded.")
+            if (
+                event.logical_run_id is not None
+                and event.operation is UsageOperation.AGENT_CALL
+                and any(
+                    u.logical_run_id == event.logical_run_id and u.operation is event.operation
+                    for u in self.usage.values()
+                )
+            ):
+                raise ConflictError(
+                    "This run already has a ledger line.",
+                    f"Run {event.logical_run_id} was billed by an earlier attempt.",
+                )
             if event.provider_request_id is not None and any(
                 u.provider == event.provider and u.provider_request_id == event.provider_request_id
                 for u in self.usage.values()

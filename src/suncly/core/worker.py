@@ -11,7 +11,7 @@ without repeating a run whose outcome is unknown.
 
 from __future__ import annotations
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Any
 from uuid import UUID
 
@@ -174,12 +174,25 @@ class AttestationJobHandler:
             )
         except LeaseLostError:
             raise
+        # A worker whose lease is gone finalizes nothing: another worker owns the job now.
+        context.check()
         attestation = orchestration.attestation
         runs_recorded = [r.run for r in orchestration.recorded]
-        new_runs = [r for r in runs_recorded if r not in orchestration.resumed_runs]
 
-        # -- ledger lines for every attempt of this execution --------------------------------
-        for run in new_runs:
+        # -- ledger lines: one per recorded run, whichever attempt recorded it ----------------
+        # A run recorded by an attempt that died before writing its ledger line is billed
+        # here, once; a run already on the ledger is never billed again.
+        ledger = [
+            event
+            for event in s.app_store.list_usage_events(meta.organization_id)
+            if event.attestation_id == attestation.id
+            and event.operation is UsageOperation.AGENT_CALL
+        ]
+        billed_runs = {event.logical_run_id for event in ledger if event.logical_run_id}
+        billed_notes = {event.note for event in ledger if event.logical_run_id is None}
+        for run in runs_recorded:
+            if run.id in billed_runs:
+                continue
             s.usage.record_agent_call(
                 organization_id=meta.organization_id,
                 attestation_id=attestation.id,
@@ -187,31 +200,31 @@ class AttestationJobHandler:
                 reservation_id=reservation_id,
                 outcome=UsageOutcome.SETTLED,
                 note=f"run {run.test_case_id}#{run.attempt}",
+                logical_run_id=run.id,
             )
         unknown = 0
         for item in orchestration.not_executed:
             if item.reason in (NotExecutedReason.UNKNOWN_OUTCOME, NotExecutedReason.RUNNER_CRASHED):
                 unknown += 1
-                s.usage.record_agent_call(
-                    organization_id=meta.organization_id,
-                    attestation_id=attestation.id,
-                    execution_attempt_id=context.attempt.id,
-                    reservation_id=reservation_id,
-                    outcome=UsageOutcome.UNKNOWN,
-                    note=(
-                        f"unknown outcome: {item.reason.value} "
-                        f"for {item.test_case_id}#{item.attempt}"
-                    ),
+                note = (
+                    f"unknown outcome: {item.reason.value} for {item.test_case_id}#{item.attempt}"
                 )
+                outcome = UsageOutcome.UNKNOWN
             elif item.reason is NotExecutedReason.WITHHELD:
-                s.usage.record_agent_call(
-                    organization_id=meta.organization_id,
-                    attestation_id=attestation.id,
-                    execution_attempt_id=context.attempt.id,
-                    reservation_id=reservation_id,
-                    outcome=UsageOutcome.SETTLED,
-                    note=f"withheld transcript for {item.test_case_id}#{item.attempt}",
-                )
+                note = f"withheld transcript for {item.test_case_id}#{item.attempt}"
+                outcome = UsageOutcome.SETTLED
+            else:
+                continue
+            if note in billed_notes:
+                continue
+            s.usage.record_agent_call(
+                organization_id=meta.organization_id,
+                attestation_id=attestation.id,
+                execution_attempt_id=context.attempt.id,
+                reservation_id=reservation_id,
+                outcome=outcome,
+                note=note,
+            )
 
         transcript_hashes = {
             str(run.id): evidence_document_hash(s.transcripts, run.transcript_ref)
@@ -238,6 +251,7 @@ class AttestationJobHandler:
             baseline=baseline,
             baseline_at=baseline_at,
         )
+        context.check()
         engine = PolicyEngine(s.store, s.clock, s.ids, signer)
         policy_evaluation: JsonObject | None = None
         if attestation.status is AttestationStatus.RUNNING:
@@ -271,8 +285,8 @@ class AttestationJobHandler:
                     "deployment_identity": binding.deployment_identity.to_json()
                     if binding.deployment_identity
                     else None,
-                    "issued_at": s.clock.now(),
-                    "expires_at": s.clock.now() + binding.validity,
+                    "issued_at": datetime.fromisoformat(str(payload["issued_at"])),
+                    "expires_at": datetime.fromisoformat(str(payload["expires_at"])),
                     "payload_version": integrity.PAYLOAD_VERSION_2,
                 }
             )

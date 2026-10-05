@@ -44,6 +44,50 @@ API_DESCRIPTION = (
 )
 
 
+# -- dependencies ---------------------------------------------------------------------
+# Module level on purpose: FastAPI resolves the (postponed) annotations of route functions
+# in this module's namespace, so the aliases must live here, not inside ``create_app``.
+
+
+def services_of(request: Request) -> AppServices:
+    services: AppServices = request.app.state.services
+    return services
+
+
+def principal(
+    request: Request,
+    authorization: Annotated[str | None, Header()] = None,
+) -> Principal:
+    if not authorization or not authorization.lower().startswith("bearer "):
+        raise AuthenticationError(
+            "A bearer token is required.",
+            "No Authorization: Bearer header was sent.",
+            "Sign in with the configured identity provider and send its token.",
+        )
+    token = authorization.split(None, 1)[1].strip()
+    last: AuthenticationError | None = None
+    for verifier in services_of(request).verifiers:
+        try:
+            return verifier.verify(token)
+        except AuthenticationError as exc:
+            last = exc
+    raise last or AuthenticationError("The token could not be verified.")
+
+
+AuthenticatedPrincipal = Annotated[Principal, Depends(principal)]
+
+
+def context_for(permission: str) -> Callable[..., AuthorizedContext]:
+    """A dependency resolving the caller's membership in the organization of the URL."""
+
+    def dependency(
+        request: Request, organization_id: UUID, who: AuthenticatedPrincipal
+    ) -> AuthorizedContext:
+        return services_of(request).authorizer.require(who, organization_id, permission)
+
+    return dependency
+
+
 def create_app(services: AppServices) -> FastAPI:
     app = FastAPI(
         title=API_TITLE,
@@ -68,34 +112,6 @@ def create_app(services: AppServices) -> FastAPI:
         response: Response = await call_next(request)
         response.headers["X-Request-Id"] = request_id
         return response
-
-    # -- dependencies ------------------------------------------------------------
-
-    def principal(
-        authorization: Annotated[str | None, Header()] = None,
-    ) -> Principal:
-        if not authorization or not authorization.lower().startswith("bearer "):
-            raise AuthenticationError(
-                "A bearer token is required.",
-                "No Authorization: Bearer header was sent.",
-                "Sign in with the configured identity provider and send its token.",
-            )
-        token = authorization.split(None, 1)[1].strip()
-        last: AuthenticationError | None = None
-        for verifier in services.verifiers:
-            try:
-                return verifier.verify(token)
-            except AuthenticationError as exc:
-                last = exc
-        raise last or AuthenticationError("The token could not be verified.")
-
-    AuthenticatedPrincipal = Annotated[Principal, Depends(principal)]  # noqa: N806 - a type alias
-
-    def context_for(permission: str) -> Callable[..., AuthorizedContext]:
-        def dependency(organization_id: UUID, who: AuthenticatedPrincipal) -> AuthorizedContext:
-            return services.authorizer.require(who, organization_id, permission)
-
-        return dependency
 
     # -- serializers ------------------------------------------------------------
 

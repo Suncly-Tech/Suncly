@@ -200,7 +200,10 @@ def test_layer_2_decides_rubrics_through_the_model_port() -> None:
     judge = ModelJudge(HeuristicJudgeClient(), CONFIG)
     tc = case_for(crit)
     passing = judge.judge(transcript_with("The capital is Paris."), crit, tc)
-    assert passing.verdict is RunVerdict.FAIL, 'the second statement quotes "maybe" which is absent'
+    assert passing.verdict is RunVerdict.PASS, 'names Paris and does not say "maybe"'
+    hedged = judge.judge(transcript_with("Maybe Paris?"), crit, tc)
+    assert hedged.verdict is RunVerdict.FAIL, "a negated statement fails when its words appear"
+    assert [st["verdict"] for st in hedged.statements] == ["pass", "fail"]
     assert passing.rubric_id == "capital" and passing.rubric_version == "3"
     assert passing.model.startswith("fake") and passing.usage["input_tokens"] > 0
     folded = apply_model_judgement(

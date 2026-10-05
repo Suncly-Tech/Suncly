@@ -226,6 +226,12 @@ CREATE TABLE suncly_app.usage_event (
     CONSTRAINT usage_unknown_has_no_cost CHECK (outcome <> 'unknown' OR provider_cost_minor IS NULL)
 );
 CREATE INDEX usage_event_org_time_idx ON suncly_app.usage_event (organization_id, recorded_at);
+
+-- One ledger line per recorded run and operation: a resumed execution that bills a run
+-- the dead attempt already billed is refused by the database, not only by the worker.
+CREATE UNIQUE INDEX usage_event_one_line_per_run
+    ON suncly_app.usage_event (logical_run_id, operation)
+    WHERE logical_run_id IS NOT NULL AND operation = 'agent_call';
 CREATE UNIQUE INDEX usage_event_provider_request_idx
     ON suncly_app.usage_event (provider, provider_request_id) WHERE provider_request_id IS NOT NULL;
 

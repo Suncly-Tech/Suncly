@@ -130,7 +130,10 @@ def approved_contract(conn: Conn) -> tuple[uuid.UUID, uuid.UUID, uuid.UUID]:
 
 
 def rejects(
-    conn: Conn, error: type[Exception], statement: str, params: tuple[Any, ...] = ()
+    conn: Conn,
+    error: type[Exception] | tuple[type[Exception], ...],
+    statement: str,
+    params: tuple[Any, ...] = (),
 ) -> None:
     """Assert the statement fails with ``error`` without poisoning the outer transaction."""
     with pytest.raises(error), conn.transaction():
@@ -255,7 +258,9 @@ def test_rejects_update_delete_and_truncate_on_run_and_decision(db: Conn) -> Non
         (decision_id,),
     )
     rejects(db, errors.RaiseException, "DELETE FROM decision WHERE id = %s", (decision_id,))
-    rejects(db, errors.RaiseException, "TRUNCATE decision")
+    # Since migration 0002, suncly_app.decision_note references decision, so Postgres refuses
+    # the TRUNCATE on the foreign key before the append-only trigger can; either way it is refused.
+    rejects(db, (errors.RaiseException, errors.FeatureNotSupported), "TRUNCATE decision")
 
 
 def test_rejects_a_decision_for_a_failed_invalidated_or_cancelled_attestation(db: Conn) -> None:

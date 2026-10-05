@@ -57,7 +57,7 @@ class DeterministicDrafter:
                     DraftTestCase(
                         skill_id=skill.id,
                         input={"text": example},
-                        criteria=criteria.model_dump(mode="json", exclude_none=True),
+                        criteria=criteria.to_document(),
                         kind=TestCaseKind.SKILL,
                     )
                 )

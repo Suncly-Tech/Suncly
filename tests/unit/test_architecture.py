@@ -128,11 +128,18 @@ def test_no_module_outside_the_runner_reads_the_environment_for_the_agent() -> N
             assert module in allowed, f"{module} reads the environment"
 
 
-def test_no_code_path_constructs_an_approve_or_block_decision() -> None:
-    """The MVP never writes approve or block: the names appear only in the enum and in checks."""
+def test_only_the_policy_evaluation_constructs_an_approve_or_block_decision() -> None:
+    """``approve`` and ``block`` come from the customer's policy alone (POLICY.md).
+
+    Only the pure evaluation in ``domain.policy`` names them; every other
+    module (the API, the CLI, the Judge, the adapters) can only pass a decision
+    through. Without a policy the evaluation yields ``flag``, which
+    ``tests/unit/test_policy.py`` proves.
+    """
     pattern = re.compile(r"DecisionOutcome\.(APPROVE|BLOCK)\b")
+    allowed = {"domain.models", "domain.policy"}
     for module, path in modules():
-        if module == "domain.models":
+        if module in allowed:
             continue
         assert not pattern.search(path.read_text(encoding="utf-8")), f"{module} names approve/block"
 
@@ -224,14 +231,21 @@ def test_placeholders_for_later_stages_hold_only_a_docstring() -> None:
         assert re.search(r"stage [56]", docstring), relative
 
 
-def test_packaged_migration_matches_the_db_folder() -> None:
-    packaged = SRC / "adapters" / "postgres" / "migrations" / "0001_initial_schema.sql"
-    source = REPO / "db" / "migrations" / "0001_initial_schema.sql"
-    assert packaged.read_bytes() == source.read_bytes()
+def test_packaged_migrations_match_the_db_folder() -> None:
+    source_dir = REPO / "db" / "migrations"
+    packaged_dir = SRC / "adapters" / "postgres" / "migrations"
+    sources = sorted(p.name for p in source_dir.glob("*.sql"))
+    assert sources == sorted(p.name for p in packaged_dir.glob("*.sql"))
+    for name in sources:
+        assert (packaged_dir / name).read_bytes() == (source_dir / name).read_bytes(), name
 
 
-def test_db_folder_holds_exactly_the_migration_and_its_readme() -> None:
+def test_db_folder_holds_exactly_the_migrations_and_its_readme() -> None:
     files = sorted(
         p.relative_to(REPO / "db").as_posix() for p in (REPO / "db").rglob("*") if p.is_file()
     )
-    assert files == ["README.md", "migrations/0001_initial_schema.sql"]
+    assert files == [
+        "README.md",
+        "migrations/0001_initial_schema.sql",
+        "migrations/0002_application_layer.sql",
+    ]

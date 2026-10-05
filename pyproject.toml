@@ -76,6 +76,8 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "src/suncly/cli/*" = ["T20"]
+# Queries are built from module constants (schema and table names), never from input.
+"src/suncly/adapters/postgres/*" = ["S608"]
 "src/suncly/mock_agents/*" = ["T20"]
 "tasks.py" = ["T20", "S"]
 "tests/*" = ["S", "T20", "PLR2004", "E501"]

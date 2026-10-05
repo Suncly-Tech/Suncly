@@ -30,7 +30,7 @@ from tests.fakes import (
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 ServicesFactory = Callable[..., Services]
-MIGRATION = REPO_ROOT / "db" / "migrations" / "0001_initial_schema.sql"
+MIGRATIONS = sorted((REPO_ROOT / "db" / "migrations").glob("*.sql"))
 
 
 @pytest.fixture(scope="session")
@@ -44,16 +44,18 @@ def database_url() -> str:
 
 @pytest.fixture(scope="session")
 def migrated_database(database_url: str) -> str:
-    """A database holding exactly the schema of ``db/migrations/0001_initial_schema.sql``.
+    """A database holding exactly the schema of the files in ``db/migrations``.
 
-    The public schema is dropped and the migration file applied as-is, so the
-    tests exercise the committed file and nothing else.
+    The schemas are dropped and the migration files applied as-is, in order, so
+    the tests exercise the committed files and nothing else.
     """
     psycopg = pytest.importorskip("psycopg")
     with psycopg.connect(database_url, autocommit=True) as conn:
+        conn.execute("DROP SCHEMA IF EXISTS suncly_app CASCADE")
         conn.execute("DROP SCHEMA public CASCADE")
         conn.execute("CREATE SCHEMA public")
-        conn.execute(MIGRATION.read_text(encoding="utf-8"))
+        for migration in MIGRATIONS:
+            conn.execute(migration.read_text(encoding="utf-8"))
     return database_url
 
 

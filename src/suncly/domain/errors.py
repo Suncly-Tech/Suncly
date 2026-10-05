@@ -75,3 +75,39 @@ class RunnerError(SunclyError):
 
 class TargetHostRefusedError(RunnerError):
     """The Runner refused a request to a host other than the target (schema §2)."""
+
+
+class AuthenticationError(SunclyError):
+    """No valid credential was presented to the API."""
+
+
+class AuthorizationError(SunclyError):
+    """The principal is not allowed to do this in this organization."""
+
+
+class NotFoundError(SunclyError):
+    """The record does not exist in this organization (also used to hide other tenants')."""
+
+
+class ConflictError(SunclyError):
+    """The operation conflicts with the record's current state."""
+
+
+class ValidationFailedError(SunclyError):
+    """A request body or configuration is invalid."""
+
+
+class QuotaError(SunclyError):
+    """The tenant's hard spending limit or entitlement refuses the operation."""
+
+
+class BillingError(SunclyError):
+    """The payment provider refused or the webhook could not be verified."""
+
+
+class JobError(SunclyError):
+    """A job could not be claimed, heartbeated or finished as expected."""
+
+
+class ModelProviderError(SunclyError):
+    """A model provider adapter is misconfigured. Model failures are recorded, never raised."""

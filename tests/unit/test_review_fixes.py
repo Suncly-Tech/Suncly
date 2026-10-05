@@ -8,7 +8,7 @@ import os
 import sys
 import threading
 from pathlib import Path
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import pytest
 
@@ -18,7 +18,7 @@ from suncly.core.jobs import JobContext, WorkerLoop
 from suncly.domain.errors import ConfigError
 from suncly.domain.jobs import AttemptOutcome, JobKind, JobStatus
 from suncly.domain.ledger import Reservation, ReservationState
-from suncly.domain.models import AttestationStatus
+from suncly.domain.models import AttestationStatus, Contract
 from suncly.domain.tenancy import DeploymentMode, Role
 from tests.fakes import StaticFetcher, card_text
 from tests.hosted import build_world, prepare_attestation
@@ -68,7 +68,7 @@ def test_a_job_that_exhausts_its_attempts_fails_the_attestation_and_keeps_the_mo
     # exhausts the job; a store that fails on every attempt does.
     original = s.store.get_contract
 
-    def dying(contract_id: object) -> object:
+    def dying(contract_id: UUID) -> Contract | None:
         raise OSError("evidence disk is full")
 
     s.store.get_contract = dying  # type: ignore[method-assign]
@@ -89,9 +89,7 @@ def test_a_job_that_exhausts_its_attempts_fails_the_attestation_and_keeps_the_mo
     assert attestation is not None and attestation.status is AttestationStatus.FAILED
     assert attestation.finished_at is not None and s.store.list_decisions(attestation.id) == []
     assert job.progress["phase"] == "finished" and "disk is full" in job.progress["note"]
-    reservation = s.app_store.get_reservation(
-        __import__("uuid").UUID(str(job.payload["reservation_id"]))
-    )
+    reservation = s.app_store.get_reservation(UUID(str(job.payload["reservation_id"])))
     assert reservation is not None and reservation.state is ReservationState.HELD, (
         "a person reconciles it"
     )

@@ -7,7 +7,8 @@ database.
 | File | Contents |
 |---|---|
 | `migrations/0001_initial_schema.sql` | The seven tables, eight enums, constraints and triggers. |
-| `README.md` | This document: what the migration enforces and what it leaves open. |
+| `migrations/0002_rls_and_search_path.sql` | Row level security on the seven tables, with no policies, and a fixed `search_path` for the six trigger functions. |
+| `README.md` | This document: what the migrations enforce and what they leave open. |
 
 **Source of truth.** This folder implements
 [docs/DATA_MODEL.md](../docs/DATA_MODEL.md). It does not redefine the model:
@@ -21,21 +22,35 @@ define, and `OQ-…` marks open questions.
 ## Running it
 
 Any PostgreSQL 13 or newer works: Supabase, Google Cloud SQL or a local
-install.
+install. Apply the files in order; each runs in one transaction, so either
+everything in it is created or nothing is:
 
 ```bash
-psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/migrations/0001_initial_schema.sql
+for f in db/migrations/*.sql; do psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$f"; done
 ```
 
-On Supabase the file can also be pasted into the SQL Editor. The migration
-runs in one transaction: either everything is created or nothing is.
+`suncly db migrate` does the same and applies only what the database does not
+hold yet; `suncly db check` verifies the result. On Supabase the files can
+also be pasted into the SQL Editor, one after the other.
 
-To check the result:
+On Supabase, `DATABASE_URL` must use port 5432: the direct connection
+(`postgresql://postgres:<password>@db.<project-ref>.supabase.co:5432/postgres`,
+which needs IPv6 or the IPv4 add-on) or the session pooler
+(`postgresql://postgres.<project-ref>:<password>@aws-<n>-<region>.pooler.supabase.com:5432/postgres`).
+Never the transaction pooler on port 6543: the store keeps one connection and
+uses prepared statements, which transaction mode does not support.
+
+To check the result by hand:
 
 ```sql
 SELECT count(*) FROM information_schema.tables
 WHERE table_schema = 'public' AND table_type = 'BASE TABLE';
 -- expected: 7
+SELECT count(*) FROM pg_tables WHERE schemaname = 'public' AND rowsecurity;
+-- expected: 7 (migration 0002)
+SELECT count(*) FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+WHERE n.nspname = 'public' AND p.proname LIKE 'suncly%' AND p.proconfig IS NOT NULL;
+-- expected: 6 (migration 0002)
 ```
 
 Never put the connection string or the database password in the repository.
@@ -131,12 +146,49 @@ says so in a comment.
 | OQ-D2, OQ-D4: card URL, repetitions, judge model version | No columns added. The seven entities keep exactly the schema's fields. |
 | OQ-A7, OQ-A8: hash and signature formats | `card_hash` and `signature` are plain `text` with no format check. |
 
+## Row level security and function search paths (migration 0002)
+
+Supabase's Security Advisor reports two things about the schema of 0001:
+`RLS Disabled in Public` for the seven tables, and `Function Search Path
+Mutable` for the six trigger functions. Migration 0002 answers both without
+changing the model:
+
+- **Row level security is enabled on all seven tables, with no policies.**
+  Every role sees no rows and can write nothing until a policy is added in a
+  later migration, except the table owner (the role that ran the migrations),
+  superusers and roles with the `BYPASSRLS` attribute; on Supabase those are
+  the `postgres` role, which owns the tables, and `service_role`. Postgres
+  applies row security to the owner only under `FORCE ROW LEVEL SECURITY`,
+  which the migration clears. Suncly's Postgres store connects as the owner.
+  The Security Advisor then shows one INFO entry per table, `RLS Enabled No
+  Policy`: that is the intended state until policies exist, not a failure.
+- **Each trigger function runs with `SET search_path = ''`** and names every
+  table and type it uses as `public.…`, so an object planted in another
+  schema can never be picked up instead. From 0002 on, the schema lives in
+  `public`.
+
+The migration is idempotent: it is safe on a database where row level
+security was already enabled by hand, and when run twice. `suncly db check`
+reports a table without row level security, a table where it is forced, a
+function without a fixed `search_path`, and a function whose body is not the
+one in 0002 (for example after a hand-run `ALTER FUNCTION ... SET search_path
+= ''` on the bodies of 0001, which would break every guard that reads another
+table). `suncly db migrate` repairs each of these by applying 0002 again.
+
+The guards run as `SECURITY INVOKER`: they read `contract`, `attestation`,
+`test_case` and `decision` under the writing role's own policies, and treat a
+parent row they cannot see as absent. A later migration that lets another role
+write must therefore also give that role `SELECT` (and, for the row locks the
+guards take, `UPDATE`) policies on those tables, or the guards would pass
+where they should refuse.
+
 ## Changing the schema
 
 A migration file is never edited once it has been run anywhere. Every change
 is a new file: `0002_...sql`, `0003_...sql` and so on.
 
 Postgres superusers can disable triggers, so the append-only triggers protect
-against application bugs, not against someone with full database access. The
-application should connect with a role that is not a superuser and does not
-own the tables.
+against application bugs, not against someone with full database access.
+Until policies exist (migration 0002), the application has to connect as the
+table owner; a separate, non-superuser role with its own policies is the next
+step.

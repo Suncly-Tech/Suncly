@@ -61,7 +61,7 @@ jobs:
           cache: pip
       - name: Install
         run: python tasks.py install
-      - name: Apply the migration with psql
-        run: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/migrations/0001_initial_schema.sql
+      - name: Apply the migrations with psql, in order
+        run: for f in db/migrations/*.sql; do psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$f"; done
       - name: Database and store tests
         run: python tasks.py test

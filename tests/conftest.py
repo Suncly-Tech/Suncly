@@ -9,6 +9,7 @@ from __future__ import annotations
 import os
 from collections.abc import Callable, Iterator
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -30,7 +31,13 @@ from tests.fakes import (
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 ServicesFactory = Callable[..., Services]
-MIGRATION = REPO_ROOT / "db" / "migrations" / "0001_initial_schema.sql"
+MIGRATIONS_DIR = REPO_ROOT / "db" / "migrations"
+
+
+def apply_migrations(conn: Any) -> None:
+    """Apply every file in ``db/migrations``, in order, exactly as committed."""
+    for path in sorted(MIGRATIONS_DIR.glob("*.sql")):
+        conn.execute(path.read_text(encoding="utf-8"))
 
 
 @pytest.fixture(scope="session")
@@ -44,16 +51,16 @@ def database_url() -> str:
 
 @pytest.fixture(scope="session")
 def migrated_database(database_url: str) -> str:
-    """A database holding exactly the schema of ``db/migrations/0001_initial_schema.sql``.
+    """A database holding exactly the schema of the files in ``db/migrations``.
 
-    The public schema is dropped and the migration file applied as-is, so the
-    tests exercise the committed file and nothing else.
+    The public schema is dropped and the migration files applied as-is, in
+    order, so the tests exercise the committed files and nothing else.
     """
     psycopg = pytest.importorskip("psycopg")
     with psycopg.connect(database_url, autocommit=True) as conn:
         conn.execute("DROP SCHEMA public CASCADE")
         conn.execute("CREATE SCHEMA public")
-        conn.execute(MIGRATION.read_text(encoding="utf-8"))
+        apply_migrations(conn)
     return database_url
 
 

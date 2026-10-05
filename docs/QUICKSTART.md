@@ -143,7 +143,7 @@ other.
 ## 7. Use Postgres instead of the file store
 
 By default evidence lives in files under `~/.suncly/store`. To use Postgres,
-set `DATABASE_URL` and apply the migration:
+set `DATABASE_URL` and apply the migrations:
 
 ```powershell
 $env:DATABASE_URL = "postgresql://user:password@host:5432/suncly"    # never commit this value
@@ -152,8 +152,10 @@ suncly db check
 ```
 
 That is the only change. Transcripts stay on local disk under
-`~/.suncly/transcripts` until an object storage adapter exists. When the
-Supabase database is ready, set `DATABASE_URL` to its connection string.
+`~/.suncly/transcripts` until an object storage adapter exists. On Supabase,
+use a port 5432 connection string (the direct connection or the session
+pooler), never the transaction pooler on port 6543, which does not support
+the prepared statements the store uses; see [db/README.md](../db/README.md).
 
 ## 8. When something goes wrong
 

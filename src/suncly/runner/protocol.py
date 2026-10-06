@@ -57,8 +57,10 @@ def _request_params(job: RunJob, params: JsonObject) -> JsonObject:
     """``params`` with the interface's ``tenant`` first when one is declared (A2A §8.3.2).
 
     The field is omitted when the interface declares none, as the same rule requires.
+    An empty string counts as none: ``tenant`` is a plain proto3 string, so a card
+    that serializes it as ``""`` (as a2a-js does) has not set it.
     """
-    if job.tenant is None:
+    if not job.tenant:
         return params
     return {"tenant": job.tenant, **params}
 

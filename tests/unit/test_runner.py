@@ -128,14 +128,19 @@ def test_the_tenant_of_the_selected_interface_is_sent_in_every_request() -> None
     assert [m for m, _ in transport.calls] == ["SendMessage", "GetTask"]
     assert transport.calls[0][1]["tenant"] == "acme"
     assert transport.calls[1][1] == {"tenant": "acme", "id": "task-1"}
-    # Without a declared tenant the field is omitted, as the same rule requires.
-    transport = ScriptedTransport(
-        TARGET,
-        [rpc_ok({"task": task_response(state="TASK_STATE_SUBMITTED")}), rpc_ok(task_response())],
-    )
-    run(transport)
-    assert "tenant" not in transport.calls[0][1]
-    assert transport.calls[1][1] == {"id": "task-1"}
+    # Without a declared tenant the field is omitted, as the same rule requires. An empty
+    # string is "not set" for a proto3 string field (a2a-js cards serialize tenant as "").
+    for undeclared in (job(), job(tenant="")):
+        transport = ScriptedTransport(
+            TARGET,
+            [
+                rpc_ok({"task": task_response(state="TASK_STATE_SUBMITTED")}),
+                rpc_ok(task_response()),
+            ],
+        )
+        run(transport, undeclared)
+        assert "tenant" not in transport.calls[0][1]
+        assert transport.calls[1][1] == {"id": "task-1"}
 
 
 def test_interrupted_states_stop_the_runner_without_answering() -> None:

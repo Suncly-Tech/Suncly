@@ -50,7 +50,7 @@ marked **uncertain**.
 | a2a-samples `multitenancy` (three tenants on one host) | yes | 1.0 | Three cards at tenant sub-paths parsed; 18 runs over path-bearing interface URLs, all `pass`; `suncly verify` passes | works as intended |
 | a2a-samples `sign_and_verify_agent_card` | yes | 1.0 | Signed card parsed; `card_hash` stable although the agent re-signs on every fetch; 3 runs, all `fail` on `output_modes` because the card declares `"text"` instead of a media type | works as intended; agent card conformance issue |
 | a2a-samples Go `helloworld` (a2a-go v2.3.1) | yes | 1.0 | Card parsed; 6 runs, all `fail` on `response_present` because the agent returns its answer in `status.message` and no artifact; the Go SDK's JSON was consumed without any structural problem | works as intended; agent deviates from a spec SHOULD |
-| JavaScript agent on `@a2a-js/sdk` | partly (official SDK, see section) | pending | pending | pending |
+| Echo agent on `@a2a-js/sdk` 1.3.0 | official SDK, test agent written for this run (see section) | 1.0 | Card parsed; 3 runs, all `pass`; a variant with the official JS sample's `["text", "task-status"]` output modes fails `output_modes` correctly; the SDK's `"tenant": ""` exposed an edge case in the `tenant` fix, now handled | works as intended |
 
 Spec gap found by reading, confirmed by the spec and fixed: the Runner never
 sent the `tenant` routing field that spec §8.3.2 requires when the selected
@@ -422,9 +422,50 @@ Only the differences Suncly's JSON-RPC path meets. Sources: spec v0.3.0
 - **Evidence:** `scratchpad/runs/go-helloworld/` (card, six probes,
   `src-diff.txt`, `build.log`, report folder).
 
-### 8. JavaScript agent on `@a2a-js/sdk`
+### 8. Echo agent on `@a2a-js/sdk` 1.3.0 (JavaScript)
 
-Pending.
+- **Repository:** the official JavaScript SDK `@a2a-js/sdk` 1.3.0 (npm,
+  2026-09-29; `a2aproject/a2a-js` main c4eac35, 2026-10-06), Apache-2.0,
+  implementing A2A 1.0 with an opt-in 0.3 layer that stayed off. The agent
+  itself is **not an official sample**: the a2a-samples JavaScript agents pin
+  `@a2a-js/sdk ^0.3.3` and need Gemini keys, and the a2a-js repository's own
+  sample agent imports the SDK from source, needs the repository's full
+  development toolchain and hard-codes its card URL to port 41241. A minimal
+  echo agent (one skill `echo`, example `hi`, one `text/plain` artifact) was
+  written with the documented server API, mirroring that sample's structure.
+  Port 9908.
+- **Protocol version:** 1.0; the card's interface is
+  `{"url": "http://127.0.0.1:9908/", "protocolBinding": "JSONRPC", "tenant": "", "protocolVersion": "1.0"}`.
+  The SDK serializes every empty field literally (`tenant`, `signatures`,
+  `securityRequirements`, `documentationUrl`), as the official sample's card
+  does too.
+- **Card discovery:** 200 with `ETag` and `Cache-Control`;
+  `/.well-known/agent.json` 404.
+- **Card parsing:** parsed; `card_hash` `sha256:e8ec10f6…673c`, recomputed
+  independently; JSONRPC 1.0 selected; one test case drafted.
+- **Declared skills:** `echo`.
+- **Invocation:** one blocking `SendMessage` per run; each answer
+  `{"result": {"task": {… "status": {"state": "TASK_STATE_COMPLETED"}, "artifacts": [{"artifactId": …, "name": "echo", "parts": [{"mediaType": "text/plain", "text": "hi"}]}], "history": […]}}}`,
+  6 to 7 ms. Probes: 0.3-shaped requests, with `A2A-Version: 0.3` or without
+  a header, and a 1.0 request without the header, all get -32009
+  `VERSION_NOT_SUPPORTED` (spec §3.6.2 behaviour: empty means 0.3, which the
+  card does not offer); a 0.3 method name under header 1.0 gets -32601;
+  `GetTask` returns the bare Task; every error comes as HTTP 200 with a
+  JSON-RPC error envelope.
+- **Interpretation:** 3 `pass`, 0 `fail`, 0 `inconclusive`; completed,
+  `flag`, signed, exit 0. A second one-run attestation against the same agent
+  with the official sample's `defaultOutputModes` of `["text", "task-status"]`
+  failed `output_modes` ("offending media types: ['text/plain']"), correctly.
+- **Pass or failure point:** none on the main run.
+- **Classification:** works as intended. Two findings: the official a2a-js
+  sample card's output modes are not media types (same **card conformance
+  issue** as two Python samples); and the Runner, after the first version of
+  the `tenant` fix, forwarded `"tenant": ""` because the card carries that
+  literal. `tenant` is a plain proto3 string, so an empty value is "not set";
+  the fix now omits empty values as well (regression test extended). The JS
+  SDK ignores an empty tenant, so no run was affected.
+- **Evidence:** `scratchpad/runs/js-sdk/` (`src/index.mjs`, card, six probes,
+  report folder, `variant-sample-modes/`).
 
 ## Findings by class
 
@@ -436,12 +477,13 @@ Pending.
    make this a MUST. It affected no run here, because none of the tested
    cards declares a tenant on its JSONRPC interface, but it is a MUST and the
    fix is a pass-through.
-2. **Agent cards (a2a-tck SUT and `sign_and_verify_agent_card`):**
-   `defaultInputModes` and `defaultOutputModes` are `["text"]`, not media
-   types; the proto defines these fields as media types and every example in
-   the spec uses forms such as `text/plain`. On the signed-card sample this
-   made all three runs fail the `output_modes` check, correctly: the agent
-   emits `text/plain`. On the SUT it was not triggered (no artifacts).
+2. **Agent cards (a2a-tck SUT, `sign_and_verify_agent_card`, the a2a-js
+   sample agent):** `defaultInputModes` and `defaultOutputModes` are
+   `["text"]` or `["text", "task-status"]`, not media types; the proto
+   defines these fields as media types and every example in the spec uses
+   forms such as `text/plain`. On the signed-card sample and on the JS
+   variant this made every run fail the `output_modes` check, correctly: the
+   agents emit `text/plain`. On the SUT it was not triggered (no artifacts).
 3. **SDK (a2a-sdk 1.2.2, 0.3 compatibility path):** a 0.3-shaped request with
    `A2A-Version: 1.0` is answered with -32603 where spec §9.5 assigns -32009
    to `VersionNotSupportedError`. **Uncertain** whether the maintainers count
@@ -523,7 +565,7 @@ founders can decide; none was changed in this task.
 
 | Bug | Fix | Regression test |
 |---|---|---|
-| `tenant` not sent (spec §8.3.2) | `RunJob.tenant` carries the selected interface's value; the Orchestrator fills it; the Runner adds `tenant` to the `SendMessage` and `GetTask` params when set and omits it otherwise | `tests/unit/test_runner.py::test_the_tenant_of_the_selected_interface_is_sent_in_every_request`, `tests/unit/test_orchestrator_and_service.py::test_the_tenant_of_the_selected_interface_reaches_the_runner` |
+| `tenant` not sent (spec §8.3.2) | `RunJob.tenant` carries the selected interface's value; the Orchestrator fills it; the Runner adds `tenant` to the `SendMessage` and `GetTask` params when set and omits it when absent or empty (a plain proto3 string serialized as `""` is not set; a2a-js cards do this) | `tests/unit/test_runner.py::test_the_tenant_of_the_selected_interface_is_sent_in_every_request`, `tests/unit/test_orchestrator_and_service.py::test_the_tenant_of_the_selected_interface_reaches_the_runner` |
 | `--export-draft` internal error on a card without usable examples | the export path raises the same `ContractError` as `create_draft` before building the file | `tests/unit/test_orchestrator_and_service.py::test_export_draft_of_a_card_without_usable_examples_is_refused_not_an_internal_error` |
 | 0.3 card refused with a generic structure message | `parse_agent_card` recognizes the pre-1.0 card markers (top-level `url`, `preferredTransport`, `protocolVersion`, no `supportedInterfaces`) and names the declared protocol version in the refusal | `tests/unit/test_card.py::test_a_0_3_card_is_refused_with_its_protocol_version_named` |
 
@@ -535,7 +577,9 @@ no secret handling or host restriction weakened.
 
 **Which tested agents require older-version compatibility:** the Python
 `helloworld` sample on a2a-sdk 0.3.26 (section 3). Every other agent tested is
-1.0. Among the official repositories: all four SDK main lines (a2a-python
+1.0: four Python agents on a2a-sdk 1.1.0 and 1.2.2, one Go agent on a2a-go
+v2.3.1 and one JavaScript agent on `@a2a-js/sdk` 1.3.0 interoperated with
+Suncly's 1.0 client without any translation. Among the official repositories: all four SDK main lines (a2a-python
 1.2.2, a2a-js 1.3.0, a2a-go v2.6.0, a2a-java 1.4.0.Final) are protocol 1.0
 with opt-in 0.3 compatibility layers; the TCK and a2a-inspector are 1.0 tools;
 but the sample corpus is still mostly 0.3-written: 28 of 39 Python sample

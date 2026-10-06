@@ -114,6 +114,30 @@ def test_a_non_terminal_task_is_polled_with_get_task_until_final() -> None:
     assert len(transcript.exchanges) == 6
 
 
+def test_the_tenant_of_the_selected_interface_is_sent_in_every_request() -> None:
+    """A2A v1.0.1 §8.3.2 rule 4: set ``tenant`` to the interface's value in every request.
+
+    Found while attesting reference agents (docs/REAL_AGENT_REPORT.md): the Runner
+    omitted the field even when the selected interface declared one.
+    """
+    transport = ScriptedTransport(
+        TARGET,
+        [rpc_ok({"task": task_response(state="TASK_STATE_SUBMITTED")}), rpc_ok(task_response())],
+    )
+    run(transport, job(tenant="acme"))
+    assert [m for m, _ in transport.calls] == ["SendMessage", "GetTask"]
+    assert transport.calls[0][1]["tenant"] == "acme"
+    assert transport.calls[1][1] == {"tenant": "acme", "id": "task-1"}
+    # Without a declared tenant the field is omitted, as the same rule requires.
+    transport = ScriptedTransport(
+        TARGET,
+        [rpc_ok({"task": task_response(state="TASK_STATE_SUBMITTED")}), rpc_ok(task_response())],
+    )
+    run(transport)
+    assert "tenant" not in transport.calls[0][1]
+    assert transport.calls[1][1] == {"id": "task-1"}
+
+
 def test_interrupted_states_stop_the_runner_without_answering() -> None:
     transport = ScriptedTransport(
         TARGET, [rpc_ok({"task": task_response(state="TASK_STATE_INPUT_REQUIRED")})]

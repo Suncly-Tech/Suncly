@@ -212,6 +212,7 @@ class Orchestrator:
                 target_url=interface.url,
                 protocol_binding=interface.protocol_binding,
                 protocol_version=interface.protocol_version,
+                tenant=interface.tenant,
                 timeout_s=self._settings.run_timeout_s,
                 poll_interval_s=self._settings.poll_interval_s,
                 sandbox_declared=sandbox_declared,

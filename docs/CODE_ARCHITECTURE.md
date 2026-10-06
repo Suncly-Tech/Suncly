@@ -77,7 +77,7 @@ sequenceDiagram
     participant X as SubprocessRunExecutor (adapter)
     participant R as suncly.runner.process (own process)
     participant A as Agent (sandbox)
-    O->>X: RunJob (input, run key, target, timeouts, sandbox flag)
+    O->>X: RunJob (input, run key, target, tenant, timeouts, sandbox flag)
     X->>R: stdin: RunJob JSON · env: SUNCLY_AGENT_AUTHORIZATION
     R->>R: read credential (credentials.py), build Redactor
     R->>A: SendMessage (A2A-Version 1.0, Authorization)

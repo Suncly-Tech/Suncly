@@ -21,6 +21,12 @@ from suncly.domain.models import JsonObject
 #: The field excluded from the hash, as A2A §8.4.1 excludes it from signing (OQ-A7, proposal).
 SIGNATURES_FIELD = "signatures"
 
+#: Top-level fields of the pre-1.0 Agent Card format (A2A v0.3.0 §5.6.1: ``url`` and
+#: ``preferredTransport`` were REQUIRED, ``protocolVersion`` was a top-level string).
+#: In 1.0 all three live inside ``supportedInterfaces`` entries. Used only to name the
+#: cause when such a card is refused; Suncly speaks no 0.3 (OQ-A4).
+LEGACY_CARD_FIELDS = ("url", "preferredTransport", "protocolVersion")
+
 #: Agent Card fields the specification marks REQUIRED (A2A §4.4.1).
 SPEC_REQUIRED_CARD_FIELDS = (
     "name",
@@ -43,7 +49,7 @@ class CardModel(BaseModel):
 
 
 class AgentInterface(CardModel):
-    """One entry of ``supportedInterfaces`` (A2A §4.4.2)."""
+    """One entry of ``supportedInterfaces`` (A2A §4.4.6)."""
 
     url: str = Field(min_length=1)
     protocol_binding: str = Field(min_length=1)
@@ -117,6 +123,17 @@ def compute_card_hash(card_json: JsonObject) -> str:
     return canonical_sha256(without_signatures)
 
 
+def legacy_card_markers(card_json: JsonObject) -> list[str]:
+    """The pre-1.0 top-level fields a card carries instead of ``supportedInterfaces``.
+
+    Empty for every card that declares ``supportedInterfaces``, including the hybrid
+    cards that 1.x SDKs serve in 0.3 compatibility mode.
+    """
+    if "supportedInterfaces" in card_json:
+        return []
+    return [name for name in LEGACY_CARD_FIELDS if name in card_json]
+
+
 def parse_agent_card(raw_json: str) -> ParsedCard:
     """Parse the text of an Agent Card. Fails visibly on anything unusable (OQ-A11)."""
     try:
@@ -136,6 +153,17 @@ def parse_agent_card(raw_json: str) -> ParsedCard:
     try:
         card = AgentCard.model_validate(loaded)
     except ValidationError as exc:
+        markers = legacy_card_markers(loaded)
+        if markers:
+            declared = loaded.get("protocolVersion")
+            version = f"protocolVersion {declared!r}" if declared else "no protocolVersion"
+            raise CardNotParsableError(
+                "The Agent Card uses the pre-1.0 A2A card format, which Suncly does not speak.",
+                f"It declares {version} and the top-level field(s) {', '.join(markers)} instead "
+                "of supportedInterfaces (A2A 1.0, §8.3).",
+                "Suncly attests A2A 1.0 interfaces only (OQ-A4). Serve a 1.0 Agent Card with a "
+                "JSONRPC 1.0 interface.",
+            ) from exc
         problems = "; ".join(
             f"{'.'.join(str(p) for p in error['loc'])}: {error['msg']}" for error in exc.errors()
         )

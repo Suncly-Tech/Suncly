@@ -49,6 +49,67 @@ def test_a_card_missing_what_suncly_needs_fails_with_the_field_named() -> None:
         parse_agent_card(json.dumps({"name": "x", "skills": []}))
 
 
+def test_a_0_3_card_is_refused_with_its_protocol_version_named() -> None:
+    """Found against a2a-samples helloworld on a2a-sdk 0.3.26 (docs/REAL_AGENT_REPORT.md).
+
+    A 0.3 card has a top-level ``url``, ``preferredTransport`` and ``protocolVersion``
+    instead of ``supportedInterfaces`` (A2A v0.3.0 §5.6.1). Refusing it is correct;
+    the refusal must name the cause, not only the missing 1.0 field.
+    """
+    card = {
+        "name": "Hello World Agent",
+        "description": "Just a hello world agent",
+        "version": "1.0.0",
+        "url": "http://127.0.0.1:9903/",
+        "preferredTransport": "JSONRPC",
+        "protocolVersion": "0.3.0",
+        "capabilities": {"streaming": True},
+        "defaultInputModes": ["text"],
+        "defaultOutputModes": ["text"],
+        "supportsAuthenticatedExtendedCard": True,
+        "skills": [
+            {
+                "id": "hello_world",
+                "name": "Returns hello world",
+                "description": "just returns hello world",
+                "tags": ["hello world"],
+                "examples": ["hi", "hello world"],
+            }
+        ],
+    }
+    with pytest.raises(CardNotParsableError) as exc:
+        parse_agent_card(json.dumps(card))
+    message = str(exc.value)
+    assert "0.3.0" in message and "supportedInterfaces" in message
+    assert "1.0" in exc.value.next_step
+
+
+def test_a_hybrid_card_with_legacy_fields_and_interfaces_parses_as_1_0() -> None:
+    """a2a-sdk 1.2.2 with 0.3 compatibility enabled serves both shapes in one card.
+
+    Observed in docs/REAL_AGENT_REPORT.md: the legacy top-level fields must not
+    make Suncly refuse a card that does declare ``supportedInterfaces``.
+    """
+    card = card_json(
+        extra={
+            "url": "https://agent.example.com/rpc",
+            "preferredTransport": "JSONRPC",
+            "protocolVersion": "0.3",
+            "supportsAuthenticatedExtendedCard": True,
+        }
+    )
+    card["supportedInterfaces"].append(
+        {
+            "url": "https://agent.example.com/rpc",
+            "protocolBinding": "JSONRPC",
+            "protocolVersion": "0.3",
+        }
+    )
+    parsed = parse_agent_card(json.dumps(card))
+    assert parsed.json_object["protocolVersion"] == "0.3", "unknown fields are kept"
+    assert select_interface(parsed).protocol_version == "1.0"
+
+
 def test_unknown_fields_are_kept_and_missing_required_fields_are_reported() -> None:
     card = card_json(extra={"futureField": {"a": 1}})
     del card["capabilities"]

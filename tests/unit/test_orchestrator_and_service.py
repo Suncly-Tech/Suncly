@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import threading
 from collections.abc import Callable
 from decimal import Decimal
@@ -20,6 +21,7 @@ from suncly.domain.errors import (
     CardFetchError,
     CardNotAttestableError,
     CardNotParsableError,
+    ContractError,
     SigningError,
 )
 from suncly.domain.evidence import NotExecutedReason
@@ -33,6 +35,7 @@ from tests.fakes import (
     MemoryReportWriter,
     MemorySigningKeys,
     StaticFetcher,
+    card_json,
     card_text,
     make_transcript,
 )
@@ -211,6 +214,38 @@ def test_the_approved_contract_is_reused_and_a_changed_card_needs_a_new_approval
     )
     third_contract = file_store.get_contract(third.attestation.contract_id)
     assert third_contract is not None and third_contract.version == 1
+
+
+def test_the_tenant_of_the_selected_interface_reaches_the_runner(
+    services_factory: ServicesFactory,
+) -> None:
+    """The Orchestrator hands the interface's ``tenant`` to the Runner (A2A §8.3.2)."""
+    executor = FakeExecutor(lambda job, n: RunResult(transcript=make_transcript(job)))
+    card = card_json()
+    card["supportedInterfaces"][0]["tenant"] = "acme"
+    services = services_factory(StaticFetcher({CARD_URL: json.dumps(card)}), executor=executor)
+    AttestationService(services).attest(request())
+    assert executor.jobs and all(job.tenant == "acme" for job in executor.jobs)
+    plain = FakeExecutor(lambda job, n: RunResult(transcript=make_transcript(job)))
+    services = services_factory(StaticFetcher({CARD_URL: card_text()}), executor=plain)
+    AttestationService(services).attest(request())
+    assert plain.jobs and all(job.tenant is None for job in plain.jobs)
+
+
+def test_export_draft_of_a_card_without_usable_examples_is_refused_not_an_internal_error(
+    services_factory: ServicesFactory,
+) -> None:
+    """Found against the a2a-tck reference agent (docs/REAL_AGENT_REPORT.md).
+
+    A skill's ``examples`` are optional in A2A (a2a.proto v1.0.1, AgentSkill). A card
+    whose skills declare none gives a draft with no test cases; exporting it must be
+    the same documented refusal as running it, not a pydantic error.
+    """
+    card = card_text(skills=[{"id": "tck", "name": "TCK", "description": "", "tags": ["t"]}])
+    services = services_factory(StaticFetcher({CARD_URL: card}))
+    with pytest.raises(ContractError, match="no test cases") as exc:
+        AttestationService(services).attest(request(export_draft=True, approve_as=None))
+    assert "tck" in exc.value.why
 
 
 def test_export_draft_runs_nothing(services_factory: ServicesFactory) -> None:

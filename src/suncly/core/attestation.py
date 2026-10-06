@@ -23,6 +23,7 @@ from suncly.core.contract_builder import (
     ContractService,
     contract_file_from_draft,
     draft_from_contract_file,
+    require_test_cases,
     same_content,
     uncovered_skills,
 )
@@ -211,6 +212,7 @@ class AttestationService:
             )
             source = s.drafter.name
         if request.export_draft:
+            require_test_cases(draft, "export")
             exported = render_contract_file(contract_file_from_draft(draft, parsed))
             return AttestOutcome(kind="draft_exported", exported_contract_file=exported)
 

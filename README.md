@@ -161,6 +161,8 @@ through the real code path.
 | [docs/DECISIONS.md](docs/DECISIONS.md) | The non-negotiable rules, as decision records. |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | The six build stages, what this MVP implements, and what it does not. |
 | [docs/IMPLEMENTATION_NOTES.md](docs/IMPLEMENTATION_NOTES.md) | Every proposal the code implements, the choices the founders decided, every choice that still needs a decision, and the facts that were verified. |
+| [docs/REAL_AGENT_REPORT.md](docs/REAL_AGENT_REPORT.md) | Suncly tested against official A2A reference agents: what was observed, which failures are protocol, version, agent or Suncly issues, and the A2A 0.3 decision. |
+| [docs/OSS_EVALUATION.md](docs/OSS_EVALUATION.md) | Evaluation of the A2A TCK and Promptfoo as import-only evidence sources: licence, release, maintenance, result formats, import safety. |
 | [db/README.md](db/README.md) | What the migration enforces, and which open questions it leaves open. |
 
 **How to read these documents.** Where a document and

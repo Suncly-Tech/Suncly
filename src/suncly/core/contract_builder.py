@@ -100,6 +100,22 @@ def same_content(
     return Counter(content_key(tc) for tc in left) == Counter(content_key(tc) for tc in right)
 
 
+def require_test_cases(draft: Draft, purpose: str) -> None:
+    """Refuse a draft with no test cases: there is nothing to ``purpose`` (OQ-R2).
+
+    A skill's ``examples`` are optional in A2A, so a valid card can yield an empty
+    draft; the refusal is the same whether the draft is run or exported.
+    """
+    if draft.test_cases:
+        return
+    skipped = ", ".join(skill.skill_id for skill in draft.not_testable)
+    raise ContractError(
+        f"The draft has no test cases, so there is nothing to {purpose}.",
+        "No declared skill has a usable example" + (f": {skipped}." if skipped else "."),
+        "Add examples to the card's skills, or write a contract file (see docs/API.md).",
+    )
+
+
 def draft_from_contract_file(contract_file: ContractFile, parsed: ParsedCard) -> Draft:
     """Turn a hand-written contract file into a draft, refusing what the brief forbids.
 
@@ -193,17 +209,7 @@ class ContractService:
 
     def create_draft(self, card_version_id: UUID, draft: Draft) -> tuple[Contract, list[TestCase]]:
         """Record a new draft. Versions count per card version (OQ-D5, proposal)."""
-        if not draft.test_cases:
-            raise ContractError(
-                "The draft has no test cases, so there is nothing to approve or run.",
-                "No declared skill has a usable example"
-                + (
-                    f": {', '.join(s.skill_id for s in draft.not_testable)}."
-                    if draft.not_testable
-                    else "."
-                ),
-                "Add examples to the card's skills, or write a contract file (see docs/API.md).",
-            )
+        require_test_cases(draft, "approve or run")
         version = (
             max((c.version for c in self._store.list_contracts(card_version_id)), default=0) + 1
         )

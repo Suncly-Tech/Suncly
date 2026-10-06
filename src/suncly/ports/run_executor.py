@@ -29,6 +29,8 @@ class RunJob(BaseModel):
     target_url: str
     protocol_binding: str
     protocol_version: str
+    tenant: str | None = None
+    """The selected interface's ``tenant``, sent in every request when set (A2A §8.3.2)."""
     timeout_s: float = Field(gt=0)
     poll_interval_s: float = Field(gt=0)
     sandbox_declared: bool

@@ -3,7 +3,8 @@
 Pure protocol logic over the ``A2ATransport`` port, so it is tested with a fake
 transport. Facts used: A2A §3.1.1 (SendMessage returns a Task or a Message),
 §3.2.2 (blocking by default; a non-terminal task is polled with GetTask,
-§3.1.3), §9.4 (JSON-RPC shapes) and the TaskState values of a2a.proto v1.0.1.
+§3.1.3), §8.3.2 (the selected interface's ``tenant`` goes into every request),
+§9.4 (JSON-RPC shapes) and the TaskState values of a2a.proto v1.0.1.
 The Runner never answers an interrupted state (OQ-A4, proposal).
 """
 
@@ -50,6 +51,16 @@ class _Recorder:
                 else {"transport_error": response.transport_error},
             )
         )
+
+
+def _request_params(job: RunJob, params: JsonObject) -> JsonObject:
+    """``params`` with the interface's ``tenant`` first when one is declared (A2A §8.3.2).
+
+    The field is omitted when the interface declares none, as the same rule requires.
+    """
+    if job.tenant is None:
+        return params
+    return {"tenant": job.tenant, **params}
 
 
 def _rpc_result(response: RpcResponse) -> tuple[JsonObject | None, str | None]:
@@ -120,7 +131,10 @@ def execute_run(
         )
 
     first = transport.call(
-        a2a.METHOD_SEND_MESSAGE, {"message": message}, str(request_counter), max(remaining(), 0.001)
+        a2a.METHOD_SEND_MESSAGE,
+        _request_params(job, {"message": message}),
+        str(request_counter),
+        max(remaining(), 0.001),
     )
     recorder.add(a2a.METHOD_SEND_MESSAGE, first)
     sent_at = first.sent_at
@@ -187,7 +201,10 @@ def execute_run(
         sleep(min(job.poll_interval_s, max(remaining(), 0)))
         request_counter += 1
         poll = transport.call(
-            a2a.METHOD_GET_TASK, {"id": task_id}, str(request_counter), max(remaining(), 0.001)
+            a2a.METHOD_GET_TASK,
+            _request_params(job, {"id": task_id}),
+            str(request_counter),
+            max(remaining(), 0.001),
         )
         recorder.add(a2a.METHOD_GET_TASK, poll)
         result, problem = _rpc_result(poll)

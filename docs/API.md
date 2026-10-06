@@ -91,7 +91,7 @@ options it cannot work without. All are proposals.
 | `--budget N` | `attestation.budget_limit`, in attempts. Default 2 x planned runs. One attempt costs 1 (OQ-D1). |
 | `--approve-as ID` | Approves the drafted contract as `ID` without a prompt; `ID` becomes `approved_by`. Without it, the CLI shows the draft and asks; with no terminal, it refuses. |
 | `--contract FILE` | Uses a contract file instead of the drafter (see below). The imported contract becomes a new version and still needs approval. |
-| `--export-draft FILE` | Writes the draft contract to `FILE` and stops. Nothing runs. |
+| `--export-draft FILE` | Writes the draft contract to `FILE` and stops. Nothing runs. When no declared skill has a usable example the draft is empty, and the command is refused (exit 3) with the same message as a run; write the contract file by hand in that case. |
 | `--owner`, `--risk-level` | `agent.owner` and `agent.risk_level`, recorded on first sight of the card URL. Defaults: `unspecified` and `high`. |
 | `--reports-dir DIR` | Where the report folder goes. Default `./suncly-reports`. |
 | `--json` | Prints a machine-readable result: `kind`, `attestation`, `decision`, `results`, `not_tested`, `report_dir`, `exit_code`. |

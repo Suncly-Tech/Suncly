@@ -49,7 +49,7 @@ marked **uncertain**.
 | a2a-sdk 1.2.2 server with 0.3 compatibility mode (helloworld agent) | yes | 1.0 and 0.3 on one endpoint | Hybrid card parsed, 1.0 interface selected, 6 runs, all `pass`, signed, exit 0; the 0.3 path was observed only through raw probes | works as intended |
 | a2a-samples `multitenancy` (three tenants on one host) | yes | 1.0 | Three cards at tenant sub-paths parsed; 18 runs over path-bearing interface URLs, all `pass`; `suncly verify` passes | works as intended |
 | a2a-samples `sign_and_verify_agent_card` | yes | 1.0 | Signed card parsed; `card_hash` stable although the agent re-signs on every fetch; 3 runs, all `fail` on `output_modes` because the card declares `"text"` instead of a media type | works as intended; agent card conformance issue |
-| a2a-samples Go `helloworld` (a2a-go v2) | yes | 1.0 | pending | pending |
+| a2a-samples Go `helloworld` (a2a-go v2.3.1) | yes | 1.0 | Card parsed; 6 runs, all `fail` on `response_present` because the agent returns its answer in `status.message` and no artifact; the Go SDK's JSON was consumed without any structural problem | works as intended; agent deviates from a spec SHOULD |
 | JavaScript agent on `@a2a-js/sdk` | partly (official SDK, see section) | pending | pending | pending |
 
 Spec gap found by reading, confirmed by the spec and fixed: the Runner never
@@ -376,9 +376,51 @@ Only the differences Suncly's JSON-RPC path meets. Sources: spec v0.3.0
 - **Evidence:** `scratchpad/runs/py-signed-card/` (three fetches,
   `verify_sig.out`, probes, report folder).
 
-### 7. a2a-samples `helloworld` (Go, a2a-go v2)
+### 7. a2a-samples `helloworld` (Go, a2a-go v2.3.1)
 
-Pending.
+- **Repository:** `a2aproject/a2a-samples`, `samples/go/agents/helloworld`,
+  main 6603ba3 (sample commit 1f03e5d, 2026-07-06). Official. `go.mod` pins
+  `github.com/a2aproject/a2a-go/v2 v2.3.1` (the module proxy has v2.6.0;
+  the declared version was built). The port 9999 is hard-coded; a copy was
+  changed to 9907 (six lines). Built with `go build`; the binary also runs an
+  interactive stdin client, so stdin was held open. No model key needed.
+- **Protocol version:** 1.0 over JSONRPC (`a2a.Version` is `"1.0"` in a2a-go).
+- **Card discovery:** 200, 602 bytes, all eight spec-required fields,
+  lowerCamelCase names, skill `echo_bot` with examples `hi`, `how are you`,
+  modes `text/plain`.
+- **Card parsing:** parsed; `card_hash` `sha256:61504c4c…582c`; JSONRPC 1.0
+  selected; two test cases drafted; card unchanged at the re-check.
+- **Declared skills:** `echo_bot`.
+- **Invocation:** one `SendMessage` per run; every answer HTTP 200 with
+  `{"result": {"task": {"id": …, "contextId": …, "history": […], "status": {"message": {"parts": [{"text": "Hello, World! I have received your request (hi)"}], "role": "ROLE_AGENT"}, "state": "TASK_STATE_COMPLETED", "timestamp": "…Z"}}}}`
+  and **no `artifacts` key**. Latencies 5 to 10 ms. Cross-language
+  serialization observed: enums as strings (`TASK_STATE_COMPLETED`,
+  `ROLE_USER`), the `{"task": …}` wrapper on `SendMessage`, the bare Task on
+  `GetTask`, camelCase field names, no `mediaType` on text parts (omitted when
+  empty), `artifacts` omitted when empty, nanosecond timestamps, JSON-RPC
+  errors carrying `google.rpc.ErrorInfo` details. Suncly's Judge found every
+  Task well-formed. Raw probes: `message/send` gives -32601; **a request
+  without `A2A-Version`, and one with `A2A-Version: 0.3`, are both answered
+  as 1.0** (the server does not read the header).
+- **Interpretation:** every run `valid_schema`, `final_task_state`,
+  `latency_limit`, `output_modes` true (the last vacuously) and
+  `response_present` **false** ("0 output part(s) with content"). 0 `pass`,
+  6 `fail`; completed, `flag`, signed, exit 0.
+- **Pass or failure point:** the `response_present` check, on the agent's
+  side: the sample's executor yields a status update with the text and never
+  an artifact, although the sample's README shows an artifact in its expected
+  output (**uncertain** which SDK version that output was captured with).
+- **Classification:** works as intended. The fails are a correct application
+  of Suncly's documented rule, which follows spec §3.7 (outputs SHOULD be
+  artifacts); the agent deviates from that SHOULD. Agent-side conformance
+  issue: the server ignores `A2A-Version`, where spec §3.6.2 says an empty
+  value MUST be read as 0.3 and an unsupported version MUST get
+  `VersionNotSupportedError`; no non-test code in a2a-go v2.3.1 reads the
+  header. Suncly always sends the header, so it is unaffected. The
+  `status.timestamp` uses nanoseconds where §5.6.1 says millisecond precision
+  SHOULD be used; Suncly does not parse timestamps.
+- **Evidence:** `scratchpad/runs/go-helloworld/` (card, six probes,
+  `src-diff.txt`, `build.log`, report folder).
 
 ### 8. JavaScript agent on `@a2a-js/sdk`
 
@@ -410,6 +452,14 @@ Pending.
 5. **Agent (`sign_and_verify_agent_card`):** `GetExtendedAgentCard` answers
    without authentication; spec §13.3 says the extended card MUST require it.
    Observed by raw probe only; Suncly does not fetch extended cards.
+6. **SDK (a2a-go v2.3.1 server):** does not read `A2A-Version`; a header-less
+   request and `A2A-Version: 0.3` are both served as 1.0, where spec §3.6.2
+   requires 0.3 semantics or `VersionNotSupportedError`. Does not affect
+   Suncly.
+7. **Agents (a2a-tck SUT default branch, Go `helloworld`):** the task's only
+   output is in `status.message`, with no artifact; spec §3.7 says outputs
+   SHOULD be artifacts. Suncly's `response_present` fails such runs
+   (OQ-RA1).
 
 ### Suncly interoperability bugs
 

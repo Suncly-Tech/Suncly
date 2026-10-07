@@ -11,7 +11,7 @@ import { JsonLd } from "@/components/site/JsonLd";
 import { breadcrumbLd, graph, KEYWORDS, pageMeta, webPageLd } from "@/lib/seo";
 
 const description =
-  "What Suncly can test: A2A 1.0 over JSON-RPC, Agent Card verification, agents built on any model or framework, and the integrations available today and planned.";
+  "What Suncly can test: A2A 1.0 over JSON-RPC 2.0, Agent Card verification, agents built on any model or framework, and the integrations available today and planned.";
 
 export const metadata: Metadata = pageMeta({
   title: "A2A protocol coverage and integrations",

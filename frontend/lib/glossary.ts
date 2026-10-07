@@ -17,7 +17,7 @@ export const glossary: GlossaryTerm[] = [
     term: "A2A protocol (Agent2Agent)",
     anchor: "a2a-protocol",
     definition:
-      "The A2A protocol is an open protocol in which an AI agent publishes an Agent Card describing itself and its skills, and answers requests as Tasks or Messages over bindings such as JSON-RPC.",
+      "The A2A protocol is an open protocol in which an AI agent publishes an Agent Card describing itself and its skills, and answers requests as Tasks or Messages over bindings such as JSON-RPC 2.0.",
     detail:
       "Suncly evaluates agents through A2A version 1.0 over JSON-RPC: it sends each test input as a Message and follows the Task to a terminal or interrupted state. The protocol defines how skills are described; it has no mechanism for checking that the agent performs them, which is the gap Suncly fills.",
     related: ["agent-card", "skill"],

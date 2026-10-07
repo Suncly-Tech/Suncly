@@ -137,7 +137,7 @@ export default function CertificationPolicyPage() {
             production endpoint, which is never called; whether the content of
             an answer is correct in meaning; prompt-injection,
             undeclared-behaviour and failure-handling probes; A2A bindings other
-            than JSON-RPC; and declared capabilities no test exercised, such as
+            than JSON-RPC 2.0; and declared capabilities no test exercised, such as
             streaming or push notifications.
           </p>
 

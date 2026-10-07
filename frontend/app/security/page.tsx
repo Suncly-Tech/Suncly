@@ -107,7 +107,7 @@ export default function SecurityPage() {
                 <strong>The agent endpoint named in the card.</strong> The
                 Runner refuses any request whose host is not the target agent's
                 host; one test enforces this in the one place that makes HTTP
-                calls. It speaks A2A 1.0 over JSON-RPC: <code>SendMessage</code>
+                calls. It speaks A2A 1.0 over JSON-RPC 2.0: <code>SendMessage</code>
                 , then <code>GetTask</code> until a terminal or interrupted
                 state.
               </li>

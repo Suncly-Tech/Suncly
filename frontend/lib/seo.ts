@@ -6,15 +6,14 @@
  */
 
 import type { Metadata } from "next";
-import { site } from "@/lib/content";
+import { hero, site } from "@/lib/content";
 import { socialLinks } from "@/lib/launch";
 
 export const BRAND = "Suncly";
 export const DOMAIN = site.domain;
 
 /** The canonical one-paragraph definition. Reused verbatim so every engine sees one entity. */
-export const DEFINITION =
-  "Suncly is an evaluation tool for AI agents that speak the A2A (Agent2Agent) protocol. It reads an agent's Agent Card, tests each declared skill repeatedly in a sandbox against the card's claims, judges each run deterministically, signs the evidence, and gives platform and security teams a report that states what passed, what failed, what stayed inconclusive and what was never tested, so they can decide on evidence before they give the agent access. It charges only for usage of its API, and agents that meet its published criteria can carry the Suncly Certified badge, which links to the record behind it.";
+export const DEFINITION = `${site.definition} It charges only for usage of its API, and agents that meet its published criteria can carry the Suncly Certified badge, which links to the record behind it.`;
 
 export const SHORT_DEFINITION =
   "Suncly tests A2A AI agents against their Agent Card claims before approval: repeated sandbox tests, deterministic verdicts, signed evidence and an explicit list of what was not tested.";
@@ -124,9 +123,49 @@ export function organizationLd(): Json {
     foundingLocation: { "@type": "Place", name: "Tallinn, Estonia" },
     address: { "@type": "PostalAddress", addressLocality: "Tallinn", addressCountry: "EE" },
     contactPoint: [{ "@type": "ContactPoint", contactType: "sales", email: site.email, availableLanguage: ["en"] }],
-    knowsAbout: ["A2A protocol", "Agent2Agent protocol", "AI agent evaluation", "AI agent governance", "Agent Card", "attestation"],
-    // sameAs profiles (LinkedIn, GitHub organisation, X) are added once the owners confirm them; see SEO.md.
+    disambiguatingDescription: SHORT_DEFINITION,
+    slogan: hero.headline.join(" "),
+    knowsLanguage: "en",
+    knowsAbout: knowsAbout(),
+    brand: {
+      "@type": "Brand",
+      name: "Suncly Certified",
+      url: `${DOMAIN}/certified`,
+      description:
+        "A private, voluntary badge for A2A agents that met Suncly's published criteria on a date, on a sandbox. The badge links to the record behind it.",
+    },
+    keywords: [...KEYWORDS.core, ...KEYWORDS.protocol].join(", "),
+    mainEntityOfPage: `${DOMAIN}/company`,
+    // sameAs profiles come from lib/launch.ts (X, LinkedIn, GitHub, Reddit); Hacker News is blank. See SEO.md.
   };
+}
+
+/** The A2A specification the tool implements (A2A 1.0 over JSON-RPC 2.0; docs/ and README cite v1.0.1). */
+const A2A_SPEC_URLS = [
+  "https://a2a-protocol.org/latest/specification/",
+  "https://github.com/a2aproject/A2A",
+] as const;
+
+/**
+ * What the organisation knows about: one named topic per entry, each pointing at the page
+ * on this site that defines or documents it, and the protocol also at its public
+ * specification. Only subjects the implementation covers (CONTENT.md): Suncly evaluates
+ * A2A agents; it does no authentication, issues no identities and does not speak the
+ * Model Context Protocol, so none of those are listed.
+ */
+export function knowsAbout(): Json[] {
+  const about = (name: string, path: string, extra: Json = {}): Json => ({ "@type": "Thing", name, url: absoluteUrl(path), ...extra });
+  return [
+    about("Agent2Agent (A2A) protocol", "/glossary#a2a-protocol", { sameAs: [...A2A_SPEC_URLS] }),
+    about("A2A Agent Card", "/glossary#agent-card"),
+    about("A2A JSON-RPC 2.0 binding", "/workflows"),
+    about("AI agent evaluation", "/glossary#ai-agent-evaluation"),
+    about("AI agent approval", "/product"),
+    about("AI agent governance", "/product"),
+    about("signed attestation", "/glossary#attestation"),
+    about("Ed25519 signatures", "/glossary#signed-evidence"),
+    about("sandbox testing of AI agents", "/glossary#sandbox"),
+  ];
 }
 
 export function websiteLd(): Json {
@@ -198,7 +237,7 @@ export function webPageLd({
     name: `${name} — ${BRAND}`,
     description,
     isPartOf: { "@id": WEBSITE_ID },
-    about: { "@id": SOFTWARE_ID },
+    about: { "@id": type === "AboutPage" || type === "ContactPage" ? ORGANIZATION_ID : SOFTWARE_ID },
     inLanguage: "en",
     datePublished,
     dateModified,

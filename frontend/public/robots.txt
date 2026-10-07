@@ -1,4 +1,4 @@
-# Suncly — https://suncly.com
+# Suncly — https://www.suncly.com
 # The public site may be crawled and quoted. The review workspace at /app holds
 # visitor-local data and is not meant for indexing.
 
@@ -69,4 +69,4 @@ User-agent: meta-externalagent
 Allow: /
 Disallow: /app
 
-Sitemap: https://suncly.com/sitemap.xml
+Sitemap: https://www.suncly.com/sitemap.xml

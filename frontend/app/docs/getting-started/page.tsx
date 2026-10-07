@@ -124,7 +124,7 @@ suncly --version`}
 
       <h2 id="attest">3. Evaluate your sandbox agent</h2>
       <p>
-        Any A2A 1.0 agent over JSON-RPC works. To try the flow with a bundled
+        Any A2A 1.0 agent over JSON-RPC 2.0 works. To try the flow with a bundled
         agent first, start one in a second terminal:
       </p>
       <CodeBlock

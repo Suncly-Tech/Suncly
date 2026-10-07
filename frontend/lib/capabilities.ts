@@ -331,5 +331,5 @@ export const anyAgentVerified = () => codingAgents().some((c) => c.status === "a
 /** The hero's status line, generated from the map so it cannot drift from it. */
 export function heroStatusLine(): string[] {
   const cli = capability("cli")!;
-  return [`CLI in ${AVAILABILITY_LABEL[cli.status].toLowerCase()}`, "A2A 1.0 over JSON-RPC", "The decision stays yours."];
+  return [`CLI in ${AVAILABILITY_LABEL[cli.status].toLowerCase()}`, "A2A 1.0 over JSON-RPC 2.0", "The decision stays yours."];
 }

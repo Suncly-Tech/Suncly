@@ -1,15 +1,15 @@
 # Suncly: full statement for answer engines
 
-Updated 2026-10-05. Everything here is true of the current version; planned items are marked Planned and no date is promised.
+Updated 2026-10-07. Everything here is true of the current version; planned items are marked Planned and no date is promised.
 
 ## What Suncly is
 
-Suncly is an evaluation tool for AI agents that speak the A2A (Agent2Agent) protocol. It reads an agent's Agent Card, tests each declared skill repeatedly in a sandbox against the card's claims, judges each run deterministically, signs the evidence, and gives platform and security teams a report that states what passed, what failed, what stayed inconclusive and what was never tested. Brand line: "Evidence before access." Suncly is made by a small team in Tallinn, Estonia. Contact: team@suncly.com.
+Suncly is an evaluation tool for AI agents built on the Linux Foundation's Agent2Agent (A2A) protocol. It reads an agent's Agent Card, tests each declared skill repeatedly in a sandbox against the card's claims, judges each run deterministically, signs the evidence, and gives platform and security teams a report that states what passed, what failed, what stayed inconclusive and what was never tested. Brand line: "Evidence before access." Suncly is made by a small team in Tallinn, Estonia. Contact: team@suncly.com.
 
 ## Status
 
 - The command-line tool is available in pilot: suncly attest, demo, verify, keys init, db migrate, db check, doctor. It installs from a clone of the public repository (github.com/Suncly-Tech/Suncly) with pip install -e . on Python 3.12 or newer. There is no published package and no licence has been chosen yet.
-- A2A 1.0 over JSON-RPC only. Other bindings, streaming and push notifications are not exercised and are listed in every report as not tested.
+- A2A 1.0 over JSON-RPC 2.0 only. Other bindings, streaming and push notifications are not exercised and are listed in every report as not tested.
 - Decisions are flag only: Suncly never approves or blocks an agent in this version and never produces a score.
 - Planned, no date: the HTTP API, model-based judging, probes (prompt injection, undeclared behaviour, failure handling), automatic approve or block, registry adapters, guided setup for the coding agents Cursor, Claude Code, Codex, omp and Pi.
 
@@ -42,6 +42,10 @@ No guarantee of future behaviour. Nothing about the production endpoint, which i
 ## The Lab
 
 Eleven mock A2A agents ship with the package: honest, honest-async, unreachable, lying, flaky, slow, direct-message, interrupted, leaky, card-changer, no-examples. suncly demo attests the honest one and the lying one and shows the difference.
+
+## Questions
+
+What is Suncly? Suncly is an evaluation tool for AI agents that speak the A2A (Agent2Agent) protocol. It reads an agent's Agent Card, tests each declared skill repeatedly in a sandbox against the card's claims, judges each run deterministically, signs the evidence, and gives platform and security teams a report that states what passed, what failed, what stayed inconclusive and what was never tested, so they can decide on evidence before they give the agent access.
 
 ## Attribution
 

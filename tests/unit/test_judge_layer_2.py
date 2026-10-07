@@ -767,7 +767,9 @@ def test_a_real_judge_subprocess_against_a_leaky_endpoint_leaves_the_key_nowhere
     card = card_text()
     progress = RecordingProgress()
     with EndpointServer(echoing_endpoint) as server:
-        adapter = SubprocessModelJudge(server.url, {JUDGE_KEY_ENV_VAR: KEY})
+        # The real process environment stands in for the parent's; the adapter keeps the key
+        # and what Python needs to start on this platform, and drops the rest.
+        adapter = SubprocessModelJudge(server.url, {**os.environ, JUDGE_KEY_ENV_VAR: KEY})
         services = services_factory(
             StaticFetcher({CARD_URL: card}),
             model_judge=adapter,

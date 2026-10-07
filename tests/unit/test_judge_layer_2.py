@@ -5,7 +5,10 @@ model, no model configured), the rule that Layer 2 judges only what Layer 1
 cannot decide, the provenance in the evidence document, DR-004, the criteria
 format, and the isolation of the judge subprocess: a from-scratch environment,
 one key variable, one endpoint host, and a key that never appears in any
-evidence, report or log.
+evidence, report or log. The subprocess speaks the Anthropic Messages API to a
+loopback fake in the verified wire shape (docs/IMPLEMENTATION_NOTES.md, section
+4), including its error, refusal and truncation cases; no test calls the real
+API (that is tests/live, skipped without a key).
 """
 
 from __future__ import annotations
@@ -33,6 +36,7 @@ from suncly.core.cards import agent_id_for_url
 from suncly.core.config import Config
 from suncly.core.coverage import semantic_correctness
 from suncly.core.judge import (
+    NO_VERDICT,
     JudgeService,
     agent_output_text,
     interpret_answer,
@@ -517,23 +521,34 @@ def test_what_was_not_tested_names_semantic_correctness_truthfully() -> None:
     ]
 
 
-# -- the judge subprocess -------------------------------------------------------------------------
+# -- the judge subprocess: the Anthropic Messages API on a loopback fake -------------------------
+
+MESSAGES_API_PATH = "/v1/messages"
+REQUEST_ID = "req_011CSHoEeqs5C35K2UUqR7Fy"
+
+Behaviour = Callable[[dict[str, str], dict[str, Any]], tuple[int, bytes]]
 
 
 class EndpointServer:
-    """A loopback stand-in for a model endpoint: ``behaviour(headers, body) -> (status, body)``."""
+    """A loopback stand-in for the Messages API: ``behaviour(headers, body) -> (status, body)``.
 
-    def __init__(self, behaviour: Callable[[dict[str, str], dict[str, Any]], tuple[int, bytes]]):
+    Header names are handed to the behaviour in lower case, as HTTP treats them.
+    """
+
+    def __init__(self, behaviour: Behaviour):
         self.behaviour = behaviour
         self.requests: list[dict[str, Any]] = []
+        self.headers_seen: list[dict[str, str]] = []
         outer = self
 
         class Handler(BaseHTTPRequestHandler):
             def do_POST(self) -> None:
                 length = int(self.headers.get("Content-Length") or 0)
                 body = json.loads(self.rfile.read(length) or b"{}")
+                headers = {name.lower(): value for name, value in self.headers.items()}
                 outer.requests.append(body)
-                status, payload = outer.behaviour(dict(self.headers.items()), body)
+                outer.headers_seen.append(headers)
+                status, payload = outer.behaviour(headers, body)
                 self.send_response(status)
                 self.send_header("Content-Type", "application/json")
                 self.send_header("Content-Length", str(len(payload)))
@@ -556,13 +571,44 @@ class EndpointServer:
 
     @property
     def url(self) -> str:
-        return f"http://127.0.0.1:{self._server.server_address[1]}/v1/judge"
+        return f"http://127.0.0.1:{self._server.server_address[1]}{MESSAGES_API_PATH}"
+
+
+def message_body(
+    model: str | None, text: str | None, stop_reason: str = "end_turn", **extra: Any
+) -> bytes:
+    """A Messages API answer in the verified shape; ``text`` ``None`` leaves no text block."""
+    message: dict[str, Any] = {
+        "id": "msg_01XFDUDYJgAACzvnptvVoYEL",
+        "type": "message",
+        "role": "assistant",
+        "model": model,
+        "content": [] if text is None else [{"type": "text", "text": text}],
+        "stop_reason": stop_reason,
+        "stop_sequence": None,
+        "usage": {"input_tokens": 512, "output_tokens": 40},
+        **extra,
+    }
+    if model is None:
+        del message["model"]
+    return json.dumps(message).encode()
+
+
+def error_body(error_type: str, message: str) -> bytes:
+    """The API's error shape: ``type`` ``error``, an ``error`` object and a ``request_id``."""
+    return json.dumps(
+        {
+            "type": "error",
+            "error": {"type": error_type, "message": message},
+            "request_id": REQUEST_ID,
+        }
+    ).encode()
 
 
 def echoing_endpoint(headers: dict[str, str], body: dict[str, Any]) -> tuple[int, bytes]:
     """Answers yes, and echoes the key it received into the rationale (a leaky endpoint)."""
-    answer = {"answer": "yes", "rationale": f"seen {headers.get('Authorization')}"}
-    return 200, json.dumps({"model": body["model"], "output": json.dumps(answer)}).encode()
+    answer = {"answer": "yes", "rationale": f"seen {headers.get('authorization')}"}
+    return 200, message_body(body["model"], json.dumps(answer))
 
 
 def judge_job(endpoint: str, **overrides: object) -> JudgeJob:
@@ -584,13 +630,73 @@ def run_judge_process(job: JudgeJob | str, env: dict[str, str]) -> tuple[ModelRe
     return ModelResponse.model_validate_json(text), text
 
 
-def test_the_subprocess_asks_the_endpoint_in_the_placeholder_shape_and_redacts_the_key() -> None:
-    with EndpointServer(echoing_endpoint) as server:
-        response, text = run_judge_process(judge_job(server.url), {JUDGE_KEY_ENV_VAR: KEY})
+def ask(behaviour: Behaviour, **overrides: object) -> tuple[ModelResponse, str, EndpointServer]:
+    """One judge question to a loopback endpoint with the test key; the key must never come back."""
+    with EndpointServer(behaviour) as server:
+        response, text = run_judge_process(
+            judge_job(server.url, **overrides), {JUDGE_KEY_ENV_VAR: KEY}
+        )
+    assert KEY not in text
+    return response, text, server
+
+
+def test_the_subprocess_asks_the_messages_api_in_its_wire_shape_and_redacts_the_key() -> None:
+    response, _, server = ask(echoing_endpoint)
     assert response.model == PINNED_MODEL and response.error is None
-    assert KEY not in text and "[REDACTED]" in (response.text or "")
-    [request] = server.requests
-    assert request == {"model": PINNED_MODEL, "input": judge_job(server.url).prompt}
+    assert "seen Bearer [REDACTED]" in (response.text or "")
+    assert interpret_answer(TONE, response, PINNED_MODEL)[0] is True
+    [request], [headers] = server.requests, server.headers_seen
+    job = judge_job(server.url)
+    assert request == process.build_request(job)
+    assert request == {
+        "model": PINNED_MODEL,
+        "max_tokens": process.MAX_OUTPUT_TOKENS,
+        "messages": [{"role": "user", "content": job.prompt}],
+        "output_config": {"format": {"type": "json_schema", "schema": process.ANSWER_SCHEMA}},
+    }
+    assert headers["anthropic-version"] == "2023-06-01"
+    assert headers["content-type"] == "application/json"
+    assert headers["authorization"] == f"Bearer {KEY}"
+    assert "x-api-key" not in headers, "the key travels in one header"
+
+
+def test_the_request_asks_for_a_strict_json_object_with_the_rubric_keys_only() -> None:
+    schema = process.ANSWER_SCHEMA
+    assert schema["type"] == "object" and schema["additionalProperties"] is False
+    assert sorted(schema["required"]) == ["answer", "rationale"] == sorted(schema["properties"])
+    assert schema["properties"]["rationale"] == {"type": "string"}
+    assert set(schema["properties"]["answer"]["type"]) == {"string", "integer"}, (
+        "yes/no or 0 to 10; the core checks the value against the check's answer shape"
+    )
+
+
+@pytest.mark.parametrize(
+    ("model", "generation", "temperature"),
+    [
+        ("claude-haiku-4-5-20251001", (4, 5), 0),
+        ("claude-haiku-4-5", (4, 5), 0),
+        ("claude-opus-4-5-20251101", (4, 5), 0),
+        ("claude-opus-4-6", (4, 6), 0),
+        ("claude-sonnet-4-6", (4, 6), 0),
+        ("claude-opus-4-7", (4, 7), None),
+        ("claude-sonnet-5", (5, 0), None),
+        ("claude-sonnet-5-5", (5, 5), None),
+        ("claude-opus-5-5", (5, 5), None),
+        ("claude-fable-5-1", (5, 1), None),
+        ("claude-mythos-preview", None, None),
+        (PINNED_MODEL, None, None),
+    ],
+)
+def test_temperature_0_is_sent_only_to_the_models_whose_api_accepts_sampling(
+    model: str, generation: tuple[int, int] | None, temperature: int | None
+) -> None:
+    assert process.model_generation(model) == generation
+    assert process.accepts_sampling(model) is (temperature is not None)
+    body = process.build_request(judge_job("https://api.anthropic.com/v1/messages", model=model))
+    assert body.get("temperature") == temperature
+    assert "thinking" not in body and "effort" not in body["output_config"], (
+        "model-specific thinking settings are not sent; the API rejects them on the wrong model"
+    )
 
 
 def test_the_subprocess_answers_an_error_without_a_key_or_with_a_bad_job() -> None:
@@ -602,28 +708,105 @@ def test_the_subprocess_answers_an_error_without_a_key_or_with_a_bad_job() -> No
     assert response.error is not None and "invalid judge job" in response.error
 
 
-def test_the_subprocess_turns_endpoint_failures_into_errors_with_the_key_redacted() -> None:
-    def failing(headers: dict[str, str], body: dict[str, Any]) -> tuple[int, bytes]:
-        return 500, f"boom {headers.get('Authorization')}".encode()
+def test_the_subprocess_turns_api_errors_into_errors_with_the_key_redacted() -> None:
+    def unauthorised(headers: dict[str, str], body: dict[str, Any]) -> tuple[int, bytes]:
+        return 401, error_body("authentication_error", f"bad key {headers.get('authorization')}")
 
-    with EndpointServer(failing) as server:
-        response, text = run_judge_process(judge_job(server.url), {JUDGE_KEY_ENV_VAR: KEY})
-    assert response.error is not None and "HTTP 500" in response.error and KEY not in text
-    assert "[REDACTED]" in response.error
+    response, _, _ = ask(unauthorised)
+    assert response.error == (
+        "the Messages API answered HTTP 401 authentication_error: bad key Bearer [REDACTED] "
+        f"(request {REQUEST_ID})"
+    )
+    assert response.text is None and response.model is None
+
+    def overloaded(headers: dict[str, str], body: dict[str, Any]) -> tuple[int, bytes]:
+        return 529, error_body("overloaded_error", "Overloaded")
+
+    response, _, _ = ask(overloaded)
+    assert response.error is not None and response.error.startswith(
+        "the Messages API answered HTTP 529 overloaded_error: Overloaded"
+    )
+
+    def failing(headers: dict[str, str], body: dict[str, Any]) -> tuple[int, bytes]:
+        return 500, f"boom {headers.get('authorization')}".encode()
+
+    response, _, _ = ask(failing)
+    assert response.error == "the Messages API answered HTTP 500: boom Bearer [REDACTED]"
 
     def not_json(headers: dict[str, str], body: dict[str, Any]) -> tuple[int, bytes]:
         return 200, b"<html>"
 
-    with EndpointServer(not_json) as server:
-        response, _ = run_judge_process(judge_job(server.url), {JUDGE_KEY_ENV_VAR: KEY})
+    response, _, _ = ask(not_json)
     assert response.error is not None and "not JSON" in response.error
 
-    def no_output(headers: dict[str, str], body: dict[str, Any]) -> tuple[int, bytes]:
-        return 200, json.dumps({"model": "m", "choices": []}).encode()
+    def not_a_message(headers: dict[str, str], body: dict[str, Any]) -> tuple[int, bytes]:
+        return 200, error_body("api_error", "odd")
 
-    with EndpointServer(no_output) as server:
-        response, _ = run_judge_process(judge_job(server.url), {JUDGE_KEY_ENV_VAR: KEY})
-    assert response.error is not None and '"output"' in response.error
+    response, _, _ = ask(not_a_message)
+    assert response.error == "the Messages API answered with a 'error' object, not a message"
+
+
+@pytest.mark.parametrize(
+    ("stop_reason", "extra", "expected"),
+    [
+        (
+            "refusal",
+            {"stop_details": {"type": "refusal", "category": "cyber", "explanation": "x"}},
+            "the model refused to answer (stop_reason 'refusal', category 'cyber')",
+        ),
+        ("refusal", {"stop_details": None}, "category None"),
+        ("max_tokens", {}, "the answer is incomplete (stop_reason 'max_tokens'"),
+        ("model_context_window_exceeded", {}, "the answer is incomplete"),
+        ("tool_use", {}, "the model stopped before a complete answer (stop_reason 'tool_use')"),
+        ("pause_turn", {}, "stopped before a complete answer"),
+    ],
+)
+def test_a_refusal_a_truncated_answer_or_an_unexpected_stop_is_no_verdict(
+    stop_reason: str, extra: dict[str, Any], expected: str
+) -> None:
+    def endpoint(headers: dict[str, str], body: dict[str, Any]) -> tuple[int, bytes]:
+        well_formed = model_answer("yes").text or ""
+        return 200, message_body(body["model"], well_formed, stop_reason=stop_reason, **extra)
+
+    response, _, _ = ask(endpoint)
+    assert response.error is not None and expected in response.error
+    assert response.text is None, "an incomplete answer is never handed to the core as text"
+    passed, answer, rationale = interpret_answer(TONE, response, PINNED_MODEL)
+    assert passed is None and answer is None and rationale.startswith(NO_VERDICT)
+
+
+def test_an_answer_attributed_to_another_model_is_carried_and_is_no_verdict() -> None:
+    def other_model(headers: dict[str, str], body: dict[str, Any]) -> tuple[int, bytes]:
+        return 200, message_body("claude-other-model", model_answer("yes").text)
+
+    response, _, _ = ask(other_model)
+    assert response.error is None and response.model == "claude-other-model"
+    passed, _, rationale = interpret_answer(TONE, response, PINNED_MODEL)
+    assert passed is None and "not the pinned model" in rationale
+
+    def unnamed(headers: dict[str, str], body: dict[str, Any]) -> tuple[int, bytes]:
+        return 200, message_body(None, model_answer("yes").text)
+
+    response, _, _ = ask(unnamed)
+    assert response.error is None and response.model is None
+    assert interpret_answer(TONE, response, PINNED_MODEL)[0] is None
+
+
+def test_the_text_comes_from_the_text_blocks_and_a_message_without_one_is_no_answer() -> None:
+    def with_thinking(headers: dict[str, str], body: dict[str, Any]) -> tuple[int, bytes]:
+        message = json.loads(message_body(body["model"], model_answer("yes").text))
+        message["content"].insert(0, {"type": "thinking", "thinking": "", "signature": "s"})
+        return 200, json.dumps(message).encode()
+
+    response, _, _ = ask(with_thinking)
+    assert response.text == model_answer("yes").text
+    assert interpret_answer(TONE, response, PINNED_MODEL)[0] is True
+
+    def no_text(headers: dict[str, str], body: dict[str, Any]) -> tuple[int, bytes]:
+        return 200, message_body(body["model"], None)
+
+    response, _, _ = ask(no_text)
+    assert response.error == "the message carries no text block"
 
 
 def test_the_subprocess_reports_a_timeout_as_such() -> None:
@@ -742,8 +925,13 @@ def test_the_adapter_treats_a_killed_silent_or_garbled_process_as_a_model_failur
     assert "unreadable answer" in (adapter.ask(request).error or "")
 
 
-def test_the_credential_variables_are_not_set_in_the_test_process() -> None:
-    assert not os.environ.get(JUDGE_KEY_ENV_VAR)
+def test_the_fixture_key_is_never_a_real_key_of_this_process() -> None:
+    """KEY is a fixture: no leak test may pass by finding a credential this process holds.
+
+    The live smoke test (tests/live) is the one reason the real variable may be set.
+    """
+    assert KEY not in os.environ.values()
+    assert os.environ.get(JUDGE_KEY_ENV_VAR, "") != KEY
 
 
 # -- the key never appears in any evidence, report or log -----------------------------------------

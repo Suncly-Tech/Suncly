@@ -200,15 +200,19 @@ stage 3 cannot make yet), [OQ-D6](DATA_MODEL.md#open-questions),
 - [ ] Probes run only against the sandbox or dry-run endpoint
       ([DR-006](DECISIONS.md#dr-006-tests-hit-a-sandbox-or-dry-run-endpoint)).
 - [ ] Model calls use the customer's own keys (schema §7). The judge
-      subprocess reads the customer's key, but no real provider adapter exists
-      yet, so no call to a real model has been made.
+      subprocess reads the customer's key and speaks the Anthropic Messages
+      API (`judge/process.py`, 2026-10-07), but no call to the real API has
+      been made from this repository yet. Tick when
+      `tests/live/test_messages_api_live.py` has passed with a customer key;
+      CI skips it.
 
 **Decided 2026-10-07:** [OQ-A1](ARCHITECTURE.md#open-questions),
 [OQ-D4](DATA_MODEL.md#open-questions), [OQ-D7](DATA_MODEL.md#open-questions)
 for the model checks, [OQ-PO6](POLICY.md#open-questions) for the aggregation
 level, the pinned model and the rubric
 ([IMPLEMENTATION_NOTES.md](IMPLEMENTATION_NOTES.md), section 3). **Open:** the
-probe kinds (OQ-D7, OQ-PO6) and the real provider adapter.
+probe kinds (OQ-D7, OQ-PO6) and the judge model id (a recommendation is in
+[STAGE_4_BRIEF.md](STAGE_4_BRIEF.md)).
 
 ## Stage 5: API, Policy engine, CI adapter
 

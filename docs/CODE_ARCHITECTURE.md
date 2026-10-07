@@ -118,8 +118,8 @@ sequenceDiagram
     J->>X: ModelRequest (pinned model id, prompt, timeout)
     X->>P: stdin: JudgeJob JSON · env built from scratch: SUNCLY_JUDGE_MODEL_KEY only
     P->>P: read the key (key.py)
-    P->>M: POST prompt (Authorization: Bearer key); one host only, no redirects
-    M-->>P: model id, output text
+    P->>M: POST /v1/messages (Authorization: Bearer key, anthropic-version); one host only, no redirects
+    M-->>P: message: model id, text block (strict JSON), stop_reason
     P->>P: redact the key from text, model id and errors
     P-->>X: stdout: ModelResponse JSON
     X-->>J: ModelResponse
@@ -136,7 +136,7 @@ sequenceDiagram
 | Change | Touch |
 |---|---|
 | A model-based Contract builder (stage 2) | A new class implementing `ports/drafter.py::ContractDrafter`; swap it in `cli/wiring.py`. |
-| A real model provider for Layer 2 | Replace `call_endpoint` in `judge/process.py` (the placeholder wire shape); nothing in the core changes. A new rubric frame is a new `RUBRIC_VERSION` in `core/rubric.py`, which the configuration must then name (DR-004). |
+| Another model provider for Layer 2 | Replace `build_request`, `request_headers` and `read_answer` in `judge/process.py` (today the Anthropic Messages API, [STAGE_4_BRIEF.md](STAGE_4_BRIEF.md)); nothing in the core changes. A new rubric frame is a new `RUBRIC_VERSION` in `core/rubric.py`, which the configuration must then name (DR-004). |
 | A configured Policy engine (stage 5) | Replace `core/policy_engine.py::decide`; read thresholds from a policy configuration; keep `aggregate`. |
 | The HTTP API (stage 5) | `api.py` calling `AttestationService` with the same `Services`. |
 | CI and registry adapters (stages 5 and 6) | `adapters/ci.py`, `adapters/registry.py`, reading `EvidenceBundle`. |

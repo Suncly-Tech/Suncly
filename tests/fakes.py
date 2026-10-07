@@ -22,6 +22,7 @@ from suncly.domain.models import JsonObject
 from suncly.domain.transcript import COST_PER_ATTEMPT, Exchange, RunOutcome, Transcript
 from suncly.ports.a2a import RpcResponse
 from suncly.ports.card_fetcher import FetchedCard
+from suncly.ports.model_judge import ModelRequest, ModelResponse
 from suncly.ports.run_executor import RunJob, RunResult
 
 EPOCH = datetime(2026, 10, 4, 12, 0, 0, tzinfo=UTC)
@@ -180,6 +181,33 @@ class FakeExecutor:
 
 def passing_executor(clock: FakeClock | None = None) -> FakeExecutor:
     return FakeExecutor(lambda job, n: RunResult(transcript=make_transcript(job, clock=clock)))
+
+
+PINNED_MODEL = "judge-model-2026-10"
+
+
+@dataclass
+class FakeModelJudge:
+    """Scripted ``ModelJudge``: ``behaviour(request) -> ModelResponse``; records every request."""
+
+    behaviour: Callable[[ModelRequest], ModelResponse]
+    requests: list[ModelRequest] = field(default_factory=list)
+
+    def ask(self, request: ModelRequest) -> ModelResponse:
+        self.requests.append(request)
+        return self.behaviour(request)
+
+
+def model_answer(
+    answer: str | int, rationale: str = "the response states it plainly", model: str = PINNED_MODEL
+) -> ModelResponse:
+    """A well-formed answer in the shape the rubric asks for."""
+    return ModelResponse(model=model, text=json.dumps({"answer": answer, "rationale": rationale}))
+
+
+def answering_judge(answer: str | int, model: str = PINNED_MODEL) -> FakeModelJudge:
+    """A judge that answers the same thing to every question, from ``model``."""
+    return FakeModelJudge(lambda request: model_answer(answer, model=model))
 
 
 class MemorySigner:

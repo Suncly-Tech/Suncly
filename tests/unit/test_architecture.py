@@ -19,6 +19,7 @@ from suncly.domain.models import (
     RunVerdict,
     TestCaseKind,
 )
+from suncly.judge.key import JUDGE_KEY_ENV_VAR
 from suncly.runner.credentials import CREDENTIAL_ENV_VAR
 
 REPO = Path(__file__).resolve().parents[2]
@@ -33,12 +34,15 @@ ALLOWED = {
     "ports": {"domain"},
     "core": {"domain", "ports"},
     "runner": {"domain", "ports", "runner"},
-    "adapters": {"domain", "ports", "core", "runner", "adapters"},
+    "judge": {"domain", "ports", "judge"},
+    "adapters": {"domain", "ports", "core", "runner", "judge", "adapters"},
     "mock_agents": {"domain", "mock_agents"},
     "cli": {"domain", "ports", "core", "adapters", "cli", "mock_agents"},
 }
 #: Modules that may perform I/O inside the runner package; the rest is pure protocol logic.
 RUNNER_IO_MODULES = {"http_transport", "process", "credentials"}
+#: The one module of the judge package that does I/O; the job and the key reader are pure.
+JUDGE_IO_MODULES = {"process"}
 
 
 def modules() -> list[tuple[str, Path]]:
@@ -119,9 +123,44 @@ def test_only_the_runner_reads_the_credential() -> None:
     assert offenders == [], f"modules naming {CREDENTIAL_ENV_VAR}: {offenders}"
 
 
+def test_only_the_judge_subprocess_names_the_model_key_variable() -> None:
+    """OQ-A1 (decided): the model key variable is named in exactly one source module.
+
+    The Runner never names it, so the key cannot reach the agent; the core and the
+    adapters never name it, so it cannot reach the evidence, a report or a log.
+    """
+    offenders = [
+        module
+        for module, path in modules()
+        if JUDGE_KEY_ENV_VAR in path.read_text(encoding="utf-8") and module != "judge.key"
+    ]
+    assert offenders == [], f"modules naming {JUDGE_KEY_ENV_VAR}: {offenders}"
+    assert not JUDGE_KEY_ENV_VAR.startswith(CREDENTIAL_ENV_VAR)
+    assert not CREDENTIAL_ENV_VAR.startswith(JUDGE_KEY_ENV_VAR)
+
+
+def test_the_judge_package_does_io_in_one_module_and_never_imports_the_runner() -> None:
+    for module, path in modules():
+        if layer_of(module) != "judge":
+            continue
+        imports = imports_of(path)
+        assert not any(name.startswith("suncly.runner") for name in imports), module
+        if module.split(".")[-1] not in JUDGE_IO_MODULES:
+            for imported in imports:
+                assert imported.split(".")[0] not in {"httpx", "os", "sys", "subprocess"}, (
+                    f"{module} imports {imported}"
+                )
+
+
 def test_no_module_outside_the_runner_reads_the_environment_for_the_agent() -> None:
     """The parent processes never touch os.environ except the config loader and the CLI."""
-    allowed = {"adapters.config_loader", "cli.main", "cli.output", "runner.process"}
+    allowed = {
+        "adapters.config_loader",
+        "cli.main",
+        "cli.output",
+        "runner.process",
+        "judge.process",
+    }
     for module, path in modules():
         text = path.read_text(encoding="utf-8")
         if "os.environ" in text or "getenv(" in text:

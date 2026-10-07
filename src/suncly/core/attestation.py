@@ -28,7 +28,7 @@ from suncly.core.contract_builder import (
     uncovered_skills,
 )
 from suncly.core.evidence import assemble_bundle, evidence_document_hash
-from suncly.core.judge import JudgeService
+from suncly.core.judge import JudgeService, model_judge_settings
 from suncly.core.orchestrator import Orchestrator, OrchestratorSettings
 from suncly.core.policy_engine import PolicyEngine, aggregate
 from suncly.domain.card import ParsedCard
@@ -54,6 +54,7 @@ from suncly.ports.drafter import (
     DraftTestCase,
     NotTestableSkill,
 )
+from suncly.ports.model_judge import ModelJudge
 from suncly.ports.progress import NoProgress, ProgressListener
 from suncly.ports.report import ReportWriter
 from suncly.ports.run_executor import RunExecutor
@@ -87,7 +88,11 @@ PROPOSALS_IN_EFFECT = (
         "OQ-D3: run.attempt is the repetition number; (attestation_id, test_case_id, attempt) is "
         "unique"
     ),
-    "OQ-D7: input is {text} or {parts}; criteria hold the Layer 1 checks (docs/API.md)",
+    (
+        "OQ-D7: input is {text} or {parts}; criteria hold the Layer 1 checks and the model "
+        "checks for Layer 2, each with a name, the criterion, the answer shape and the pass "
+        "rule (docs/API.md)"
+    ),
     "OQ-D9: a card hash seen before reuses its card_version and its approved contract",
     (
         "OQ-D10: latency_ms runs from sending the message to the final task state; null without a "
@@ -168,6 +173,8 @@ class Services:
     ids: IdGenerator
     report_writer: ReportWriter
     progress: ProgressListener = field(default_factory=NoProgress)
+    model_judge: ModelJudge | None = None
+    """Layer 2's way to the pinned model; ``None`` when no judge endpoint is configured."""
 
 
 class AttestationService:
@@ -183,6 +190,8 @@ class AttestationService:
                 "(DR-006).",
                 "If this agent's endpoint is a sandbox, run again with --sandbox.",
             )
+        # A judge configured only in part is refused before anything runs (DR-004).
+        model_settings = model_judge_settings(s.config)
         signer = self._signer()
 
         cards = CardService(s.fetcher, s.store, s.clock, s.ids)
@@ -249,7 +258,14 @@ class AttestationService:
             approved_by=contract.approved_by,
         )
 
-        judge = JudgeService(s.store, s.transcripts, s.clock, s.ids)
+        judge = JudgeService(
+            s.store,
+            s.transcripts,
+            s.clock,
+            s.ids,
+            model_judge=s.model_judge,
+            model_settings=model_settings,
+        )
         orchestrator = Orchestrator(
             executor=s.executor,
             store=s.store,
@@ -314,6 +330,7 @@ class AttestationService:
             drafter_name=source,
             signer_public_key=signer.public_key,
             proposals=PROPOSALS_IN_EFFECT,
+            layer_2_configured=judge.layer_2_configured,
         )
         report_dir = s.report_writer.write(bundle)
         s.progress.on_event("report_written", path=str(report_dir))

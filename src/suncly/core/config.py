@@ -2,7 +2,9 @@
 
 Values are resolved in this order: built-in defaults, then the config file
 (``SUNCLY_HOME/config.toml``), then environment variables. The object is
-immutable and passed down explicitly; there is no global state.
+immutable and passed down explicitly; there is no global state. The two
+credentials Suncly uses, the agent credential and the judge model key, are
+not settings: each is read by its own subprocess and nowhere else.
 """
 
 from __future__ import annotations
@@ -40,6 +42,14 @@ class Config:
     card_max_bytes: int = 1_000_000
     poll_interval_s: float = 0.5
     max_test_cases_per_skill: int = 3
+    judge_model: str | None = None
+    """The one pinned Layer 2 model id (DR-004). No default: without it Layer 2 does not run."""
+    judge_endpoint: str | None = None
+    """The one URL the judge subprocess may talk to. No default."""
+    judge_rubric_version: str | None = None
+    """The rubric frame version in use; must be the one this build carries (DR-004)."""
+    judge_timeout_s: float = 60.0
+    """Seconds one model question may take before it counts as a timeout (inconclusive)."""
 
     @property
     def store_dir(self) -> Path:
@@ -153,6 +163,10 @@ PARSERS: dict[str, Callable[[str], Any]] = {
     "card_max_bytes": _positive_int("card_max_bytes"),
     "poll_interval_s": _positive_float("poll_interval_s"),
     "max_test_cases_per_skill": _positive_int("max_test_cases_per_skill"),
+    "judge_model": _text,
+    "judge_endpoint": _text,
+    "judge_rubric_version": _text,
+    "judge_timeout_s": _positive_float("judge_timeout_s"),
 }
 
 #: Environment variables that do not follow the ``SUNCLY_<FIELD>`` pattern.

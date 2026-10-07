@@ -163,6 +163,7 @@ through the real code path.
 | [docs/IMPLEMENTATION_NOTES.md](docs/IMPLEMENTATION_NOTES.md) | Every proposal the code implements, the choices the founders decided, every choice that still needs a decision, and the facts that were verified. |
 | [docs/REAL_AGENT_REPORT.md](docs/REAL_AGENT_REPORT.md) | Suncly tested against official A2A reference agents: what was observed, which failures are protocol, version, agent or Suncly issues, and the A2A 0.3 decision. |
 | [docs/OSS_EVALUATION.md](docs/OSS_EVALUATION.md) | Evaluation of the A2A TCK and Promptfoo as import-only evidence sources: licence, release, maintenance, result formats, import safety. |
+| [docs/STAGE_4_BRIEF.md](docs/STAGE_4_BRIEF.md) | Judge Layer 2: the founders' decisions, the judge subprocess and its isolation, the configuration, what is proven by tests, and what is still missing. |
 | [db/README.md](db/README.md) | What the migration enforces, and which open questions it leaves open. |
 
 **How to read these documents.** Where a document and
@@ -203,8 +204,9 @@ points at a Postgres database (CI starts one); they are skipped otherwise.
 │   ├── domain/                The seven entities, Agent Card parsing, criteria, rules (no I/O)
 │   ├── ports/                 Interfaces: store, transcripts, drafter, signer, clock, HTTP, executor
 │   ├── core/                  Contract builder, Orchestrator, Judge, Policy engine, signing, use case
-│   ├── runner/                The isolated Runner: its own process, the only credential holder
-│   ├── adapters/              File and Postgres stores, keys, card fetcher, subprocess executor, report
+│   ├── runner/                The isolated Runner: its own process, the only agent-credential holder
+│   ├── judge/                 The judge subprocess: its own process, the only model-key holder
+│   ├── adapters/              File and Postgres stores, keys, card fetcher, subprocess executor, judge subprocess, report
 │   ├── mock_agents/           Bundled mock A2A agents (the demo and the tests)
 │   ├── cli/                   The suncly command
 │   └── api.py                 Placeholder for the stage 5 HTTP API

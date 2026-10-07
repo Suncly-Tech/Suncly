@@ -12,7 +12,7 @@ import pytest
 from suncly.adapters.file_store import FileEvidenceStore
 from suncly.adapters.local_transcripts import LocalTranscriptStorage
 from suncly.core.judge import JudgeService, judge_run, resolve_pointer
-from suncly.domain.criteria import Criteria
+from suncly.domain.criteria import Criteria, ModelCheck
 from suncly.domain.errors import StoreError
 from suncly.domain.models import (
     Agent,
@@ -32,6 +32,7 @@ from suncly.domain.transcript import RunOutcome
 from tests.fakes import FakeClock, SeqIds, make_transcript, task_response
 
 CRITERIA = Criteria(latency_limit_ms=1000, output_modes=["text/plain"])
+TONE = ModelCheck(name="tone", criterion="the answer is polite", expected="yes_no", pass_rule="yes")
 
 
 def failed_checks(criteria: Criteria, **kwargs: object) -> set[str]:
@@ -135,14 +136,16 @@ def test_response_schema_is_validated() -> None:
     assert check.passed is False and "integer" in check.detail
 
 
-def test_model_checks_make_the_run_inconclusive_until_layer_2_exists() -> None:
-    judgement = judge_run(make_transcript(), Criteria(latency_limit_ms=1000, model_checks=["tone"]))
+def test_model_checks_are_undecided_by_layer_1_and_make_the_run_inconclusive() -> None:
+    judgement = judge_run(make_transcript(), Criteria(latency_limit_ms=1000, model_checks=[TONE]))
     assert judgement.verdict is RunVerdict.INCONCLUSIVE
     assert "model_check tone" in judgement.summary
+    check = next(c for c in judgement.checks if c.name == "model_check tone")
+    assert check.passed is None and "needs Layer 2" in check.detail
 
 
 def test_a_failed_check_wins_over_an_undecided_one() -> None:
-    criteria = Criteria(latency_limit_ms=1, model_checks=["tone"])
+    criteria = Criteria(latency_limit_ms=1, model_checks=[TONE])
     assert judge_run(make_transcript(latency_ms=50), criteria).verdict is RunVerdict.FAIL
 
 

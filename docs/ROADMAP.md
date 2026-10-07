@@ -9,12 +9,14 @@ stage 1 item below is ticked with the test that proves it. Of the later
 stages, the MVP implements: a deterministic Contract builder with the recorded
 human approval (stage 2, without a model); the Postgres store, the Evidence
 store behind one interface, transcript storage and Ed25519 signing (stage 3);
-and a flag-only Policy engine (stage 5, without policy configuration). Not
-implemented: model-based drafting and probes, Judge Layer 2, policy
-thresholds and `approve`/`block` decisions, human resolution of a flag, the
-HTTP API, the CI and registry adapters, the job table. The placeholder modules
-`api.py`, `adapters/ci.py` and `adapters/registry.py` name their stage.
-Choices the code made are recorded in
+and a flag-only Policy engine (stage 5, without policy configuration); and,
+since 2026-10-07, Judge Layer 2 with its judge subprocess (stage 4, items 1 to
+3, without a real provider adapter; [STAGE_4_BRIEF.md](STAGE_4_BRIEF.md)). Not
+implemented: model-based drafting and probes, a real model provider adapter,
+policy thresholds and `approve`/`block` decisions, human resolution of a flag,
+the HTTP API, the CI and registry adapters, the job table. The placeholder
+modules `api.py`, `adapters/ci.py` and `adapters/registry.py` name their
+stage. Choices the code made are recorded in
 [IMPLEMENTATION_NOTES.md](IMPLEMENTATION_NOTES.md).
 
 Conventions are as in [ARCHITECTURE.md](ARCHITECTURE.md): "schema §N" refers
@@ -103,7 +105,7 @@ file report is the first version of the Report adapter
 deterministic Contract builder with the recorded approval, the Postgres store
 and signing, and the flag-only Policy engine, so every attestation is signed
 and records a `flag` decision (decided 2026-10-04; see the status above).
-Layer 2 is not implemented.
+Layer 2 is implemented as stage 4, items 1 to 3 (2026-10-07).
 
 **Open:** [OQ-R1](#open-questions) (repetitions, and the non-negotiable budget
 cap of [DR-005](DECISIONS.md#dr-005-budget-caps-live-in-the-orchestrator),
@@ -170,23 +172,43 @@ stage 3 cannot make yet), [OQ-D6](DATA_MODEL.md#open-questions),
 
 **Definition of done**
 
-- [ ] Layer 2 judges only criteria that Layer 1 cannot decide, with a fixed
+- [x] Layer 2 judges only criteria that Layer 1 cannot decide, with a fixed
       rubric and a model pinned by version. Its rationale is stored on the
       run, and `judge_layer` is `model`.
-- [ ] Changing the judge model or the rubric takes an explicit configuration
+      Proof: `tests/unit/test_judge_layer_2.py::test_layer_2_is_not_asked_when_layer_1_decided`,
+      `::test_layer_2_is_not_asked_when_there_is_no_response_to_judge`,
+      `::test_layer_2_asks_once_per_undecided_model_check_with_the_criterion_in_the_prompt`,
+      `::test_pass_when_the_pinned_model_answers_in_shape_and_the_rule_passes`,
+      `::test_the_evidence_document_records_everything_layer_2_saw_and_said` (rationale on the run, `judge_layer` `model`, rubric version and hash, model id).
+- [x] Changing the judge model or the rubric takes an explicit configuration
       change ([DR-004](DECISIONS.md#dr-004-judge-model-is-pinned)).
-- [ ] A Layer 2 failure never produces `pass`.
+      Proof: `tests/unit/test_judge_layer_2.py::test_without_a_configured_model_a_model_check_is_inconclusive_and_layer_1_decided` (no default model),
+      `::test_the_pinned_model_comes_from_the_configuration_alone`,
+      `::test_an_answer_from_another_model_than_the_pinned_one_is_no_verdict`,
+      `::test_a_rubric_version_this_build_does_not_carry_is_refused`,
+      `::test_the_rubric_is_versioned_and_hashed_and_a_changed_frame_changes_the_hash`,
+      `::test_a_judge_configured_only_in_part_is_refused_before_anything_runs`.
+- [x] A Layer 2 failure never produces `pass`.
+      Proof: `tests/unit/test_judge_layer_2.py::test_inconclusive_never_pass_when_the_model_fails`,
+      `::test_inconclusive_on_a_timeout`, `::test_inconclusive_on_malformed_output`,
+      `::test_a_score_must_be_a_whole_number_from_0_to_10`,
+      `::test_a_mix_of_decided_and_undecided_model_checks_stays_inconclusive`,
+      `::test_the_adapter_treats_a_killed_silent_or_garbled_process_as_a_model_failure`.
 - [ ] The Contract builder drafts probes with `kind` `probe_undeclared`,
       `probe_injection` and `probe_failure`. They go through the same human
       approval as skill test cases.
 - [ ] Probes run only against the sandbox or dry-run endpoint
       ([DR-006](DECISIONS.md#dr-006-tests-hit-a-sandbox-or-dry-run-endpoint)).
-- [ ] Model calls use the customer's own keys (schema §7).
+- [ ] Model calls use the customer's own keys (schema §7). The judge
+      subprocess reads the customer's key, but no real provider adapter exists
+      yet, so no call to a real model has been made.
 
-**Open:** [OQ-A1](ARCHITECTURE.md#open-questions),
-[OQ-D4](DATA_MODEL.md#open-questions),
-[OQ-D7](DATA_MODEL.md#open-questions) and
-[OQ-PO6](POLICY.md#open-questions).
+**Decided 2026-10-07:** [OQ-A1](ARCHITECTURE.md#open-questions),
+[OQ-D4](DATA_MODEL.md#open-questions), [OQ-D7](DATA_MODEL.md#open-questions)
+for the model checks, [OQ-PO6](POLICY.md#open-questions) for the aggregation
+level, the pinned model and the rubric
+([IMPLEMENTATION_NOTES.md](IMPLEMENTATION_NOTES.md), section 3). **Open:** the
+probe kinds (OQ-D7, OQ-PO6) and the real provider adapter.
 
 ## Stage 5: API, Policy engine, CI adapter
 

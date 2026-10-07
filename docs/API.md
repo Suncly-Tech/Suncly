@@ -154,10 +154,19 @@ no approval fields: approval is recorded by `--approve-as` or the prompt.
   `output_modes` (media types every output part must use; `null` disables
   the check); `required_fields` (JSON pointers that must exist and be
   non-empty in the final response); `response_schema` (a JSON Schema the
-  final response must satisfy); `model_checks` (criteria for Layer 2, which
-  does not exist yet, so any entry makes the run `inconclusive`);
-  `accept_direct_message` (a direct Message reply counts as a completed task).
-  Unknown keys are refused.
+  final response must satisfy); `model_checks` (criteria for Layer 2, see
+  below); `accept_direct_message` (a direct Message reply counts as a
+  completed task). Unknown keys are refused.
+- Each entry of `model_checks` is an object with exactly these keys (OQ-D7,
+  decided 2026-10-07): `name` (unique within the test case), `criterion` (the
+  text the judge model is asked about), `expected` (the answer shape,
+  `yes_no` or `score_0_to_10`) and `pass_rule` (`yes` or `no` for `yes_no`;
+  `at_least <n>` with `n` from 0 to 10 for `score_0_to_10`). Example:
+  `{"name": "refund_arithmetic", "criterion": "the amount equals the order
+  total minus the restocking fee", "expected": "yes_no", "pass_rule": "yes"}`.
+  Layer 2 judges these only when a judge model is configured
+  ([STAGE_4_BRIEF.md](STAGE_4_BRIEF.md)); without one, every run of the test
+  case is `inconclusive`.
 
 ## HTTP API
 

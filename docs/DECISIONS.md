@@ -85,8 +85,12 @@ define, and `OQ-…` marks open questions.
     never drift.
   - Layer 2 runs only for criteria that Layer 1 cannot decide (schema §2), so
     fewer verdicts depend on a model at all.
-  - Still open: the pinned model and rubric versions are not stored in the
-    evidence ([OQ-D4](DATA_MODEL.md#open-questions)).
+  - How the code enforces it (decided 2026-10-07): the model id comes from the
+    configuration with no default; the rubric frame is versioned and the
+    configuration must name the version in use; the model id, the rubric
+    version and the rubric hash are written into every Layer 2 evidence
+    document ([OQ-D4](DATA_MODEL.md#open-questions), decided;
+    [STAGE_4_BRIEF.md](STAGE_4_BRIEF.md)).
 
 ## DR-005 Budget caps live in the Orchestrator
 

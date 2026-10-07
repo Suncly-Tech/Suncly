@@ -21,7 +21,7 @@ from suncly.adapters.local_transcripts import LocalTranscriptStorage
 from suncly.core.attestation import AttestationService, AttestRequest, Services
 from suncly.core.judge import judge_run
 from suncly.core.policy_engine import aggregate, decide
-from suncly.domain.criteria import Criteria
+from suncly.domain.criteria import Criteria, ModelCheck
 from suncly.domain.errors import ApprovalRequiredError, SandboxDeclarationMissingError, StoreError
 from suncly.domain.evidence import TestCaseResult
 from suncly.domain.models import (
@@ -197,7 +197,8 @@ def test_nothing_runs_against_a_contract_until_a_human_has_approved_it(
 
 
 def test_inconclusive_is_never_counted_as_a_pass() -> None:
-    criteria = Criteria(latency_limit_ms=1000, model_checks=["tone"])
+    tone = ModelCheck(name="tone", criterion="polite", expected="yes_no", pass_rule="yes")
+    criteria = Criteria(latency_limit_ms=1000, model_checks=[tone])
     judgement = judge_run(make_transcript(), criteria)
     assert judgement.verdict is RunVerdict.INCONCLUSIVE
     unreachable = judge_run(

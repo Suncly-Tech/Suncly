@@ -272,8 +272,13 @@ make Suncly approve less, never more.
     shorter than the latency limit, so a run stopped by a timeout fails the
     latency check ([OQ-F3](FLOW.md#open-questions)).
 - **Layer 2 (model-based)** is used only for criteria that Layer 1 cannot
-  decide. It uses a fixed rubric, stores its rationale, and the model is pinned
-  by version.
+  decide: the model checks of the test case, each an object with a name, the
+  criterion text, the expected answer shape and the pass rule (OQ-D7, decided
+  2026-10-07). It uses a fixed rubric (a versioned global frame plus the
+  criterion text), stores its rationale, and the model is pinned by version
+  in the configuration with no default. The model is reached through a
+  separate judge subprocess, the only holder of the customer's model key
+  ([OQ-A1](#open-questions), decided).
 - Gives each run a verdict: `pass`, `fail` or `inconclusive`. An
   `inconclusive` verdict is never counted as a pass.
 - Writes each run to the Evidence store (schema §4, step 5). `judge_layer`
@@ -306,10 +311,13 @@ make Suncly approve less, never more.
 
 - A response that fails a Layer 1 check is a `fail`. That is the check working
   as intended.
-- **Proposed:** if the Layer 2 model is unavailable, returns an error or gives
-  an unusable answer, the verdict is `inconclusive`, with `judge_layer`
-  `model` and a `rationale` saying that no model verdict was available
-  ([OQ-D4](DATA_MODEL.md#open-questions)).
+- If the Layer 2 model is unavailable, returns an error, times out, answers
+  as another model than the pinned one or gives an unusable answer, the
+  verdict is `inconclusive`, with `judge_layer` `model` and a `rationale`
+  starting `no model verdict:` (decided 2026-10-07,
+  [OQ-D4](DATA_MODEL.md#open-questions)). If no judge model is configured,
+  Layer 2 does not run: the verdict is `inconclusive` with `judge_layer`
+  `deterministic`, and the summary says why.
 - **Proposed:** if Suncly cannot read the transcript because of its own fault,
   the verdict is `inconclusive`, never `pass` ([OQ-A11](#open-questions)).
 
@@ -604,7 +612,11 @@ From schema §10. Suncly does not build any of these:
   Judge (Layer 2) would hold customer credentials. Schema §2 says the Runner is
   the only component holding customer credentials. Does that rule cover only
   credentials for the agent under test, or do model calls also have to go
-  through the Runner?
+  through the Runner? **Decided 2026-10-07:** the Runner's rule covers the
+  agent credential only. The customer's model key lives in a separate judge
+  subprocess with an environment built from scratch, never in the Runner or
+  the core process ([IMPLEMENTATION_NOTES.md](IMPLEMENTATION_NOTES.md),
+  section 3; [STAGE_4_BRIEF.md](STAGE_4_BRIEF.md)).
 - **OQ-A2 Sandbox enforcement and which card is attested.** How does Suncly
   know, or enforce, that an endpoint is a sandbox or dry-run endpoint? A2A has
   no such concept. And which Agent Card is attested: the production card, or

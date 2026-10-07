@@ -186,3 +186,12 @@ whole state folder, which is useful for isolated runs:
 ```powershell
 suncly --home .\tmp-home demo --reports-dir .\tmp-reports
 ```
+
+Judge Layer 2 is off until three settings are set together: `judge_model`
+(the one pinned model id; no default), `judge_endpoint` (the one URL the judge
+subprocess may talk to) and `judge_rubric_version` (`1` for this build). The
+customer's model key goes in the environment variable `SUNCLY_JUDGE_MODEL_KEY`,
+which only the judge subprocess reads. Without these, every run whose criteria
+carry a model check is `inconclusive`, and the report says so. Details, and
+what is still missing before a real model can be used, are in
+[STAGE_4_BRIEF.md](STAGE_4_BRIEF.md).

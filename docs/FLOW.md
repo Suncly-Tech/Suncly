@@ -286,10 +286,13 @@ From schema §2:
 1. Layer 1 decides every criterion it can. The rest go to Layer 2, which uses
    a fixed rubric and the pinned model, and stores its rationale.
 2. If Layer 2 cannot decide either, the verdict is `inconclusive`, with
-   `judge_layer` `model` and the rationale stored. **Proposed:** a Layer 2
-   model that is unavailable or returns an error also gives `inconclusive`,
-   with `judge_layer` `model` and a rationale saying that no model verdict was
-   available ([OQ-D4](DATA_MODEL.md#open-questions)).
+   `judge_layer` `model` and the rationale stored. A Layer 2 model that is
+   unavailable, returns an error, times out, answers as another model or
+   gives malformed output also gives `inconclusive`, with `judge_layer`
+   `model` and a rationale starting `no model verdict:` (decided 2026-10-07,
+   [OQ-D4](DATA_MODEL.md#open-questions)). Without a configured judge model,
+   Layer 2 does not run and the run is `inconclusive` with `judge_layer`
+   `deterministic`.
 3. `inconclusive` is never counted as a pass. **Proposed:** aggregated results
    show `inconclusive` separately from `pass` and `fail`.
 4. The Policy engine never approves on `inconclusive` runs. Whether they count

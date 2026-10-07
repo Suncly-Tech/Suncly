@@ -253,7 +253,7 @@ def attest(
         contract_file=contract_file,
         export_draft=export_path is not None,
     )
-    services = build_services(config, progress)
+    services = build_services(config, progress, os.environ)
     try:
         outcome = AttestationService(services).attest(request)
     finally:
@@ -305,7 +305,7 @@ def demo(
                 console.line(
                     "Bundled mock agents run on this machine and are sandboxes by construction."
                 )
-            services = build_services(config, progress)
+            services = build_services(config, progress, os.environ)
             try:
                 outcome = AttestationService(services).attest(
                     AttestRequest(

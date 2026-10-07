@@ -121,8 +121,8 @@ not invent numbers" (schema §5).
 
 This document deliberately contains no threshold values
 ([OQ-PO1](#open-questions)). Thresholds apply to aggregated results
-(schema §2). At what level thresholds apply is open
-([OQ-PO6](#open-questions)).
+(schema §2), which are counted per test case (decided 2026-10-07,
+[OQ-PO6](#open-questions)); how probe results count is still open.
 
 ## Policy configuration and policy_version
 
@@ -168,7 +168,9 @@ This document deliberately contains no threshold values
     because no configuration exists carry?
 - **OQ-PO6 Aggregation level and probes.**
   - Are thresholds applied per test case (the level the signature uses), per
-    skill, or per attestation?
+    skill, or per attestation? **Decided 2026-10-07:** results are counted
+    per test case ([IMPLEMENTATION_NOTES.md](IMPLEMENTATION_NOTES.md),
+    section 3).
   - How do probe results (`probe_undeclared`, `probe_injection`,
     `probe_failure`) count toward the decision?
 - **OQ-PO7 Who may resolve a flag.** Who may resolve a `flag` or sign off on a

@@ -46,6 +46,7 @@ def assemble_bundle(
     drafter_name: str | None,
     signer_public_key: bytes | None,
     proposals: Sequence[str],
+    layer_2_configured: bool = False,
 ) -> EvidenceBundle:
     """Load everything about an attestation and derive results and coverage."""
     attestation = store.get_attestation(attestation_id)
@@ -81,6 +82,8 @@ def assemble_bundle(
         planned_runs=planned_runs,
         target_url=used_target,
         sandbox_declared=sandbox_declared,
+        runs=runs,
+        layer_2_configured=layer_2_configured,
     )
     policy_decision = decisions[0] if decisions else None
     payload: JsonObject | None = None

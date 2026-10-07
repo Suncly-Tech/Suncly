@@ -281,10 +281,15 @@ def main(
         for test_case in draft["test_cases"]:
             test_case["criteria"]["required_fields"] = ["/artifacts/0/parts/0/text"]
             if test_case["skill_id"] == "refund-estimate":
-                # A check Layer 1 cannot decide. Layer 2 does not exist yet, so every run of
-                # this test case is inconclusive, and the report says so.
+                # A check Layer 1 cannot decide. The sample runs without a judge model, so
+                # every run of this test case is inconclusive, and the report says so.
                 test_case["criteria"]["model_checks"] = [
-                    "the amount equals the order total minus the restocking fee"
+                    {
+                        "name": "refund_arithmetic",
+                        "criterion": "the amount equals the order total minus the restocking fee",
+                        "expected": "yes_no",
+                        "pass_rule": "yes",
+                    }
                 ]
         contract_file = parse_contract_file(json.dumps(draft))
         (out_dir / "harbor-contract.json").write_text(

@@ -366,15 +366,17 @@ and name every table and type they use as `public.…`, so the schema lives in
   - Retried attempts of the same run are not recorded separately.
   - The planned number of repetitions is not stored. The report needs it to
     state what was NOT tested after a budget stop.
-- **OQ-D4 Judge records.**
-  - The pinned judge model version and the rubric version are stored nowhere:
-    not on the run, and not in the signed payload. So the pinning rule
-    (schema §8) cannot be audited from the evidence.
-  - `judge_layer` is read as "the layer that decided the verdict". Please
-    confirm.
-  - If the Layer 2 model is unavailable, what do `judge_layer` and
-    `rationale` hold? **Proposed:** `model`, with a rationale saying that no
-    model verdict was available.
+- **OQ-D4 Judge records.** **Decided 2026-10-07**
+  ([IMPLEMENTATION_NOTES.md](IMPLEMENTATION_NOTES.md), section 3):
+  - The model id, the rubric version and hash, the criterion text, the
+    prompt, the raw response and the rationale go into the per-run evidence
+    document, whose hash the signature covers. The run table and the signed
+    payload are unchanged.
+  - `judge_layer` is the layer that decided the verdict.
+  - If the Layer 2 model is unavailable, times out, answers as another model
+    or gives an unusable answer, `judge_layer` is `model` and `rationale`
+    starts `no model verdict:`. If no model is configured, Layer 2 does not
+    run and `judge_layer` stays `deterministic`.
 - **OQ-D5 Contract lifecycle.**
   - Is `version` numbered per card version or per agent? (This decides whether
     (`card_version_id`, `version`) can be unique.)
@@ -400,7 +402,11 @@ and name every table and type they use as `public.…`, so the schema lives in
   - The working definitions of the `kind` values need confirming.
   - What does `skill_id` hold for probes, especially `probe_undeclared`, which
     has no declared skill? Is it nullable?
-  - What format do `input` and `criteria` use?
+  - What format do `input` and `criteria` use? **Decided 2026-10-07** for
+    the model checks: each is an object in `criteria.model_checks` with
+    `name`, `criterion`, `expected` and `pass_rule`, and unknown keys are
+    refused ([API.md](API.md#contract-file)). The rest of the format stays
+    the implemented proposal.
   - A2A v1.0 describes `AgentSkill.id` only as "a unique identifier for the
     agent's skill", with no format and no stated uniqueness scope. What
     happens if two skills share an id?

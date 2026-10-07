@@ -22,6 +22,7 @@ from suncly.ports.progress import NoProgress
 from tests.fakes import (
     FakeClock,
     FakeExecutor,
+    FakeModelJudge,
     MemoryReportWriter,
     MemorySigningKeys,
     SeqIds,
@@ -121,15 +122,17 @@ def services_factory(
     ids: SeqIds,
     tmp_path: Path,
 ) -> ServicesFactory:
-    """Build ``Services`` on fakes; override the fetcher, executor or keys per test."""
+    """Build ``Services`` on fakes; override the fetcher, executor, keys or judge per test."""
 
     def build(
         fetcher: StaticFetcher,
         executor: FakeExecutor | None = None,
         keys: MemorySigningKeys | None = None,
+        model_judge: FakeModelJudge | None = None,
+        judge_config: Config | None = None,
     ) -> Services:
         return Services(
-            config=config,
+            config=judge_config or config,
             store=file_store,
             transcripts=transcripts,
             fetcher=fetcher,
@@ -140,6 +143,7 @@ def services_factory(
             ids=ids,
             report_writer=MemoryReportWriter(tmp_path / "reports"),
             progress=NoProgress(),
+            model_judge=model_judge,
         )
 
     return build

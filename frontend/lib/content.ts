@@ -13,7 +13,8 @@ import { launch, PRIMARY_ACTION } from "./launch";
 
 export const site = {
   name: "suncly",
-  domain: "https://suncly.com",
+  /** Vercel serves www and 308-redirects the apex to it (checked 2026-10-07), so www is canonical everywhere. */
+  domain: "https://www.suncly.com",
   title: "Suncly — Test the agent. Then decide.",
   description:
     "Suncly tests an A2A agent against what its Agent Card claims and hands security and platform teams signed evidence: what passed, what failed, and what was never tested.",

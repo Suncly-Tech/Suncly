@@ -10,18 +10,18 @@ Brand line: Evidence before access. Based in Tallinn, Estonia. Contact team@sunc
 
 ## Pages
 
-- [Home](https://suncly.com/): what it does, how it works, how to install, evidence, use cases, Offer, Certified, Data, Research, Lab, what a pass does not cover.
-- [Offer](https://suncly.com/offer): usage-only pricing, no seats, no plans; connecting and the badge are free; billing not live.
-- [Certified](https://suncly.com/certified): the badge, its files and rules, the registry (empty at launch).
-- [Data](https://suncly.com/data): what enters a test and what leaves it; the data inventory; deletion.
-- [Research](https://suncly.com/research): notes on what evidence proves (drafts in review).
-- [Lab](https://suncly.com/lab): the eleven mock agents, how to run them, the sample generator, an example contract.
-- [Product](https://suncly.com/product): every capability with its status, and the comparison with manual review.
-- [Sample evaluation](https://suncly.com/demo): one fictional agent, three real evaluations.
-- [Security](https://suncly.com/security): what the tool touches, credentials, disclosure policy.
-- [Docs](https://suncly.com/docs): getting started, command reference, evidence and reports.
-- [Glossary](https://suncly.com/glossary): the terms, one sentence each.
+- [Home](https://www.suncly.com/): what it does, how it works, how to install, evidence, use cases, Offer, Certified, Data, Research, Lab, what a pass does not cover.
+- [Offer](https://www.suncly.com/offer): usage-only pricing, no seats, no plans; connecting and the badge are free; billing not live.
+- [Certified](https://www.suncly.com/certified): the badge, its files and rules, the registry (empty at launch).
+- [Data](https://www.suncly.com/data): what enters a test and what leaves it; the data inventory; deletion.
+- [Research](https://www.suncly.com/research): notes on what evidence proves (drafts in review).
+- [Lab](https://www.suncly.com/lab): the eleven mock agents, how to run them, the sample generator, an example contract.
+- [Product](https://www.suncly.com/product): every capability with its status, and the comparison with manual review.
+- [Sample evaluation](https://www.suncly.com/demo): one fictional agent, three real evaluations.
+- [Security](https://www.suncly.com/security): what the tool touches, credentials, disclosure policy.
+- [Docs](https://www.suncly.com/docs): getting started, command reference, evidence and reports.
+- [Glossary](https://www.suncly.com/glossary): the terms, one sentence each.
 
 ## Full text
 
-- [llms-full.txt](https://suncly.com/llms-full.txt)
+- [llms-full.txt](https://www.suncly.com/llms-full.txt)

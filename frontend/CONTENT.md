@@ -59,6 +59,7 @@ certification not open, no coding agent verified, trade mark unregistered (™).
 - Hero subhead first sentence "Suncly is an evaluation tool for AI agents built on the Linux Foundation's Agent2Agent (A2A) protocol." — `README` "What Suncly does"; the Linux Foundation wording follows the attribution line (`BRIEF` section 16) and implies no affiliation (the disclaimer stays in the footer and on `/legal`). 2026-10-07.
 - Home FAQ "What is Suncly?" — `site.definition` (`lib/content.ts`), the first two sentences of `DEFINITION`; same sources as the definition. "JSON-RPC 2.0" on first mention per page — `SCHEMA` (A2A 1.0 JSON-RPC binding is JSON-RPC 2.0), 2026-10-07.
 - Contact `team@suncly.com`, Tallinn, Estonia, © 2026 Suncly — `BRIEF`
+- Canonical host `https://www.suncly.com` (`site.domain`) — `RUN` 2026-10-07: Vercel serves www and redirects the apex to it; the brand domain in prose stays "suncly.com"
 - Legal entity, registry code, registered office, VAT: blank (`INPUTS` block 5) → named blanks on the legal pages, omitted from the footer line
 - Attribution line for A2A — `BRIEF` section 16 wording, to be confirmed against the Linux Foundation's trademark page (unreachable from the build environment; `REDESIGN_PLAN.md` §12.3)
 

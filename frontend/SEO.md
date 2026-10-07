@@ -53,10 +53,15 @@ differently; keep `DEFINITION` the single source when writing elsewhere.
 
 In rough order of effect on the brand query and on AI answers:
 
-1. **Deploy the site at https://suncly.com** with HTTPS, compression and the
-   `/_next/static/` cache headers; until it is live nothing below applies.
-2. **Google Search Console and Bing Webmaster Tools.** Verify the domain (set the two
-   verification variables above, or DNS), submit `https://suncly.com/sitemap.xml`,
+1. **Deployed on Vercel at https://www.suncly.com** (checked 2026-10-07: www serves the site, the apex
+   308-redirects to www, and `suncly.vercel.app` served an indexable duplicate). www is therefore the
+   canonical host everywhere (`site.domain`, canonicals, Open Graph, JSON-LD ids, sitemap, robots,
+   `llms.txt`), and `vercel.json` redirects the vercel.app alias and the apex to it. Keep the Vercel
+   domain settings in step: www primary, apex redirecting. The GitHub repository's About link still
+   points at `suncly.vercel.app`; change it to https://www.suncly.com.
+2. **Google Search Console and Bing Webmaster Tools.** Not done as of 2026-10-07 (the live HTML
+   carries no verification tag; Bing and the Wayback Machine have nothing from the domain). Verify the
+   domain (set the two verification variables above in Vercel, or DNS), submit `https://www.suncly.com/sitemap.xml`,
    request indexing of the home page, and watch the "Suncly" query in the performance
    report. Bing also feeds Copilot and DuckDuckGo.
 3. **IndexNow** (Bing, Yandex, Naver): generate a key, host it at the root, and ping on

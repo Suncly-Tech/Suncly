@@ -37,7 +37,7 @@ export function Hero() {
               </span>
             ))}
           </h1>
-          <p className="text-lead max-w-[38ch] text-ink">{hero.subhead}</p>
+          <p className="text-lead max-w-[42ch] text-pretty text-ink">{hero.subhead}</p>
           <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
             <ButtonLink href={hero.primary.href}>{hero.primary.label}</ButtonLink>
             <ButtonLink href={hero.secondary.href} variant="ghost" arrow>

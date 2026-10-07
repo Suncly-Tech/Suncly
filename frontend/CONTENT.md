@@ -55,6 +55,9 @@ certification not open, no coding agent verified, trade mark unregistered (™).
 
 - Brand line "Evidence before access." — `BRIEF` 4.1
 - Site description and `DEFINITION` (`lib/seo.ts`) — `README` "What Suncly does", `DR-007`, `INPUTS` (pricing model, badge)
+- Organization JSON-LD (`lib/seo.ts organizationLd()`, 2026-10-07): `knowsAbout` lists nine topics, each linked to the page that defines it (`lib/glossary.ts` terms; `/workflows` for the JSON-RPC 2.0 binding, `SCHEMA`; `/product` for approval and governance) and the A2A specification URLs cited in `README` and `docs/` (v1.0.1); `brand` Suncly Certified — `BRIEF` certification idea, `INPUTS` block 3 (programme not open, stated on `/certified`); `slogan` — the hero headline. Not claimed: authentication, identity, Model Context Protocol (nothing in `src/suncly/**` does any of them; the Runner only forwards one Authorization header, `lib/content.ts` protocol list; `RUN`, grep 2026-10-07).
+- Hero subhead first sentence "Suncly is an evaluation tool for AI agents built on the Linux Foundation's Agent2Agent (A2A) protocol." — `README` "What Suncly does"; the Linux Foundation wording follows the attribution line (`BRIEF` section 16) and implies no affiliation (the disclaimer stays in the footer and on `/legal`). 2026-10-07.
+- Home FAQ "What is Suncly?" — `site.definition` (`lib/content.ts`), the first two sentences of `DEFINITION`; same sources as the definition. "JSON-RPC 2.0" on first mention per page — `SCHEMA` (A2A 1.0 JSON-RPC binding is JSON-RPC 2.0), 2026-10-07.
 - Contact `team@suncly.com`, Tallinn, Estonia, © 2026 Suncly — `BRIEF`
 - Legal entity, registry code, registered office, VAT: blank (`INPUTS` block 5) → named blanks on the legal pages, omitted from the footer line
 - Attribution line for A2A — `BRIEF` section 16 wording, to be confirmed against the Linux Foundation's trademark page (unreachable from the build environment; `REDESIGN_PLAN.md` §12.3)
@@ -67,7 +70,7 @@ is public; a private repository would show "Request pilot access" → `/access#r
 Security, Access, Company, Glossary and the workspace keep their URLs in the mobile sheet
 and the footer.
 
-## Home (sixteen sections; 779 visible words on 2026-10-05, budget 800)
+## Home (sixteen sections; 779 visible words on 2026-10-05, budget 800; 1,032 on 2026-10-07 by the `scripts/words.mjs` rule run in a browser, of which this date's hero sentence, FAQ question and "2.0" add 19, so the page was over budget before them)
 
 - 02 Hero: eyebrow, headline, support line — `BRIEF` 5.02 proposed copy, checked against `README`; the status line is generated from the capability map; the caption is the lying agent's first line from `suncly demo` — `RUN`. Picture "Two cards" — `art/two-cards`.
 - 03 Works with: "none verified" state because `tested_in` is "no" for all five — `INPUTS` block 3; spelling and order from `BRIEF` 5.03; the no-endorsement line — existing site sentence. Where each tool reads skills — `REDESIGN_PLAN.md` §12.3.

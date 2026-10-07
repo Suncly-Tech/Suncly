@@ -1,8 +1,12 @@
 # Suncly
 
-> Suncly tests an A2A (Agent2Agent) agent against what its Agent Card claims and hands security and platform teams signed evidence: what passed, what failed, and what was never tested. A command-line tool in pilot; the hosted API is planned. It charges only for usage of its API (billing not live), and agents that meet its published criteria can carry the Suncly Certified badge, which links to the record behind it (programme opening with pilots).
+> Suncly is an evaluation tool for AI agents built on the Linux Foundation's Agent2Agent (A2A) protocol. It tests an agent against what its Agent Card claims and hands security and platform teams signed evidence: what passed, what failed, and what was never tested. A command-line tool in pilot; the hosted API is planned. It charges only for usage of its API (billing not live), and agents that meet its published criteria can carry the Suncly Certified badge, which links to the record behind it (programme opening with pilots).
 
 Brand line: Evidence before access. Based in Tallinn, Estonia. Contact team@suncly.com.
+
+## Questions
+
+- What is Suncly? Suncly is an evaluation tool for AI agents that speak the A2A (Agent2Agent) protocol. It reads an agent's Agent Card, tests each declared skill repeatedly in a sandbox against the card's claims, judges each run deterministically, signs the evidence, and gives platform and security teams a report that states what passed, what failed, what stayed inconclusive and what was never tested, so they can decide on evidence before they give the agent access.
 
 ## Pages
 

@@ -18,6 +18,12 @@ export const site = {
   description:
     "Suncly tests an A2A agent against what its Agent Card claims and hands security and platform teams signed evidence: what passed, what failed, and what was never tested.",
   mission: "Evidence before access.",
+  /**
+   * The first two sentences of the canonical definition. `lib/seo.ts DEFINITION` appends
+   * the pricing and badge sentence; the home FAQ answers "What is Suncly?" with this.
+   */
+  definition:
+    "Suncly is an evaluation tool for AI agents that speak the A2A (Agent2Agent) protocol. It reads an agent's Agent Card, tests each declared skill repeatedly in a sandbox against the card's claims, judges each run deterministically, signs the evidence, and gives platform and security teams a report that states what passed, what failed, what stayed inconclusive and what was never tested, so they can decide on evidence before they give the agent access.",
   email: "team@suncly.com",
   city: "Tallinn, Estonia",
   copyright: "© 2026 Suncly",
@@ -55,8 +61,9 @@ export const nav = {
 export const hero = {
   eyebrow: "For teams that approve third-party AI agents",
   headline: ["Test the agent.", "Then decide."],
+  /** First sentence: the attribution wording (Linux Foundation, A2A); second: the claim sentence checked against README. */
   subhead:
-    "Suncly tests an A2A agent against what its Agent Card claims, then hands your reviewers signed evidence: what passed, what failed, and what was never tested.",
+    "Suncly is an evaluation tool for AI agents built on the Linux Foundation's Agent2Agent (A2A) protocol. It tests an agent against what its Agent Card claims, then hands your reviewers signed evidence: what passed, what failed, and what was never tested.",
   primary: { label: PRIMARY_ACTION.label, href: PRIMARY_ACTION.href },
   secondary: { label: "See a sample evaluation", href: "/demo" },
   /** Word for word from a `suncly demo` run on 2026-10-05 (the lying agent's first line). RUN. */
@@ -261,12 +268,16 @@ export const questions = {
   label: "Questions",
   items: [
     {
+      q: "What is Suncly?",
+      a: site.definition,
+    },
+    {
       q: "Is it available today?",
       a: "Yes, as a command-line tool in pilot. From a card URL it drafts a test plan, records your approval, runs the tests against your sandbox, judges every run, signs the evidence and writes a report. The HTTP API, model-based judging and probes are planned.",
     },
     {
       q: "Which agents can it test?",
-      a: "Any agent that publishes an A2A 1.0 Agent Card and answers over JSON-RPC, whatever model or framework is behind it. Other bindings, streaming and push notifications are not exercised and are listed in the report as not tested.",
+      a: "Any agent that publishes an A2A 1.0 Agent Card and answers over JSON-RPC 2.0, whatever model or framework is behind it. Other bindings, streaming and push notifications are not exercised and are listed in the report as not tested.",
     },
     {
       q: "Does it touch production?",
@@ -452,7 +463,7 @@ export const workflowsPage = {
   title: "Supported workflows and integrations",
   headline: "One protocol in. Any model behind it.",
   intro:
-    "Suncly evaluates agents through the A2A protocol. It does not integrate with model providers or agent frameworks directly: if an agent publishes an A2A 1.0 Agent Card and answers over JSON-RPC, Suncly can test it, whatever built it. This page states exactly what is inspected and tested, and where coverage differs.",
+    "Suncly evaluates agents through the A2A protocol. It does not integrate with model providers or agent frameworks directly: if an agent publishes an A2A 1.0 Agent Card and answers over JSON-RPC 2.0, Suncly can test it, whatever built it. This page states exactly what is inspected and tested, and where coverage differs.",
   protocol: {
     title: "Protocol coverage",
     intro:
@@ -671,7 +682,7 @@ export const accessPage = {
   whatYouNeed: {
     title: "What you need",
     items: [
-      "An agent that publishes an A2A 1.0 Agent Card and answers over JSON-RPC.",
+      "An agent that publishes an A2A 1.0 Agent Card and answers over JSON-RPC 2.0.",
       "A sandbox or dry-run endpoint for it. Suncly never tests production.",
       "A machine with Python 3.12 or newer, inside your network if you prefer. Nothing leaves it.",
     ],
@@ -852,7 +863,7 @@ export const faq = {
     },
     {
       q: "Which agents can it evaluate?",
-      a: "Any agent that publishes an A2A 1.0 Agent Card and answers over JSON-RPC, whatever model or framework is behind it. Other A2A bindings, streaming and push notifications are not exercised yet and are listed in the report as not tested.",
+      a: "Any agent that publishes an A2A 1.0 Agent Card and answers over JSON-RPC 2.0, whatever model or framework is behind it. Other A2A bindings, streaming and push notifications are not exercised yet and are listed in the report as not tested.",
     },
     {
       q: "Does Suncly call my production agent?",
@@ -954,7 +965,7 @@ export const offerPage = {
     connect: {
       title: "What you connect",
       items: [
-        "An agent that publishes an A2A 1.0 Agent Card and answers over JSON-RPC.",
+        "An agent that publishes an A2A 1.0 Agent Card and answers over JSON-RPC 2.0.",
         "A sandbox or dry-run endpoint for it. Suncly never tests production.",
         "Once the API exists: an API key for your organisation.",
       ],
